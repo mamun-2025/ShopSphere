@@ -1,0 +1,8 @@
+
+venv
+__pycache__/
+.env
+*.py[ocd]
+db.sqlite3
+media
+roadmap.txt
