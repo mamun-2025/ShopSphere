@@ -36,7 +36,7 @@ Build a professional Django backend that includes:
 ### Topics
 
 * [✅] Project Setup
-* [ ] Custom User Model
+* [✅] Custom User Model
 * [ ] Register
 * [ ] Login
 * [ ] Logout
