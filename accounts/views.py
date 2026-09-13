@@ -35,34 +35,30 @@ def user_login(request):
       form = AuthenticationForm(request, data=request.POST)
 
       if form.is_valid():
-         username = form.cleaned_data.get("username")
-         password = form.cleaned_data.get("password")
 
-         user = authenticate(
-            username=username,
-            password=password,
+         user = form.get_user()
+
+         login(request, user)
+
+         messages.success(
+            request,
+            "Login successful."
          )
+         return redirect("profile")
 
-         if user is not None:
-            login(request, user)
+   else:
+      form = AuthenticationForm()
 
-            messages.success(
-               request,
-               "Login successful."
-            )
+   for field in form.fields.values():
+      field.widget.attrs["class"] = "form-control"
 
-            return redirect("profile")
-
-      else:
-         form = AuthenticationForm()
-
-      return render(
-         request,
-         "accounts/login.html",
-         {
-            "form": form,
-         },
-      )
+   return render(
+      request,
+      "accounts/login.html",
+      {
+         "form": form,
+      },
+   )
 
 def user_logout(request):
    logout(request)
