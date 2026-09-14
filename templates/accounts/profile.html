@@ -1,0 +1,33 @@
+
+{% extends "accounts/base.html" %}
+
+{% block content %}
+
+<h2>My Profile</h2>
+
+{% if request.user.profile_picture %}
+
+   <img 
+      src="{{ request.user.profile_picture.url }}"
+      alt="Profile Picture"
+      width="150"
+      class="rounded-circle">
+
+{% endif %}
+<hr>
+
+<p><strong>Username:</strong>{{ request.user.username }}</p>
+<p><strong>First Name:</strong>{{ request.user.first_name }}</p>
+<p><strong>Last Name:</strong>{{ request.user.last_name }}</p>
+<p><strong>Email:</strong>{{ request.user.email }}</p>
+<p><strong>Phone:</strong>{{ request.user.phone }}</p>
+<p><strong>Date of Birth:</strong>{{ request.user.date_of_birth }}</p>
+<p><strong>Address:</strong>{{ request.user.address }}</p>
+
+<a 
+   class="btn btn-primary"
+   href="{% url 'edit_profile' %}">
+   Edit Profile
+</a>
+
+{% endblock %}
