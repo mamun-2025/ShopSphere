@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages 
 from .forms import RegisterForm 
 from django.contrib.auth.forms import AuthenticationForm 
-from django.contrib.auth import login, logout, authenticate 
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from .forms import ProfileUpdateForm
 
 
 def register(request):
@@ -69,3 +71,46 @@ def user_logout(request):
    )
 
    return redirect("accounts:login")
+
+
+
+@login_required
+def profile(request):
+   return render(
+      request,
+      "accounts/profile.html",
+   )
+
+
+
+@login_required
+def edit_profile(request):
+
+   if request.method == "POST":
+      form = ProfileUpdateForm(
+         request.POST,
+         request.FILES,
+         instance=request.user,
+      )
+
+      if form.is_valid():
+         form.save()
+
+         messages.success(
+            request,
+            "Your profile has been updated successfully.",
+         )
+         return redirect("profile")
+
+   else:
+      form = ProfileUpdateForm(
+         instance=request.user,
+      )
+
+   return render(
+      request,
+      "accounts/edit_profile.html",
+      {
+         "form": form,
+      },
+   )
