@@ -18,7 +18,7 @@ def register(request):
             request,
             "Your registration was successful. You can now log in.",
          )
-         return redirect("accounts:login")
+         return redirect("login")
 
    else:
       form = RegisterForm()
@@ -70,7 +70,7 @@ def user_logout(request):
       "You have been logged out."
    )
 
-   return redirect("accounts:login")
+   return redirect("login")
 
 
 

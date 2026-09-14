@@ -38,9 +38,9 @@ Build a professional Django backend that includes:
 * [✅] Project Setup
 * [✅] Custom User Model
 * [✅] Register
-* [✅ ] Login
-* [✅ ] Logout
-* [] User Profile
+* [✅] Login
+* [✅] Logout
+* [✅] User Profile
 * [ ] Password Change
 * [ ] Bootstrap Layout
 * [ ] Base Template
