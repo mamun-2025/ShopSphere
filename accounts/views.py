@@ -1,11 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages 
-from .forms import RegisterForm 
+from .forms import RegisterForm, ProfileUpdateForm
 from django.contrib.auth.forms import AuthenticationForm ,PasswordChangeForm 
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from .forms import ProfileUpdateForm
-from django.contrib.auth import update_session_auth_hash
 
 
 def register(request):
@@ -19,7 +17,7 @@ def register(request):
             request,
             "Your registration was successful. You can now log in.",
          )
-         return redirect("login")
+         return redirect("accounts:login")
 
    else:
       form = RegisterForm()
@@ -47,7 +45,7 @@ def user_login(request):
             request,
             "Login successful."
          )
-         return redirect("profile")
+         return redirect("accounts:profile")
 
    else:
       form = AuthenticationForm()
@@ -71,7 +69,7 @@ def user_logout(request):
       "You have been logged out."
    )
 
-   return redirect("login")
+   return redirect("accounts:login")
 
 
 
@@ -101,7 +99,7 @@ def edit_profile(request):
             request,
             "Your profile has been updated successfully.",
          )
-         return redirect("profile")
+         return redirect("accounts:profile")
 
    else:
       form = ProfileUpdateForm(
@@ -140,7 +138,7 @@ def change_password(request):
             "Your password has been changed successfully.",
          )
 
-         return redirect("profile")
+         return redirect("accounts:profile")
 
    else:
       form = PasswordChangeForm(
