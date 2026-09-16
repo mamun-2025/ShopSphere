@@ -31,7 +31,7 @@ Build a professional Django backend that includes:
 
 ## 🟢 Milestone 1 — Project Foundation
 
-**Status:** 🟨 In Progress
+**Status:** ✅ Completed
 
 ### Topics
 
@@ -41,19 +41,20 @@ Build a professional Django backend that includes:
 * [✅] Login
 * [✅] Logout
 * [✅] User Profile
+* [✅] Edit Profile
 * [✅] Password Change
-* [ ] Bootstrap Layout
-* [ ] Base Template
+* [✅] Password Reset
+* [✅] Bootstrap Layout
 
 ### Output
 
-* [ ] Professional Authentication System
+* [✅] Professional Authentication System
 
 ---
 
 ## 🟢 Milestone 2 — Categories + Products (CBV)
 
-**Status:** ⬜ Not Started
+**Status:** 🟨 In Progress
 
 ### Topics
 
@@ -355,8 +356,8 @@ shopsphere/
 
 | Milestone    | Status |
 | ------------ | ------ |
-| Milestone 1  | 🟨 In Progress|
-| Milestone 2  | ⬜ Not Started|
+| Milestone 1  | ✅ Completed|
+| Milestone 2  | 🟨 In Progress|
 | Milestone 3  | ⬜ Not Started|
 | Milestone 4  | ⬜ Not Started|
 | Milestone 5  | ⬜ Not Started|
