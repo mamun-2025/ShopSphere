@@ -31,6 +31,7 @@ INSTALLED_APPS = [
 
     # Local App
     'accounts',
+    'categories',
 ]
 
 MIDDLEWARE = [
