@@ -58,13 +58,12 @@ Build a professional Django backend that includes:
 
 ### Topics
 
-* [ ] Class-Based Views (CBV)
-* [ ] ListView
-* [ ] DetailView
-* [ ] CreateView
-* [ ] UpdateView
-* [ ] DeleteView
-* [ ] Categories
+* [✅] Class-Based Views (CBV)
+* [✅] ListView
+* [✅] CreateView
+* [✅] UpdateView
+* [✅] DeleteView
+* [✅] Categories
 * [ ] Product CRUD
 * [ ] Slug
 * [ ] Search
