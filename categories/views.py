@@ -14,6 +14,9 @@ class CategoryListView(ListView):
    template_name = "categories/category_list.html"
    context_object_name = "categories"
 
+   def get_queryset(self):
+      return Category.objects.filter(is_active=True)
+
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
    model = Category
