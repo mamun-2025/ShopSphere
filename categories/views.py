@@ -23,10 +23,10 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
 
 
 class CategoryUpdateView(LoginRequiredMixin, UpdateView):
-   mdoel = Category
+   model = Category
    form_class = CategoryForm
    template_name = "categories/category_form.html"
-   success_url = reverse_lazy("cateogry_list")
+   success_url = reverse_lazy("category_list")
 
 
 class CategoryDeleteView(LoginRequiredMixin, DeleteView):

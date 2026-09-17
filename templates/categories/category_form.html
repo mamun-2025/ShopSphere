@@ -1,0 +1,40 @@
+
+
+{% extends "accounts/base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+   <h2>
+      {% if object %}
+         Edit Category
+      {% else %}
+         Add Category
+      {% endif %}
+   </h2>
+
+   <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+
+      <button 
+         type="submit"
+         class="btn btn-success"
+      >
+         Save
+      </button>
+
+      <button
+         href="{% url 'category_list' %}"
+         class="btn btn-secondary"
+      >
+         Cancel
+      </button>
+
+
+</div>
+
+
+
+
+{% endblock %}
