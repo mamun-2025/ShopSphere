@@ -10,6 +10,12 @@ class Product(models.Model):
       related_name="products",
    )
 
+   brand = models.CharField(
+      max_length=100,
+      blank=True,
+      null=True,
+   )
+
    description = models.TextField(blank=True)
 
    sku = models.CharField(
@@ -26,7 +32,7 @@ class Product(models.Model):
       default=0,
    )
 
-   is_acitve = models.BooleanField(
+   is_active = models.BooleanField(
       default=True,
    )
 
