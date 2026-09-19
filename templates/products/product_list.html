@@ -1,0 +1,32 @@
+
+
+{% extends "accounts/base.html" %}
+{% block content %}
+
+<h2>Product List</h2>
+
+{% for product in products %}
+
+   {{ product.name }}
+   {{ product.category.name }}
+   {{ product.description|truncatewords:20 }}
+   {{ product.price }}
+   {% if product.stock > 0 %}
+      <span> 
+         In Stock 
+      </span>
+   {% else %}
+      <span> 
+         Out of Stock
+      </span>
+   {% endif %}
+
+{% empty %}
+
+   <h5>No Products Available</h5>
+
+{% endfor %}
+
+
+
+{% endblock %}
