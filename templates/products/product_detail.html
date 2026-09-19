@@ -1,0 +1,67 @@
+
+
+{% extends "accounts/base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+   <h2>Product Detail</h2>
+
+   <div class="card">
+      <div class="card-body">
+         <h1 class="card-title">
+            {{ product.name }}
+         </h1>
+         <p>
+            <strong>Category:{{ product.category.name }}</strong>
+         </p>
+         <p>
+            <strong>SKU:{{ product.sku }}
+         </p>
+         <p>
+            <strong>Brand:{{ product.brand }}
+         </p>
+         <p>
+            <strong>Price:{{ product.price }}</strong>
+         </p>
+         <p>
+            <strong>Stock:{{ product.stock }}</strong>
+         </p>
+         <p>
+            <strong>Description:{{ product.description }}</strong>
+         </p>
+         <p>
+            <strong>Status:</strong>
+            {% if product.is_active %}
+               <span class="badge bg-success">
+                  Active
+               </span>
+            {% else %}
+               <span class="badge bg-danger">
+                  Inactive
+               </span>
+            {% endif %}
+         </p>
+         <p>
+            <strong>Created:</strong>
+            {{ product.created_at }}
+         </p>
+         <p>
+            <strong>Updated:</strong>
+            {{ product.updated_at }}
+         </p>
+         <a 
+            href="{% url 'product_list' %}"
+            class="btn btn-secondary"
+         >
+         Back to Product_List
+         </a>
+
+      </div>
+   </div>
+
+</div>
+
+
+{% endblock %}

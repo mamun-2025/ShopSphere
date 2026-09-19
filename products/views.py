@@ -1,4 +1,4 @@
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from .models import Product
 
 class ProductListview(ListView):
@@ -8,7 +8,7 @@ class ProductListview(ListView):
 
    def get_queryset(self):
       return Product.objects.filter(
-         is_active = True
+         is_active=True
       )
 
 """
@@ -23,5 +23,28 @@ class ProductListview(ListView):
 
 """
 
+class ProductDetailView(DetailView):
+   model = Product
+   template_name = "products/product_detail.html"
+   context_object_name = "product"
 
+   def get_queryset(self):
+      return Product.objects.filter(
+         is_active=True
+      )
+
+
+"""
+
+1. What is Django DetailView?
+= DetailView is a Django generic class-based view used to display the details of a single model object.
+2. What is pk?
+= pk stands for Primary Key. It is used to uniquely identify a database record.
+3. What does <int:pk> meand?
+= It captures an integer value from the URL and passes it to the view as pk.
+Example:
+   /products/10/
+   pk = 10
+
+"""
 
