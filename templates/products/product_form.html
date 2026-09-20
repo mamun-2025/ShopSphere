@@ -10,9 +10,15 @@
          <div class="card-shadow">
             <div class="card-body">
 
-               <h2 class="mt-4">
+               {% if object %}
+                  <h2 class="mt-4">
+                  Edit Product
+                  </h2>
+               {% else %}
+                  <h2 class="mt-4">
                   Add Product
-               </h2>
+                  </h2>
+               {% endif %}
 
 
                <form method="post">
@@ -116,7 +122,11 @@
                      type="submit"
                      class="btn btn-primary"
                   >
-                     Create Product
+                     {% if object %}
+                        Update Product
+                     {% else %}
+                        Create Product
+                     {% endif %}
                   </button>
 
                   <a

@@ -96,3 +96,18 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
    template_name = "products/product_form.html"
    context_object_name = "product"
    success_url = reverse_lazy("product_list")
+
+
+"""
+1. What is UpdateView?
+= Updateview is a Django generic class-based view used to update an existing model object through a form.
+2. Can we use the same ModelForm for CreateView and UpdateView?
+= Yes, ProductForm used for both CreateView and UpdateView.
+3. How does UpdateView know which object to update?
+= UpdateView Finds existing object from URL with primary key(<int:pk>).
+4. Does UpdateView create a new object?
+= No, It's update existing object.
+5. What is instance?
+= instance specifies the existing model object that a ModelForm should edit.
+
+"""
