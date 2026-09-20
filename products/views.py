@@ -3,7 +3,7 @@ from .models import Product
 from .forms import ProductForm
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib import messages
 
 
@@ -87,3 +87,12 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
 = Because creating a product changes server-side data and creates a new database record.
 
 """
+
+
+
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
+   model = Product
+   form_class = ProductForm
+   template_name = "products/product_form.html"
+   context_object_name = "product"
+   success_url = reverse_lazy("product_list")
