@@ -98,6 +98,17 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
    success_url = reverse_lazy("product_list")
 
 
+   def form_valid(self, form):
+
+      messages.success(
+         self.request,
+         "Product updated successfully"
+      )
+
+      return super().form_valid(form)
+
+
+
 """
 1. What is UpdateView?
 = Updateview is a Django generic class-based view used to update an existing model object through a form.
