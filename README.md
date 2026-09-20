@@ -69,7 +69,7 @@ Build a professional Django backend that includes:
 * [✅] Product ListView
 * [✅] Product DetailView
 * [✅] Product CreateView
-* [ ] Product UpdateView
+* [✅] Product UpdateView
 * [ ] Product DeleteView
 * [ ] Slug
 * [ ] Search
