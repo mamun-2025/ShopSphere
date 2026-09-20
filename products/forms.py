@@ -25,11 +25,13 @@ class ProductForm(forms.ModelForm):
                "placeholder": "Enter product name",
             }
          ),
+
          "category": forms.Select(
             attrs={
                "class": "form-select",
             }
          ),
+
          "description": forms.Textarea(
             attrs={
                "class": "form-control",
@@ -37,28 +39,42 @@ class ProductForm(forms.ModelForm):
                "placeholder": "Enter product description",
             }
          ),
-         "sku": forms.TelInput(
+
+         "sku": forms.TextInput(
             attrs={
                "class": "form-control",
-               "placeholder": "Enter sku"
+               "placeholder": "Enter sku",
             }
          ),
+
+         "brand": forms.TextInput(
+            attrs={
+               "class": "form-control",
+               "placeholder": "Enter brand",
+            }
+         ),
+
          "price": forms.NumberInput(
             attrs={
                "class": "form-control",
                "placeholder": "Enter product price",
+               "min": 0,
             }
          ),
+
          "stock": forms.NumberInput(
             attrs={
                "class": "form-control",
                "placeholder": "Enter prodcut stock",
+               "min": 0,
             }
          ),
+
          "is_active": forms.CheckboxInput(
             attrs={
                "class": "form-check-input",
             }
          ),
+
          
       }
