@@ -1,6 +1,9 @@
 
 from .models import Product
-from django.views.generic import ListView, DetailView
+from .forms import ProductForm
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, DetailView, CreateView
 
 
 class ProductListview(ListView):
@@ -51,3 +54,24 @@ Example:
 """
 
 
+class ProductCreateView(CreateView):
+   model = Product
+   form_class = ProductForm
+   template_name = "products/product_form.html"
+   success_url = reverse_lazy("product_list")
+
+
+"""
+
+1. What is CreateView?
+= CreateView is a Django generic class-based view used used to create a new model object through a form.
+2. Why is ModelForm?
+= A ModelForm automatically creates form fields and validation based on a Django model.
+3. Why use LoginRequiredMixin?
+= It ensures that only authenticated users can access the view.
+4. Why is reverse_lazy()?
+= It resolves a URL by its URL name and is commonly used for class-based view configuration such as success_url.
+5. Why use POST for creating a product?
+= Because creating a product changes server-side data and creates a new database record.
+
+"""
