@@ -31,6 +31,7 @@ def register(request):
    )
 
 
+
 def user_login(request):
    if request.method == "POST":
       form = AuthenticationForm(request, data=request.POST)
@@ -61,6 +62,8 @@ def user_login(request):
       },
    )
 
+
+
 def user_logout(request):
    logout(request)
 
@@ -70,6 +73,7 @@ def user_logout(request):
    )
 
    return redirect("accounts:login")
+
 
 
 
@@ -156,3 +160,72 @@ def change_password(request):
          "form": form
       },
    )
+
+
+
+
+"""
+8. আপনার code-এর architecture
+
+বর্তমানে আপনার Accounts app-এর structure আসলে সুন্দর একটা backend concept দেখাচ্ছে:
+                    accounts
+                       │
+        ┌──────────────┼──────────────┐
+        ↓              ↓              ↓
+    Register         Login          Logout
+        │              │              │
+   RegisterForm   AuthenticationForm  logout()
+        │              │
+        ↓              ↓
+      User          Session
+        │
+        ├───────────────┐
+        ↓               ↓
+     Profile       Edit Profile
+                         │
+                  ProfileUpdateForm
+                         │
+                         ↓
+                   request.user
+                         │
+                         ↓
+                    form.save()
+                         │
+                         ↓
+                   User updated
+
+        User
+          │
+          ↓
+   Change Password
+          │
+ PasswordChangeForm
+          │
+          ↓
+     form.save()
+          │
+          ↓
+update_session_auth_hash()
+
+1. এটা শুধু "Django code" না—
+এখানে আপনি ইতিমধ্যে Authentication, Session, Form Validation,
+ModelForm, File Upload, Authorization—এই backend concepts শিখছেন।
+
+
+2. আপনার এখন এই conceptsগুলো জানা হয়ে যাচ্ছে:
+Function-Based View = register(), user_login()
+Authentication =	AuthenticationForm
+Login	= login()
+Logout =	logout()
+Authorization =	@login_required
+ModelForm =	RegisterForm, ProfileUpdateForm
+Existing object update = instance=request.user
+File upload	= request.FILES
+Password management	= PasswordChangeForm
+Session	= login() / logout()
+Session preservation	= update_session_auth_hash()
+Flash messages	= messages.success()
+POST/GET handling	= request.method
+Validation	= form.is_valid()
+
+"""

@@ -66,9 +66,9 @@ Build a professional Django backend that includes:
 * [✅] Categories
 * [✅] Categories
 * [✅]  Product Model
-* [ ] Product ListView
-* [ ] Product DetailView
-* [ ] Product CreateView
+* [✅] Product ListView
+* [✅] Product DetailView
+* [✅] Product CreateView
 * [ ] Product UpdateView
 * [ ] Product DeleteView
 * [ ] Slug

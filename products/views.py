@@ -4,6 +4,7 @@ from .forms import ProductForm
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView
+from django.contrib import messages
 
 
 class ProductListview(ListView):
@@ -54,11 +55,22 @@ Example:
 """
 
 
-class ProductCreateView(CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView):
    model = Product
    form_class = ProductForm
    template_name = "products/product_form.html"
    success_url = reverse_lazy("product_list")
+   
+
+   def form_valid(self, form):
+
+      messages.success(
+         self.request,
+         "Product create successfully"
+      )
+
+      return super().form_valid(form)
+   
 
 
 """
