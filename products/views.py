@@ -7,15 +7,29 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib import messages
 
 
+
+### Product ListView
 class ProductListview(ListView):
    model = Product
    template_name = "products/product_list.html"
    context_object_name = "products"
 
+   paginate_by = 3
+
    def get_queryset(self):
-      return Product.objects.filter(
+      queryset = Product.objects.filter(
          is_active=True
       )
+
+      search_query = self.request.GET.get("search")
+
+      if search_query:
+         queryset = queryset.filter(
+            name__icontains = search_query
+         )
+
+      return queryset
+
 
 """
 1. What is ListView?
@@ -27,8 +41,37 @@ class ProductListview(ListView):
 4. What is a QuerySet?
 = A QuerySet is a collection of database queries representing objects retrieved from a Django model.
 
+5. What is icontains?
+= icontains performs a case-insensitive containment lookup in Django ORM.
+Example:
+   Product.objects.filter(
+      name_icontains="phone"
+   )
+
+6. What is Pagination?
+= Pagination divides a large set of results into smaller pages.
+
+7. What is paginated_by?
+= paginated_by = 10
+   Paginated_by means, Show me ever page has maximum number ten.
+
+8. What is request.GET?
+= request.GET contains query parameters sent through the URL using the HTTP GET method.
+Example:
+   /products/?search=iphone
+   request.GET.get("search") = returns = iphone
+
+9. Interview:
+="I implemented a ProductListView with active-product filtering, 
+  GET-based name search using icontains, and Django's built-in pagination 
+  with 6 products per page while preserving the search query across pages"
+
+
 """
 
+
+
+### Product DetailView
 class ProductDetailView(DetailView):
    model = Product
    template_name = "products/product_detail.html"
@@ -53,9 +96,24 @@ Example:
    /products/10/
    pk = 10
 
+4. What is a slug?
+= A slug is a URL-friendly representation of a piece of text, commonly used to create readable URLs.
+Example:
+   iPhone 15 = iphone-15
+
+5. Why use Slug instead of ID?
+= Slug provides a more human-readable URL:
+   /products/iphone-15/
+  instead of:
+   /products/15/
+  But ID and Slug is used depends on the project requirements.
+
 """
 
 
+
+
+### Product CreateView
 class ProductCreateView(LoginRequiredMixin, CreateView):
    model = Product
    form_class = ProductForm
@@ -91,6 +149,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
 
 
 
+### Product UpdateView
 class ProductUpdateView(LoginRequiredMixin, UpdateView):
    model = Product
    form_class = ProductForm
@@ -109,7 +168,6 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
       return super().form_valid(form)
 
 
-
 """
 1. What is UpdateView?
 = Updateview is a Django generic class-based view used to update an existing model object through a form.
@@ -125,6 +183,8 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
 """
 
 
+
+### Product DeleteView
 class ProductDeleteView(LoginRequiredMixin, DeleteView):
    model = Product
    template_name = "products/product_confirm_delete.html"
@@ -154,6 +214,11 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
 = It's redirect success_url, such as "success_url = reverse_lazy("product_list)
 
 """
+
+
+
+
+
 
 
 
