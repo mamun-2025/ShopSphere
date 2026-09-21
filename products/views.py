@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib import messages
+from django.db.models import Q 
 
 
 
@@ -25,13 +26,52 @@ class ProductListview(ListView):
 
       if search_query:
          queryset = queryset.filter(
-            name__icontains = search_query
+            Q(name__icontains=search_query) |
+            Q(sku__icontains=search_query) |
+            Q(description__icontains=search_query)
          )
 
       return queryset
 
-
 """
+GET /products/?search=phone
+            │
+            ▼
+     ProductListView
+            │
+            ▼
+     get_queryset()
+            │
+            ▼
+   is_active=True
+            │
+            ▼
+       search আছে?
+            │
+           YES
+            │
+            ▼
+          Q()
+       /    |    \
+      /     |     \
+   name    SKU   description
+      \     |     /
+       \    |    /
+        OR conditions
+            │
+            ▼
+     Final QuerySet
+            │
+            ▼
+      paginate_by = 3
+            │
+            ▼
+         page_obj
+            │
+            ▼
+      product_list.html
+
+
 1. What is ListView?
 = ListView is a Django generic class-based view used to display a list of objects from a model.
 2. What does get_queryset() do>
@@ -66,7 +106,6 @@ Example:
   GET-based name search using icontains, and Django's built-in pagination 
   with 6 products per page while preserving the search query across pages"
 
-
 """
 
 
@@ -85,7 +124,6 @@ class ProductDetailView(DetailView):
 
 
 """
-
 1. What is Django DetailView?
 = DetailView is a Django generic class-based view used to display the details of a single model object.
 2. What is pk?
@@ -130,10 +168,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
 
       return super().form_valid(form)
    
-
-
 """
-
 1. What is CreateView?
 = CreateView is a Django generic class-based view used used to create a new model object through a form.
 2. Why is ModelForm?
@@ -215,59 +250,7 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
 
 """
 
-
-
-
-
-
-
-
-
-
 """
-Create / Update / Delete একসাথে
-এখন আমাদের Product management অনেক পরিষ্কার:
-
-CREATE:
-/products/create/
-       ↓
-CreateView
-       ↓
-INSERT
-
-
-READ:
-/products/
-       ↓
-ListView
-
-
-READ ONE:
-/products/1/
-       ↓
-DetailView
-
-
-UPDATE:
-/products/1/edit/
-       ↓
-UpdateView
-       ↓
-UPDATE
-
-
-DELETE:
-/products/1/delete/
-       ↓
-DeleteView
-       ↓
-Confirmation
-       ↓
-POST
-       ↓
-DELETE
-
-
 ⭐ CRUD Complete
 আমাদের Product CRUD এখন সম্পূর্ণ:
 
@@ -286,5 +269,4 @@ DELETE
                    │
               DeleteView
 
-              
 """

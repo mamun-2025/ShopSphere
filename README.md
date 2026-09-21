@@ -54,7 +54,7 @@ Build a professional Django backend that includes:
 
 ## 🟢 Milestone 2 — Categories + Products (CBV)
 
-**Status:** 🟨 In Progress
+**Status:** ✅ Completed
 
 ### Topics
 
@@ -65,7 +65,7 @@ Build a professional Django backend that includes:
 * [✅] DeleteView
 * [✅] Categories
 * [✅] Categories
-* [✅]  Product Model
+* [✅] Product Model
 * [✅] Product ListView
 * [✅] Product DetailView
 * [✅] Product CreateView
@@ -74,17 +74,16 @@ Build a professional Django backend that includes:
 * [✅] Slug
 * [✅] Search
 * [✅] Pagination
-* [ ] Messages Framework
 
 ### Output
 
-* [ ] Professional Product Management Panel
+* [✅] Professional Product Management Panel
 
 ---
 
 ## 🟢 Milestone 3 — File Handling
 
-**Status:** ⬜ Not Started
+**Status:** 🟨 In Progress
 
 ### Topics
 
@@ -362,8 +361,8 @@ shopsphere/
 | Milestone    | Status |
 | ------------ | ------ |
 | Milestone 1  | ✅ Completed|
-| Milestone 2  | 🟨 In Progress|
-| Milestone 3  | ⬜ Not Started|
+| Milestone 2  | ✅ Completed|
+| Milestone 3  | 🟨 In Progress|
 | Milestone 4  | ⬜ Not Started|
 | Milestone 5  | ⬜ Not Started|
 | Milestone 6  | ⬜ Not Started|
