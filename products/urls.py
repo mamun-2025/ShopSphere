@@ -27,7 +27,7 @@ urlpatterns = [
         ProductDeleteView.as_view(),
         name="product_delete",
       ),
-   path("<int:pk>/",
+   path("<slug:slug>/",
         ProductDetailView.as_view(),
         name="product_detail",
       ),
