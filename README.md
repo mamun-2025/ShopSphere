@@ -90,10 +90,16 @@ Build a professional Django backend that includes:
 * [✅] MEDIA_ROOT
 * [✅] MEDIA_URL
 * [✅] Pillow
-* [✅] Product Image Upload
-* [ ] Multiple Images
-* [ ] PDF Attachment
-* [ ] Image Validation
+* [✅] ImageField
+* [✅] Product Image
+* [✅] FileField
+* [✅] PDF Extension Validation
+* [✅] File Size Validator
+[ ] Image Replace Cleanup
+[ ] Image Delete Cleanup
+[ ] Multiple Image Upload UI
+[ ] PDF Upload UI
+Milestone 3 — File Handling
 
 ### Output
 

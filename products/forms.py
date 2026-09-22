@@ -17,6 +17,7 @@ class ProductForm(forms.ModelForm):
          "price",
          "stock",
          "image",
+         "manual",
          "is_active",
       ]
       widgets ={

@@ -1,8 +1,10 @@
 
 from django.utils.text import slugify
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, FileExtensionValidator
+from .validators import validate_file_size
 from django.db import models
 from categories.models import Category
+
 
 
 # Product Model
@@ -45,8 +47,22 @@ class Product(models.Model):
       default=0,
    )
 
+   # Main Product Image
    image = models.ImageField(
       upload_to="products/",
+      blank=True,
+      null=True,
+   )
+
+   # Product Manual Pdf 
+   manual = models.FileField(
+      upload_to="products/manuals/",
+      validators=[
+         FileExtensionValidator(
+            allowed_extensions=["pdf"]
+         ),
+         validate_file_size,
+      ],
       blank=True,
       null=True,
    )
@@ -90,7 +106,9 @@ class ProductImage(models.Model):
    )
 
    image = models.ImageField(
-      upload_to="products/gallery/"
+      upload_to="products/gallery/",
+      blank=True,
+      null=True,
    )
 
    alt_text = models.CharField(
@@ -104,3 +122,5 @@ class ProductImage(models.Model):
 
    def __str__(self):
       return f"{ self.product.name } Image"
+
+
