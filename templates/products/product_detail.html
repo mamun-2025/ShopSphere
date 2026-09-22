@@ -11,6 +11,7 @@
    <div class="card">
       <div class="card-body">
 
+         <!-- Single Product Image(Main)-->
          {% if product.image %}
             <div class="mb-4">
                <img
@@ -23,6 +24,32 @@
          {% endif %}
 
 
+         <!-- Multiple Product Image(Gallery) -->
+         <h4 class="mt-4 mb-3">
+            Product Gallery
+         </h4>
+
+         <div class="row">
+            {% for image in product.images.all %}
+
+               <div class="col-md-3 mb-3">
+                  <img
+                  src="{{ image.image.url }}"
+                  alt="{{ imgage.alt_text }}"
+                  class="img-fluid rounded"
+                  style="
+                     height: 180px;
+                     weight: 100%;
+                     object-fit: cover;
+                  "
+                  >
+               </div>
+
+            {% endfor %}
+         </div>
+
+        
+
          <h1 class="card-title">
             {{ product.name }}
          </h1>
@@ -30,10 +57,10 @@
             <strong>Category:{{ product.category.name }}</strong>
          </p>
          <p>
-            <strong>SKU:{{ product.sku }}
+            <strong>SKU:{{ product.sku }}</strong>
          </p>
          <p>
-            <strong>Brand:{{ product.brand }}
+            <strong>Brand:{{ product.brand }}</strong>
          </p>
          <p>
             <strong>Price:৳{{ product.price }}</strong>

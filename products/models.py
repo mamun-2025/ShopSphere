@@ -4,6 +4,8 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from categories.models import Category
 
+
+# Product Model
 class Product(models.Model):
    name = models.CharField(max_length=100)
 
@@ -74,3 +76,31 @@ class Product(models.Model):
          self.slug = slugify(self.name)
 
       super().save(*args, **kwargs)
+
+
+
+
+# Product ImgaeModel
+class ProductImage(models.Model):
+
+   product = models.ForeignKey(
+      Product,
+      on_delete=models.CASCADE,
+      related_name="images",
+   )
+
+   image = models.ImageField(
+      upload_to="products/gallery/"
+   )
+
+   alt_text = models.CharField(
+      max_length=200,
+      blank=True,
+   )
+
+   created_at = models.DateTimeField(
+      auto_now_add=True,
+   )
+
+   def __str__(self):
+      return f"{ self.product.name } Image"
