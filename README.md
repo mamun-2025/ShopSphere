@@ -87,10 +87,10 @@ Build a professional Django backend that includes:
 
 ### Topics
 
-* [ ] MEDIA_ROOT
-* [ ] MEDIA_URL
-* [ ] Pillow
-* [ ] Product Image Upload
+* [✅] MEDIA_ROOT
+* [✅] MEDIA_URL
+* [✅] Pillow
+* [✅] Product Image Upload
 * [ ] Multiple Images
 * [ ] PDF Attachment
 * [ ] Image Validation
