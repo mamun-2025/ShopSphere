@@ -16,10 +16,11 @@ class ProductForm(forms.ModelForm):
          "sku",
          "price",
          "stock",
+         "image",
          "is_active",
       ]
       widgets ={
-         "name":forms.TelInput(
+         "name":forms.TextInput(
             attrs={
                "class": "form-control",
                "placeholder": "Enter product name",
@@ -67,6 +68,12 @@ class ProductForm(forms.ModelForm):
                "class": "form-control",
                "placeholder": "Enter prodcut stock",
                "min": 0,
+            }
+         ),
+         
+         "image": forms.ClearableFileInput(
+            attrs={
+               "class": "form-control",
             }
          ),
 

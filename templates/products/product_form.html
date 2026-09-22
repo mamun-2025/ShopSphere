@@ -6,8 +6,8 @@
 
 <div class="container mt-4">
    <div class="row justify-content-center">
-      <div class="col md-8">
-         <div class="card-shadow">
+      <div class="col-md-8">
+         <div class="card shadow">
             <div class="card-body">
 
                {% if object %}
@@ -21,7 +21,9 @@
                {% endif %}
 
 
-               <form method="post">
+               <form method="post"
+                     enctype="multipart/form-data"
+               >
 
                   {% csrf_token %}
 
@@ -103,6 +105,16 @@
                      {{ form.stock }}
                      {{ form.stock.errors }}
 
+                  </div>
+
+                  <div class="mb-3">
+                     <label class="form-label">
+                        Product Image
+                     </label>
+
+                     {{ form.image }}
+                     {{ form.image.errors }}
+                     
                   </div>
 
                   <div class="mb-3 form-check">
