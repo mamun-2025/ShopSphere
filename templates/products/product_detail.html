@@ -17,7 +17,7 @@
                <img
                   src="{{ product.image.url }}"
                   alt="{{ product.name }}"
-                  class="image-fluid rounded"
+                  class="img-fluid rounded"
                   style="max-height: 400px;"
                >
             </div>
@@ -35,11 +35,11 @@
                <div class="col-md-3 mb-3">
                   <img
                   src="{{ image.image.url }}"
-                  alt="{{ imgage.alt_text }}"
+                  alt="{{ image.alt_text }}"
                   class="img-fluid rounded"
                   style="
                      height: 180px;
-                     weight: 100%;
+                     width: 100%;
                      object-fit: cover;
                   "
                   >
@@ -50,6 +50,7 @@
 
         
 
+         <!-- Product Information -->
          <h1 class="card-title">
             {{ product.name }}
          </h1>
@@ -71,6 +72,40 @@
          <p>
             <strong>Description:{{ product.description }}</strong>
          </p>
+
+
+
+         <!-- Product PDF -->
+         {% if product.manual %}
+
+            <div class="mt-4 mb-4">
+
+               <h4> Product Manual </h4>
+
+               <a 
+                  href="{{ product.manual.url }}"
+                  target="_blank"
+                  class="btn btn-outline-primary"
+               >
+               View PDF
+               </a>
+               
+               <a 
+                  href="{{ product.manual.url }}"
+                  download
+                  class="btn btn-primary"
+               >
+               Download PDF
+               </a>
+
+            </div>
+
+         {% endif %}
+
+
+
+
+         <!-- Product Status -->
          <p>
             <strong>Status:</strong>
             {% if product.is_active %}
@@ -83,6 +118,10 @@
                </span>
             {% endif %}
          </p>
+
+
+
+         <!-- TimeStamps -->
          <p>
             <strong>Created:</strong>
             {{ product.created_at }}
@@ -91,6 +130,9 @@
             <strong>Updated:</strong>
             {{ product.updated_at }}
          </p>
+
+
+         <!-- Action buttons -->
          <a 
             href="{% url 'product_list' %}"
             class="btn btn-secondary"

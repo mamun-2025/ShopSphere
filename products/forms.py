@@ -20,6 +20,7 @@ class ProductForm(forms.ModelForm):
          "manual",
          "is_active",
       ]
+
       widgets ={
          "name":forms.TextInput(
             attrs={
@@ -75,6 +76,13 @@ class ProductForm(forms.ModelForm):
          "image": forms.ClearableFileInput(
             attrs={
                "class": "form-control",
+            }
+         ),
+
+         "manual": forms.ClearableFileInput(
+            attrs={
+               "class": "form-control",
+               "accept": "application/pdf",
             }
          ),
 
