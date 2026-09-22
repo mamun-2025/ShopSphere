@@ -10,6 +10,19 @@
 
    <div class="card">
       <div class="card-body">
+
+         {% if product.image %}
+            <div class="mb-4">
+               <img
+                  src="{{ product.image.url }}"
+                  alt="{{ product.name }}"
+                  class="image-fluid rounded"
+                  style="max-height: 400px;"
+               >
+            </div>
+         {% endif %}
+
+
          <h1 class="card-title">
             {{ product.name }}
          </h1>
@@ -70,7 +83,9 @@
          Delete Product
          </a>
 
+
       </div>
+
    </div>
 
 </div>
