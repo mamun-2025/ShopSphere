@@ -83,7 +83,7 @@ Build a professional Django backend that includes:
 
 ## 🟢 Milestone 3 — File Handling
 
-**Status:** 🟨 In Progress
+**Status:** ✅ Completed
 
 ### Topics
 
@@ -110,13 +110,13 @@ Milestone 3 — File Handling
 
 ### Output
 
-* [ ] Complete File Upload System
+* [✅] Complete File Upload System
 
 ---
 
 ## 🟢 Milestone 4 — Reviews
 
-**Status:** ⬜ Not Started
+**Status:** 🟨 In Progress
 
 ### Topics
 
@@ -375,8 +375,8 @@ shopsphere/
 | ------------ | ------ |
 | Milestone 1  | ✅ Completed|
 | Milestone 2  | ✅ Completed|
-| Milestone 3  | 🟨 In Progress|
-| Milestone 4  | ⬜ Not Started|
+| Milestone 3  | ✅ Completed|
+| Milestone 4  | 🟨 In Progress|
 | Milestone 5  | ⬜ Not Started|
 | Milestone 6  | ⬜ Not Started|
 | Milestone 7  | ⬜ Not Started|
