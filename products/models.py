@@ -86,15 +86,23 @@ class Product(models.Model):
       return self.name 
 
 
-   # Main Product Delete and Replace
+
+   # Main Product Replace and PDF Replace
    def save(self, *args, **kwargs):
       if self.pk:
          old_product = Product.objects.get(pk=self.pk)
 
+         # Main product image replace
          if (
             old_product.image and old_product.image.name != self.image.name
          ): 
             old_product.image.delete(save=False)
+
+         # PDF Replace
+         if (
+            old_product.manual and old_product.manual.name != self.manual.name 
+         ):
+            old_product.manual.delete(save=False)
 
 
       # Automatically slug method
@@ -104,10 +112,15 @@ class Product(models.Model):
       super().save(*args, **kwargs)
 
 
-   # Product Delete Method
+   # Main Product Delete Method
    def delete(self, *args, **kwargs):
+      # Main Image delete
       if self.image:
          self.image.delete(save=False)
+
+      # Pdf delete
+      if self.manual:
+         self.manual.delete(save=False)
 
       super().delete(*args, **kwargs)
 

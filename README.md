@@ -99,8 +99,8 @@ Build a professional Django backend that includes:
 * [✅] File Size Validator
 * [✅] Main Image Delete
 * [✅] Main Image Replace
-* [ ] PDF Image Delete
-* [ ] PDF Image Replace
+* [✅] PDF Image Delete
+* [✅] PDF Image Replace
 * [ ] Gallery Image Delete
 * [ ] Gallery Image Replace
 
