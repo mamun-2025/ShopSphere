@@ -97,12 +97,13 @@ Build a professional Django backend that includes:
 * [✅] PDF Upload
 * [✅] PDF Extension Validation
 * [✅] File Size Validator
-* [ ] Main Image Delete
-* [ ] Main Image Replace
-* [ ] Gallery Image Delete
-* [ ] Gallery Image Replace
+* [✅] Main Image Delete
+* [✅] Main Image Replace
 * [ ] PDF Image Delete
 * [ ] PDF Image Replace
+* [ ] Gallery Image Delete
+* [ ] Gallery Image Replace
+
 
 Milestone 3 — File Handling
 
