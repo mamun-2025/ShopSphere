@@ -91,14 +91,18 @@ Build a professional Django backend that includes:
 * [✅] MEDIA_URL
 * [✅] Pillow
 * [✅] ImageField
-* [✅] Product Image
-* [✅] Multiple Image Upload UI
+* [✅] Product Image Upload
+* [✅] Multiple Image Upload 
 * [✅] FileField
+* [✅] PDF Upload
 * [✅] PDF Extension Validation
 * [✅] File Size Validator
-* [✅] PDF Upload UI
-* [ ] Image Replace Cleanup
-* [ ] Image Delete Cleanup
+* [ ] Main Image Delete
+* [ ] Main Image Replace
+* [ ] Gallery Image Delete
+* [ ] Gallery Image Replace
+* [ ] PDF Image Delete
+* [ ] PDF Image Replace
 
 Milestone 3 — File Handling
 

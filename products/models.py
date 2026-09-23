@@ -86,12 +86,33 @@ class Product(models.Model):
       return self.name 
 
 
+   # Main Product Delete and Replace
    def save(self, *args, **kwargs):
+      if self.pk:
+         old_product = Product.objects.get(pk=self.pk)
 
+         if (
+            old_product.image and old_product.image.name != self.image.name
+         ): 
+            old_product.image.delete(save=False)
+
+
+      # Automatically slug method
       if not self.slug:
          self.slug = slugify(self.name)
 
       super().save(*args, **kwargs)
+
+
+   # Product Delete Method
+   def delete(self, *args, **kwargs):
+      if self.image:
+         self.image.delete(save=False)
+
+      super().delete(*args, **kwargs)
+
+
+
 
 
 
