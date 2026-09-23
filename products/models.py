@@ -122,6 +122,10 @@ class Product(models.Model):
       if self.manual:
          self.manual.delete(save=False)
 
+      # Gallery images
+      for product_image in self.images.all():
+         product_image.delete()
+
       super().delete(*args, **kwargs)
 
 
