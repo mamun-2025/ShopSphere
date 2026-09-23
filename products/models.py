@@ -87,7 +87,7 @@ class Product(models.Model):
 
 
 
-   # Main Product Replace and PDF Replace
+   # Main Product Replace and PDF Replace save method
    def save(self, *args, **kwargs):
       if self.pk:
          old_product = Product.objects.get(pk=self.pk)
@@ -156,5 +156,28 @@ class ProductImage(models.Model):
 
    def __str__(self):
       return f"{ self.product.name } Image"
+
+
+   # ProductImage Replace save method
+   def save(self, *args, **kwargs):
+
+      if self.pk:
+         old_image = ProductImage.objects.get(pk=self.pk)
+
+         if (
+            old_image.image and old_image.image.name != self.image.name 
+         ):
+            old_image.image.delete(save=False)
+
+      super().save(*args, **kwargs)
+
+
+   # ProductImage Delete Method(Gallery)
+   def delete(self, *args, **kwargs):
+      if self.image:
+         self.image.delete(save=False)
+
+      super().delete(*args, **kwargs)
+
 
 

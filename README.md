@@ -101,8 +101,8 @@ Build a professional Django backend that includes:
 * [✅] Main Image Replace
 * [✅] PDF Image Delete
 * [✅] PDF Image Replace
-* [ ] Gallery Image Delete
-* [ ] Gallery Image Replace
+* [✅] Gallery Image Delete
+* [✅] Gallery Image Replace
 
 
 Milestone 3 — File Handling
