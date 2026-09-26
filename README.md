@@ -120,11 +120,20 @@ Milestone 3 — File Handling
 
 ### Topics
 
-* [ ] Rating System
-* [ ] Product Reviews
+* [✅] Review App Setup
+* [✅] Review Model
+* [✅] Rating System
+* [ ] Review Form
+* [ ] Create Review
+* [ ] Display Reviews
 * [ ] Average Rating
+* [ ] Rating Distribution
 * [ ] Aggregation
 * [ ] Annotation
+* [ ] Update Review
+* [ ] Delete Review
+* [ ] Review Moderation
+* [ ] Review Pagination
 
 ### Output
 
