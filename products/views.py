@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib import messages
-from django.db.models import Q 
+from django.db.models import Q, Avg, Count
 
 
 
@@ -118,9 +118,36 @@ class ProductDetailView(DetailView):
    slug_field = "slug"
 
    def get_queryset(self):
-      return Product.objects.filter(
-         is_active=True
+
+      return (Product.objects
+         .filter(is_active=True)
+         .annotate(
+            average_rating=Avg(
+               "reviews__rating",
+               filter=Q(
+                  reviews__is_active=True
+               ),
+            ),
+            total_reviews=Count(
+               "reviews",
+               filter=Q(
+                  reviews__is_active=True
+               ),
+            ),
+         )
       )
+
+   def get_context_data(self, **kwargs):
+      context = super().get_context_data(**kwargs)
+
+      context["active_reviews"] = (
+         self.object.reviews
+         .filter(is_active=True)
+         .select_related("user")
+      )
+
+      return context
+   
 
 
 """

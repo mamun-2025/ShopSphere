@@ -126,11 +126,11 @@ Milestone 3 — File Handling
 * [✅] Review Form
 * [✅] Create Review
 * [✅] Duplicate Review Protection
-* [ ] Display Reviews
-* [ ] Average Rating
-* [ ] Rating Distribution
-* [ ] Aggregation
-* [ ] Annotation
+* [✅] Display Reviews
+* [✅] Average Rating
+* [✅] Rating Distribution
+* [✅] Aggregation
+* [✅] Annotation
 * [ ] Update Review
 * [ ] Delete Review
 * [ ] Review Moderation

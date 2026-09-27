@@ -152,12 +152,133 @@
          >
          Delete Product
          </a>
-         <a 
-            href="{% url 'reviews:review_create' product.id %}"
-            class="btn btn-primary"
-         >
-         ⭐ Write a Review
-         </a>
+         
+
+         <!-- Customer Reviews -->
+         <hr class="my-5">
+
+         <div class="mt-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+               <h3>
+                  Customer Reviews
+               </h3>
+
+               <a
+                  href="{% url 'reviews:review_create' product.id %}"
+                  class="btn btn-primary"
+               >
+               ⭐ Write a Review
+               </a>
+            </div>
+
+            <!-- Rating Summary -->
+            <div class="card mb-4">
+
+               <div class="card-body">
+
+                  <h5 class="card-title">
+                     Rating Summary
+                  </h5>
+
+                  {% if product.average_rating %}
+
+                     <div class="d-flex align-items-center">
+
+                        <h2 class="mb-0 me-3">
+                           {{ product.average_rating|floatformat:1 }}/5
+                        </h2> 
+
+                        <div class="text-warning fs-4">
+                           ⭐⭐⭐⭐⭐
+                        </div>
+
+                     </div>
+                     <p class="text-muted mt-2 mb-0">
+                        Based on 
+                        {{ product.total_reviews }}
+                        review{{ product.total_reviews|pluralize }}
+                     </p>
+
+                  {% else %}
+
+                     <p class="text-muted mb-0">
+                        No reviews yet.
+                        Be the first to review this product!
+                     </p>
+
+                  {% endif %}
+
+               </div>
+
+            </div>
+
+            <!-- Individual Reviews -->
+            <h4 class="mb-3">
+               Reviews
+            </h4>
+
+            {% for review in active_reviews %}
+
+                  <div class="card mb-3">
+
+                     <div class="card-body">
+
+                        <!-- User + Date -->
+                        <div class="d-flex justify-content-between align-items-center">
+
+                           <h5 class="mb-1">
+                              {{ review.user.username }}
+                           </h5>
+
+                           <small class="text-muted">
+                              {{ review.created_at|date:"M d, Y" }}
+                           </small>
+
+                        </div>
+
+                        <!-- Rating -->
+                        <div class="text-warning mb-2">
+                           {% if review.rating >= 1 %}
+                              ⭐
+                           {% endif %}
+
+                           {% if review.rating >= 2 %}
+                              ⭐
+                           {% endif %}
+
+                           {% if review.rating >= 3 %}
+                              ⭐
+                           {% endif %}
+
+                           {% if review.rating >= 4 %}
+                              ⭐
+                           {% endif %}
+
+                           {% if review.rating >= 5 %}
+                              ⭐
+                           {% endif %}
+                        </div>
+
+                        <!-- Comment -->
+                        <p class="mb-0">
+                           {{ review.comment }}
+                        </p>
+
+                     </div>
+
+                  </div>
+
+            {% empty %}
+
+               <div class="alert alert-info">
+                  No reviews yet.
+                  Be the first to review this product!
+               </div>
+            
+            {% endfor %}
+
+         </div>
 
 
       </div>
@@ -168,3 +289,5 @@
 
 
 {% endblock %}
+
+
