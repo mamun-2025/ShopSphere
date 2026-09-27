@@ -4,35 +4,36 @@ from django import forms
 from .models import Review
 
 class ReviewForm(forms.ModelForm):
-   model = Review
+   class Meta:
+      model = Review
 
-   fields = [
-      "rating",
-      "comment",
-   ]
+      fields = [
+         "rating",
+         "comment",
+      ]
 
-   widgets = {
+      widgets = {
 
-      "rating": forms.Select(
-         choices= [
-            (1, "⭐"),
-            (2, "⭐⭐"),
-            (3, "⭐⭐⭐"),
-            (4, "⭐⭐⭐⭐"),
-            (5, "⭐⭐⭐⭐⭐")
-         ],
-         attrs={
-            "class": "form-select",
-         },
-      ),
+         "rating": forms.Select(
+            choices= [
+               (1, "⭐"),
+               (2, "⭐⭐"),
+               (3, "⭐⭐⭐"),
+               (4, "⭐⭐⭐⭐"),
+               (5, "⭐⭐⭐⭐⭐"),
+            ],
+            attrs={
+               "class": "form-select",
+            },
+         ),
 
-      "comment": forms.Textarea(
-         attrs={
-            "class": "form-control",
-            "rows": 4,
-            "placeholder": "Write your review",
-         },
-      ),
+         "comment": forms.Textarea(
+            attrs={
+               "class": "form-control",
+               "rows": 4,
+               "placeholder": "Write your review",
+            },
+         ),
 
-      
-   }
+         
+      }

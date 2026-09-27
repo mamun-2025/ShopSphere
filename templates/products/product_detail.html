@@ -123,12 +123,13 @@
 
          <!-- TimeStamps -->
          <p>
-            <strong>Created:</strong>
-            {{ product.created_at }}
+            <strong>
+            Created:{{ product.created_at }}
+            </strong>
          </p>
          <p>
-            <strong>Updated:</strong>
-            {{ product.updated_at }}
+            <strong>
+            Updated:{{ product.updated_at }}</strong>
          </p>
 
 
@@ -150,6 +151,12 @@
             class="btn btn-danger"
          >
          Delete Product
+         </a>
+         <a 
+            href="{% url 'reviews:review_create' product.id %}"
+            class="btn btn-primary"
+         >
+         ⭐ Write a Review
          </a>
 
 
