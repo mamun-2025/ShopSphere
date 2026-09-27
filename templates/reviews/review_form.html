@@ -22,6 +22,16 @@
 
                   {% csrf_token %}
 
+                  {% if form.non_field_error %}
+
+                     <div class="alert alert-danger">
+
+                        {{ form.non_field_error }}
+                        
+                     </div>
+
+                  {% endif %}
+
                   {{ form.as_p }}
 
                   <button 

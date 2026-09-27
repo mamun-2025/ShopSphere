@@ -1,5 +1,6 @@
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404
 from django.views.generic import CreateView
 from django.urls import reverse
@@ -35,9 +36,33 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
 
       form.instance.product = self.product
 
-      response = super().form_valid(form)
+      if Review.objects.filter(
+         user=self.request.user,
+         product=self.product,
+      ).exists():
+
+         form.add_error(
+            None,
+            "You have already reviewed this porduct."
+         )
+
+         return self.form_valid(form)
+
+      try:
+
+         with transaction.atomic():
+
+            response = super().form_valid(form)
+
+      except IntegrityError:
+
+         form.add_error(
+            None,
+            "You have already reviewed this product."
+         )
 
       return response
+
 
 
    def get_success_url(self):
