@@ -125,7 +125,7 @@ Milestone 3 — File Handling
 * [✅] Rating System
 * [✅] Review Form
 * [✅] Create Review
-* [✅] Duplicate Review 
+* [✅] Duplicate Review Protection
 * [ ] Display Reviews
 * [ ] Average Rating
 * [ ] Rating Distribution

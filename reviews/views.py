@@ -46,7 +46,7 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
             "You have already reviewed this porduct."
          )
 
-         return self.form_valid(form)
+         return self.form_invalid(form)
 
       try:
 
