@@ -270,6 +270,21 @@
 
                         </div>
 
+                        {% if review.user == request.user %}
+
+                           <div class="mt-3">
+                              <a 
+                                 href="{% url 'reviews:review_update' review.id %}"
+                                 class="btn btn-secondary"
+                              >
+                              Edit Review
+                              </a>
+                           </div>
+                           
+                        {% endif %}
+
+
+                     
                         <!-- Rating -->
                         <div class="text-warning mb-2">
                            {% if review.rating >= 1 %}

@@ -2,7 +2,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView
 from django.urls import reverse
 
 from products.models import Product
@@ -10,6 +10,8 @@ from products.models import Product
 from .forms import ReviewForm
 from .models import Review
 
+
+# Review CreateView
 class ReviewCreateView(LoginRequiredMixin, CreateView):
    model = Review
    form_class = ReviewForm
@@ -75,4 +77,31 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
       )
 
 
-   
+
+# Review UpdateView
+class ReviewUpdateView(LoginRequiredMixin, UpdateView):
+
+   model = Review
+
+   form_class = ReviewForm
+
+   template_name = "reviews/review_form.html"
+
+   pk_url_kwarg = "review_id"
+
+   def get_object(self, queryset=None):
+
+      return get_object_or_404(
+         Review,
+         pk = self.kwargs["review_id"],
+         user = self.request.user,
+      )
+
+   def get_success_url(self):
+
+      return reverse(
+         "product_detail",
+         kwargs={
+            "slug": self.object.product.slug,
+         },
+      )

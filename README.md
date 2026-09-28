@@ -131,7 +131,7 @@ Milestone 3 — File Handling
 * [✅] Rating Distribution
 * [✅] Rating Dynamic Stars
 * [✅] Annotation
-* [ ] Update Review
+* [✅] Update Review
 * [ ] Delete Review
 * [ ] Review Moderation
 * [ ] Review Pagination

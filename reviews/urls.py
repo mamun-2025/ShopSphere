@@ -1,7 +1,7 @@
 
 
 from django.urls import path 
-from .views import ReviewCreateView
+from .views import ReviewCreateView, ReviewUpdateView
 
 app_name = "reviews"
 
@@ -11,4 +11,10 @@ urlpatterns = [
       ReviewCreateView.as_view(),
       name="review_create",
    ),
+   path(
+      "<int:review_id>/edit/",
+      ReviewUpdateView.as_view(),
+      name="review_update",
+   ),
+   
 ]
