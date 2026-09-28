@@ -31,5 +31,9 @@ class ReviewAdmin(admin.ModelAdmin):
       "updated_at",
    )
 
+   list_editable = (
+      "is_active",
+   )
+
 
 

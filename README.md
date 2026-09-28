@@ -116,7 +116,7 @@ Milestone 3 — File Handling
 
 ## 🟢 Milestone 4 — Reviews
 
-**Status:** 🟨 In Progress
+**Status:** ✅ Completed
 
 ### Topics
 
@@ -133,18 +133,18 @@ Milestone 3 — File Handling
 * [✅] Annotation
 * [✅] Update Review
 * [✅] Delete Review
-* [ ] Review Moderation
-* [ ] Review Pagination
+* [✅] Review Moderation
+
 
 ### Output
 
-* [ ] Product Review System
+* [✅] Product Review System
 
 ---
 
 ## 🟢 Milestone 5 — Authorization
 
-**Status:** ⬜ Not Started
+**Status:** 🟨 In Progress
 
 ### Topics
 
@@ -386,8 +386,8 @@ shopsphere/
 | Milestone 1  | ✅ Completed|
 | Milestone 2  | ✅ Completed|
 | Milestone 3  | ✅ Completed|
-| Milestone 4  | 🟨 In Progress|
-| Milestone 5  | ⬜ Not Started|
+| Milestone 4  | ✅ Completed|
+| Milestone 5  | 🟨 In Progress|
 | Milestone 6  | ⬜ Not Started|
 | Milestone 7  | ⬜ Not Started|
 | Milestone 8  | ⬜ Not Started|

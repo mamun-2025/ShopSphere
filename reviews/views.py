@@ -66,6 +66,11 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
 
          return self.form_invalid(form)
 
+      messages.success(
+         self.request,
+         "Your review has been successfully sumitted.",
+      )
+
       return response
 
 
