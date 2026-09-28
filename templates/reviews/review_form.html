@@ -37,11 +37,11 @@
 
                   {% csrf_token %}
 
-                  {% if form.non_field_error %}
+                  {% if form.non_field_errors %}
 
                      <div class="alert alert-danger">
 
-                        {{ form.non_field_error }}
+                        {{ form.non_field_errors }}
                         
                      </div>
 
@@ -70,12 +70,25 @@
                   {% endif %}
 
                  
-                  <a 
+                  {% if object %}
+
+                     <a 
+                        href="{% url 'product_detail' object.product.slug %}"
+                        class="btn btn-secondary"
+                     >
+                     Cancel
+                     </a>
+
+                  {% else %}
+
+                     <a 
                      href="{% url 'product_detail' view.product.slug %}"
                      class="btn btn-secondary"
-                  >
-                  Cancel
-                  </a>
+                     >
+                     Cancel
+                     </a>
+
+                  {% endif %}
 
                </form>
 
