@@ -2,8 +2,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, DeleteView
 from django.urls import reverse
+from django.contrib import messages
 
 from products.models import Product
 
@@ -45,7 +46,7 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
 
          form.add_error(
             None,
-            "You have already reviewed this porduct."
+            "You have already reviewed this product."
          )
 
          return self.form_invalid(form)
@@ -62,6 +63,8 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
             None,
             "You have already reviewed this product."
          )
+
+         return self.form_invalid(form)
 
       return response
 
@@ -89,12 +92,10 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
 
    pk_url_kwarg = "review_id"
 
-   def get_object(self, queryset=None):
+   def get_queryset(self):
 
-      return get_object_or_404(
-         Review,
-         pk = self.kwargs["review_id"],
-         user = self.request.user,
+      return Review.objects.filter(
+         user=self.request.user
       )
 
    def get_success_url(self):
@@ -105,3 +106,51 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
             "slug": self.object.product.slug,
          },
       )
+
+   def form_valid(self, form):
+
+      messages.success(
+         self.request,
+         "Your review has been updated successfully.",
+      )
+
+      return super().form_valid(form)
+
+   
+
+
+
+# Review DeleteView
+class ReviewDeleteView(LoginRequiredMixin, DeleteView):
+
+   model = Review
+
+   template_name = "reviews/review_confirm_delete.html"
+
+   pk_url_kwarg = "review_id"
+
+   def get_queryset(self):
+
+      return Review.objects.filter(
+         user=self.request.user
+      )
+
+   def get_success_url(self):
+      
+      return reverse(
+         "product_detail",
+         kwargs={
+            "slug": self.object.product.slug,
+         },
+      )
+
+   def form_valid(self, form):
+
+      messages.success(
+         self.request,
+         "Your review has been deleted successfully.",
+      )
+
+      return super().form_valid(form)
+   
+   
