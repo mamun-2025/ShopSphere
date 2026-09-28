@@ -185,15 +185,48 @@
 
                      <div class="d-flex align-items-center">
 
+                        <!-- Average Number -->
                         <h2 class="mb-0 me-3">
                            {{ product.average_rating|floatformat:1 }}/5
                         </h2> 
 
-                        <div class="text-warning fs-4">
-                           ⭐⭐⭐⭐⭐
+                        <!-- Dynamic Stars -->
+                        <div class="fs-4">
+                           
+                           {% if product.average_rating >= 1 %}
+                              <span class="text-warning">⭐</span>
+                           {% else %}
+                              <span class="text-secondary">☆</span>
+                           {% endif %}
+
+                           {% if product.average_rating >= 2 %}
+                              <span class="text-warning">⭐</span>
+                           {% else %}
+                              <span class="text-secondary">☆</span>
+                           {% endif %}
+
+                           {% if product.average_rating >= 3 %}
+                              <span class="text-warning">⭐</span>
+                           {% else %}
+                              <span class="text-secondary">☆</span>
+                           {% endif %}
+
+                           {% if product.average_rating >= 4 %}
+                              <span class="text-warning">⭐</span>
+                           {% else %}
+                              <span class="text-secondary">☆</span>
+                           {% endif %}
+
+                           {% if product.average_rating >= 5 %}
+                              <span class="text-warning">⭐</span>
+                           {% else %}
+                              <span class="text-secondary">☆</span>
+                           {% endif %}
+
                         </div>
 
                      </div>
+
                      <p class="text-muted mt-2 mb-0">
                         Based on 
                         {{ product.total_reviews }}
