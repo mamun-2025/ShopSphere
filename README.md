@@ -142,7 +142,7 @@ Milestone 3 — File Handling
 
 ---
 
-## 🟢 Milestone 5 — Authorization
+## 🟢 Milestone 5 — Authorization [Role-Based Access Control (RBAC)]
 
 **Status:** 🟨 In Progress
 
@@ -150,14 +150,21 @@ Milestone 3 — File Handling
 
 * [✅] Permissions
 * [✅] Groups
-* [ ] Role-Based Access Control (RBAC)
+* [ ] Role System
 
 ### Roles
 
-* [ ] Admin
-* [ ] Manager
-* [ ] Staff
-* [ ] Customer
+* [ ] Customer Authorization
+* [ ] Staff Authorization 
+* [ ] Manager Authorization 
+* [ ] Admin Authorization 
+* [ ] Object-Level Authorization
+* [ ] CBV Authorization
+* [ ] Function-Based Authorization
+* [ ] Template Authorization  
+* [ ] Admin Security   
+* [ ] Full Authorization Testing    
+
 
 ### Output
 
