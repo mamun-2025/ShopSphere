@@ -148,8 +148,8 @@ Milestone 3 — File Handling
 
 ### Topics
 
-* [ ] Permissions
-* [ ] Groups
+* [✅] Permissions
+* [✅] Groups
 * [ ] Role-Based Access Control (RBAC)
 
 ### Roles

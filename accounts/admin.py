@@ -60,8 +60,8 @@ class CustomUserAdmin(UserAdmin):
       (
          "Personal_Information",{
             "fields":(
-               "firstname",
-               "lastname",
+               "first_name",
+               "last_name",
                "email",
                "phone",
                "profile_picture",
