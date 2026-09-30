@@ -12,12 +12,14 @@
 
         <h2>Categories</h2>
 
-        <a
-            href="{% url 'category_create' %}"
-            class="btn btn-primary"
-        >
-            Add Category
-        </a>
+        {% if perms.categories.add_category %}
+            <a
+                href="{% url 'category_create' %}"
+                class="btn btn-primary"
+            >
+                Add Category
+            </a>
+        {% endif %}
 
     </div>
 

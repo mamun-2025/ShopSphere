@@ -2,7 +2,7 @@
 from .models import Product
 from .forms import ProductForm
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib import messages
 from django.db.models import Q, Avg, Count
@@ -179,11 +179,12 @@ Example:
 
 
 ### Product CreateView
-class ProductCreateView(LoginRequiredMixin, CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView, PermissionRequiredMixin):
    model = Product
    form_class = ProductForm
    template_name = "products/product_form.html"
    success_url = reverse_lazy("product_list")
+   permission_required = "products.add_product"
    
 
    def form_valid(self, form):
@@ -212,12 +213,13 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
 
 
 ### Product UpdateView
-class ProductUpdateView(LoginRequiredMixin, UpdateView):
+class ProductUpdateView(LoginRequiredMixin, UpdateView, PermissionRequiredMixin):
    model = Product
    form_class = ProductForm
    template_name = "products/product_form.html"
    context_object_name = "product"
    success_url = reverse_lazy("product_list")
+   permission_required = "products.change_product"
 
 
    def form_valid(self, form):
@@ -247,11 +249,12 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
 
 
 ### Product DeleteView
-class ProductDeleteView(LoginRequiredMixin, DeleteView):
+class ProductDeleteView(LoginRequiredMixin, DeleteView, PermissionRequiredMixin):
    model = Product
    template_name = "products/product_confirm_delete.html"
    context_object_name = "product"
    success_url = reverse_lazy("product_list")
+   permission_required = "products.delete_product"
 
    def form_valid(self, form):
 

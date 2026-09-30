@@ -140,18 +140,24 @@
          >
          Back to Product_List
          </a>
-         <a 
-            href="{% url 'product_update' product.pk %}"
-            class="btn btn-primary"
-         >
-         Edit Product
-         </a>
-         <a 
-            href="{% url 'product_delete' product.pk %}"
-            class="btn btn-danger"
-         >
-         Delete Product
-         </a>
+         
+         {% if perms.products.change_product %}
+            <a 
+               href="{% url 'product_update' product.pk %}"
+               class="btn btn-primary"
+            >
+            Edit Product
+            </a>
+         {% endif %}
+
+         {% if perms.products.delete_product %}
+            <a 
+               href="{% url 'product_delete' product.pk %}"
+               class="btn btn-danger"
+            >
+            Delete Product
+            </a>
+         {% endif %}
          
 
          <!-- Customer Reviews -->

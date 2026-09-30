@@ -156,7 +156,7 @@ Milestone 3 — File Handling
 
 * [✅] Customer Authorization
 * [✅] Staff Authorization 
-* [ ] Manager Authorization 
+* [✅] Manager Authorization 
 * [ ] Admin Authorization 
 * [ ] Object-Level Authorization
 * [ ] CBV Authorization

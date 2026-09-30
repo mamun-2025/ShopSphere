@@ -25,12 +25,15 @@
       </a>
 
       <div>
-         <a 
-            href="{% url 'category_list' %}"
-            class="btn btn-primary"
-         >
-         Categories
-         </a>
+
+         {% if perms.categories.add_category %}
+            <a 
+               href="{% url 'category_list' %}"
+               class="btn btn-primary"
+            >
+            Categories
+            </a>
+         {% endif %}
 
          <a 
             href="{% url 'product_list' %}"
@@ -39,12 +42,14 @@
          Products
          </a>
 
-         <a 
-            href="{% url 'product_create' %}"
-            class="btn btn-info"
-         >
-         Add Products
-         </a>
+         {% if perms.products.add_product %}
+            <a 
+               href="{% url 'product_create' %}"
+               class="btn btn-info"
+            >
+            Add Products
+            </a>
+         {% endif %}
 
          
          {% if request.user.is_authenticated %}
