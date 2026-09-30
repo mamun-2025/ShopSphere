@@ -1,5 +1,5 @@
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404
 from django.views.generic import CreateView, UpdateView, DeleteView
@@ -13,10 +13,11 @@ from .models import Review
 
 
 # Review CreateView
-class ReviewCreateView(LoginRequiredMixin, CreateView):
+class ReviewCreateView(LoginRequiredMixin, CreateView, PermissionRequiredMixin):
    model = Review
    form_class = ReviewForm
    template_name = "reviews/review_form.html"
+   permission_required = "reviews.add_review"
 
    def dispatch(self, request, *args, **kwargs):
 
@@ -87,7 +88,7 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
 
 
 # Review UpdateView
-class ReviewUpdateView(LoginRequiredMixin, UpdateView):
+class ReviewUpdateView(LoginRequiredMixin, UpdateView, PermissionRequiredMixin):
 
    model = Review
 
@@ -96,6 +97,9 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
    template_name = "reviews/review_form.html"
 
    pk_url_kwarg = "review_id"
+
+   permission_required = "reviews.change_review"
+
 
    def get_queryset(self):
 
@@ -126,13 +130,16 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
 
 
 # Review DeleteView
-class ReviewDeleteView(LoginRequiredMixin, DeleteView):
+class ReviewDeleteView(LoginRequiredMixin, DeleteView, PermissionRequiredMixin):
 
    model = Review
 
    template_name = "reviews/review_confirm_delete.html"
 
    pk_url_kwarg = "review_id"
+
+   permission_required = "reviews.delete_review"
+   
 
    def get_queryset(self):
 

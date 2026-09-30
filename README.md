@@ -150,7 +150,7 @@ Milestone 3 — File Handling
 
 * [✅] Permissions
 * [✅] Groups
-* [ ] Role System
+* [✅] Role System
 
 ### Roles
 
