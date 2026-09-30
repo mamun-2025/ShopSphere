@@ -154,7 +154,7 @@ Milestone 3 — File Handling
 
 ### Roles
 
-* [ ] Customer Authorization
+* [✅] Customer Authorization
 * [ ] Staff Authorization 
 * [ ] Manager Authorization 
 * [ ] Admin Authorization 
