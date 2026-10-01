@@ -168,7 +168,12 @@ Milestone 3 — File Handling
 
 ### Output
 
-* [ ] Role-Based Product Management
+* [ ] Role-Based Access Control (RBAC)
+* [ ] Permission-Based Authorization
+* [ ] Object-Level Authorization
+* [ ] CBV/FBV Authorization
+* [ ] Permission-Aware UI
+* [ ] Authorization Test Suite
 
 ---
 

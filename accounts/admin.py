@@ -45,7 +45,7 @@ class CustomUserAdmin(UserAdmin):
       "user_permissions",
    )
 
-   empty_value_diplay= "-"
+   empty_value_display= "-"
 
    fieldsets = (
       (
@@ -109,4 +109,4 @@ class CustomUserAdmin(UserAdmin):
    )
    
    
-   
+
