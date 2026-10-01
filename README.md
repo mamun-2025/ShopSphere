@@ -144,7 +144,7 @@ Milestone 3 — File Handling
 
 ## 🟢 Milestone 5 — Authorization [Role-Based Access Control (RBAC)]
 
-**Status:** 🟨 In Progress
+**Status:** ✅ Completed
 
 ### Topics
 
@@ -162,24 +162,24 @@ Milestone 3 — File Handling
 * [✅] CBV Authorization
 * [✅] Function-Based Authorization
 * [✅] Template Authorization  
-* [ ] Admin Security   
-* [ ] Full Authorization Testing    
+* [✅] Admin Security   
+* [✅] Full Authorization Testing    
 
 
 ### Output
 
-* [ ] Role-Based Access Control (RBAC)
-* [ ] Permission-Based Authorization
-* [ ] Object-Level Authorization
-* [ ] CBV/FBV Authorization
-* [ ] Permission-Aware UI
-* [ ] Authorization Test Suite
+* [✅] Role-Based Access Control (RBAC)
+* [✅] Permission-Based Authorization
+* [✅] Object-Level Authorization
+* [✅] CBV/FBV Authorization
+* [✅] Permission-Aware UI
+* [✅] Authorization Test Suite
 
 ---
 
 ## 🟢 Milestone 6 — Inventory
 
-**Status:** ⬜ Not Started
+**Status:** 🟨 In Progress
 
 ### Topics
 
@@ -399,8 +399,8 @@ shopsphere/
 | Milestone 2  | ✅ Completed|
 | Milestone 3  | ✅ Completed|
 | Milestone 4  | ✅ Completed|
-| Milestone 5  | 🟨 In Progress|
-| Milestone 6  | ⬜ Not Started|
+| Milestone 5  | ✅ Completed|
+| Milestone 6  | 🟨 In Progress|
 | Milestone 7  | ⬜ Not Started|
 | Milestone 8  | ⬜ Not Started|
 | Milestone 9  | ⬜ Not Started|
