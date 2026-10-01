@@ -185,6 +185,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView, PermissionRequiredMixin)
    template_name = "products/product_form.html"
    success_url = reverse_lazy("product_list")
    permission_required = "products.add_product"
+   raise_exception = True
    
 
    def form_valid(self, form):
@@ -220,6 +221,7 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView, PermissionRequiredMixin)
    context_object_name = "product"
    success_url = reverse_lazy("product_list")
    permission_required = "products.change_product"
+   raise_exception = True
 
 
    def form_valid(self, form):
@@ -255,6 +257,7 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView, PermissionRequiredMixin)
    context_object_name = "product"
    success_url = reverse_lazy("product_list")
    permission_required = "products.delete_product"
+   raise_exception = True
 
    def form_valid(self, form):
 
