@@ -12,12 +12,20 @@ from .forms import ReviewForm
 from .models import Review
 
 
+
 # Review CreateView
-class ReviewCreateView(LoginRequiredMixin, CreateView, PermissionRequiredMixin):
+class ReviewCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+
    model = Review
+
    form_class = ReviewForm
+
    template_name = "reviews/review_form.html"
+
    permission_required = "reviews.add_review"
+
+   raise_exception = True
+
 
    def dispatch(self, request, *args, **kwargs):
 
@@ -87,8 +95,10 @@ class ReviewCreateView(LoginRequiredMixin, CreateView, PermissionRequiredMixin):
 
 
 
+
+
 # Review UpdateView
-class ReviewUpdateView(LoginRequiredMixin, UpdateView, PermissionRequiredMixin):
+class ReviewUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 
    model = Review
 
@@ -99,6 +109,8 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView, PermissionRequiredMixin):
    pk_url_kwarg = "review_id"
 
    permission_required = "reviews.change_review"
+
+   raise_exception = True 
 
 
    def get_queryset(self):
@@ -130,7 +142,7 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView, PermissionRequiredMixin):
 
 
 # Review DeleteView
-class ReviewDeleteView(LoginRequiredMixin, DeleteView, PermissionRequiredMixin):
+class ReviewDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 
    model = Review
 
@@ -139,6 +151,8 @@ class ReviewDeleteView(LoginRequiredMixin, DeleteView, PermissionRequiredMixin):
    pk_url_kwarg = "review_id"
 
    permission_required = "reviews.delete_review"
+
+   raise_exception = True 
    
 
    def get_queryset(self):

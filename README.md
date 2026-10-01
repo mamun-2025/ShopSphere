@@ -161,7 +161,7 @@ Milestone 3 — File Handling
 * [✅] Object-Level Authorization
 * [✅] CBV Authorization
 * [✅] Function-Based Authorization
-* [ ] Template Authorization  
+* [✅] Template Authorization  
 * [ ] Admin Security   
 * [ ] Full Authorization Testing    
 
