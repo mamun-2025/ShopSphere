@@ -183,10 +183,17 @@ Milestone 3 — File Handling
 
 ### Topics
 
-* [ ] Stock Management
-* [ ] SKU
+* [✅] Inventory Model
+* [✅] SKU Management
 * [ ] Low Stock
 * [ ] Out of Stock
+* [ ] Stock Increase
+* [ ] Stock Decrease
+* [ ] Stock Validation
+* [ ] Inventory Admin
+* [ ] Inventory Views
+* [ ] Inventory UI
+
 
 ### Output
 
