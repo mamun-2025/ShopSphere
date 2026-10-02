@@ -94,3 +94,13 @@ class ProductForm(forms.ModelForm):
 
          
       }
+
+
+   def clean_sku(self):
+      sku = self.cleaned_data["sku"]
+      return sku.strip() 
+
+   
+
+
+   
