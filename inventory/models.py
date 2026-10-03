@@ -22,6 +22,11 @@ class Inventory(models.Model):
       auto_now=True,
    )
 
+   @property
+   def is_low_stock(self):
+      return self.product.stock <= self.low_stock_threshold
+
+   
    def __str__(self):
       return f"Inventory: {self.product.name}"
 

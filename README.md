@@ -185,7 +185,7 @@ Milestone 3 — File Handling
 
 * [✅] Inventory Model
 * [✅] SKU Management
-* [ ] Low Stock
+* [✅] Low Stock
 * [ ] Out of Stock
 * [ ] Stock Increase
 * [ ] Stock Decrease
