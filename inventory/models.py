@@ -26,7 +26,21 @@ class Inventory(models.Model):
    def is_low_stock(self):
       return self.product.stock <= self.low_stock_threshold
 
-   
+   @property
+   def is_out_of_stock(self):
+      return self.product.stock == 0
+
+   @property
+   def stock_status(self):
+      if self.is_out_of_stock:
+         return "Out of Stock"
+
+      if self.is_low_stock:
+         return "Low Stock"
+
+      return "In Stock"
+
+
    def __str__(self):
       return f"Inventory: {self.product.name}"
 

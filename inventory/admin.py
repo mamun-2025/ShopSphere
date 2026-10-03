@@ -10,7 +10,7 @@ class InventoryAdmin(admin.ModelAdmin):
       "product",
       "current_stock",
       "low_stock_threshold",
-      "low_stock_display_status",
+      "display_stock_status",
       "created_at",
       "updated_at",
    )
@@ -34,11 +34,10 @@ class InventoryAdmin(admin.ModelAdmin):
 
 
    @admin.display(
-      boolean=True,
-      description="Low Stock",
+      description="Stock Status"
    )
 
-   def low_stock_display_status(self, obj):
-      return obj.is_low_stock
+   def display_stock_status(self, obj):
+      return obj.stock_status
 
 
