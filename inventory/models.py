@@ -41,6 +41,41 @@ class Inventory(models.Model):
       return "In Stock"
 
 
+   # Stock Validation
+   def validate_quantity(self, quantity):
+      if quantity <= 0:
+         raise ValueError(
+            "Quantity must be greater than zero."
+         )
+
+
+   # Increase Stock
+   def increase_stock(self, quantity):
+      self.validate_quantity(quantity)
+
+      self.product.stock += quantity
+
+      self.product.save(
+         update_fields=["stock"]
+      )
+
+
+   # Decrease Stock
+   def decrease_stock(self, quantity):
+      self.validate_quantity(quantity)
+
+      if quantity > self.product.stock:
+         raise ValueError(
+            "Insufficient stock."
+         )
+
+      self.product.stock -= quantity
+
+      self.product.save(
+         update_fields=["stock"]
+      )
+
+
    def __str__(self):
       return f"Inventory: {self.product.name}"
 
