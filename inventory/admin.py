@@ -15,6 +15,14 @@ class InventoryAdmin(admin.ModelAdmin):
       "updated_at",
    )
 
+   list_select_related = (
+      "product",
+   )
+
+   list_filter = (
+      "created_at",
+   )
+
    search_fields = (
       "product__name",
       "product__sku",

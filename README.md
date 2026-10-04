@@ -190,7 +190,7 @@ Milestone 3 — File Handling
 * [✅] Stock Increase
 * [✅] Stock Decrease
 * [✅] Stock Validation
-* [ ] Inventory Admin
+* [✅] Inventory Admin
 * [ ] Inventory Views
 * [ ] Inventory UI
 
