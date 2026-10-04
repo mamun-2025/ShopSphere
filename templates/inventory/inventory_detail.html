@@ -1,0 +1,61 @@
+
+
+{% extends "accounts/base.html" %}
+
+{% block title %}
+   Inventory Details
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+   <h1 class="mb-4">Inventory Details</h1>
+
+   <div class="card">
+
+      <div class="card-body">
+
+         <h3>{{ inventory.product.name }}</h3>
+
+         <hr>
+
+         <p>
+            <strong>SKU:</strong>
+            {{ inventory.product.sku }}
+         </p>
+
+         <p>
+            <strong>Current Stock:</strong>
+            {{ inventory.product.stock}}
+         </p>
+
+         <p>
+            <strong>Low Stock Threshold:</strong>
+            {{ inventory.low_stock_threshold }}
+         </p>
+
+         <p>
+            <strong>Status:</strong>
+            {{ inventory.stock_status }}
+         </p>
+
+         <p>
+            <strong>Created:<strong>
+            {{ inventory.updated_at }}
+         </p>
+
+         <a 
+            href="{% url 'inventory:list' %}"
+            class="btn btn-secondary"
+         >
+         Back to Inventory 
+         </a>
+
+      </div>
+
+   </div>
+
+</div>
+
+
+{% endblock %}
