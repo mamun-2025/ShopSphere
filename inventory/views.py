@@ -1,8 +1,12 @@
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, FormView
+from django.contrib import messages
+from django.shortcuts import redirect, get_object_or_404
 
+from .forms import StockAdjusmentForm
 from .models import Inventory
+
 
 
 # Inventory List View
@@ -48,3 +52,109 @@ class InventoryDetailView(
       return Inventory.objects.select_related(
          "product"
       )
+
+
+
+
+# Inventory Stock Increase View
+class InventoryStockIncreaseView(
+   LoginRequiredMixin,
+   PermissionRequiredMixin,
+   FormView,
+):
+   form_class = StockAdjusmentForm
+   template_name = "inventory/stock_adjusment.html"
+
+   permission_required = "inventory.change_inventory"
+
+   raise_exception = True
+
+
+
+   def dispatch(self, request, *args, **kwargs):
+       self.inventory = get_object_or_404(
+          Inventory.objects.select_related("product"),
+          pk=kwargs["pk"],
+       )
+       
+       return super().dispatch(
+          request, 
+          *args, 
+          **kwargs
+      )
+
+
+   def form_valid(self, form):
+      quantity = form.cleaned_data["quantity"]
+
+      self.inventory.increase_stock(quantity)
+      
+      messages.success(
+         self.request,
+         f"{quantity} stock added successfully",
+      )
+
+      return redirect(
+         "inventory:detail",
+         pk=self.inventory.pk,
+      )
+
+
+
+
+# Inventory Stock Decrease View
+class InventoryStockDecreaseView(
+   LoginRequiredMixin,
+   PermissionRequiredMixin,
+   FormView,
+):
+   form_class = StockAdjusmentForm
+   template_name = "inventory/stock_adjusment.html"
+
+   permission_required = "inventory.change_inventory"
+
+   raise_exception = True
+
+
+   def dispatch(self, request, *args, **kwargs):
+      self.inventory = get_object_or_404(
+         Inventory.objects.select_related("product"),
+         pk=kwargs["pk"],
+      )
+
+      return super().dispatch(
+         request, 
+         *args, 
+         **kwargs
+      )
+
+
+   def form_valid(self, form):
+      quantity = form.cleaned_data["quantity"]
+
+      try:
+         self.inventory.decrease_stock(quantity)
+
+      except ValueError as error:
+         form.add_error(
+            "quantity",
+            str(error),
+         )
+
+         return self.form_valid[form]
+
+
+      messages.success(
+         self.request,
+         f"{quantity} stock removed successfully",
+      )
+
+      return redirect(
+         "inventory:detail",
+         pk=self.inventory.pk,
+      )
+
+
+      
+
+   

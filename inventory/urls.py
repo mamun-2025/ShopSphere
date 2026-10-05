@@ -16,5 +16,15 @@ urlpatterns = [
        views.InventoryDetailView.as_view(),
        name="detail",
     ),
+    path(
+       "<int:pk>/increase/",
+       views.InventoryStockIncreaseView.as_view(),
+       name="increase",
+    ),
+    path(
+       "<int:pk>/decrease/",
+       views.InventoryStockDecreaseView.as_view(),
+       name="decrease",
+    ),
 
 ]
