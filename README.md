@@ -179,9 +179,9 @@ Milestone 3 — File Handling
 
 ## 🟢 Milestone 6 — Inventory
 
-**Status:** 🟨 In Progress
+**Status:** ✅ Completed
 
-### Topics
+### Topics 
 
 * [✅] Inventory Model
 * [✅] SKU Management
@@ -192,18 +192,18 @@ Milestone 3 — File Handling
 * [✅] Stock Validation
 * [✅] Inventory Admin
 * [✅] Inventory Views
-* [ ] Inventory UI
+* [✅] Inventory UI
 
 
 ### Output
 
-* [ ] Inventory Management System
+* [✅] Inventory Management System
 
 ---
 
 ## 🟢 Milestone 7 — Business Logic
 
-**Status:** ⬜ Not Started
+**Status:** 🟨 In Progress
 
 ### Topics
 
@@ -407,8 +407,8 @@ shopsphere/
 | Milestone 3  | ✅ Completed|
 | Milestone 4  | ✅ Completed|
 | Milestone 5  | ✅ Completed|
-| Milestone 6  | 🟨 In Progress|
-| Milestone 7  | ⬜ Not Started|
+| Milestone 6  | ✅ Completed|
+| Milestone 7  | 🟨 In Progress|
 | Milestone 8  | ⬜ Not Started|
 | Milestone 9  | ⬜ Not Started|
 | Milestone 10 | ⬜ Not Started|

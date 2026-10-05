@@ -1,0 +1,65 @@
+
+
+{% extends "accounts/base.html" %}
+
+{% block title %}
+   Stock Adjusment
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+   <div class="card">
+
+      <div class="card-body">
+         
+         <h2 class="mb-3">
+            Stock Adjusment
+         </h2>
+
+         <p>
+            <strong>Product:</strong>
+            {{ view.inventory.product.name }}
+         </p>
+
+         <p>
+            <strong>SKU:</strong>
+            {{ view.inventory.product.sku }}
+         </p>
+
+         <p>
+            <strong>Current Stock</strong>
+            {{ view.inventory.product.stock }}
+         </p>
+
+         <hr>
+
+         <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button
+               type="submit"
+               class="btn btn-primary"
+            >
+               Submit
+            </button>
+
+            <a 
+               href="{% url 'inventory:detail' view.inventory.pk %}"
+               class="btn btn-secondary"
+            > 
+               Cancel
+            </a>
+
+         </form>
+
+      </div>
+
+   </div>
+
+</div>
+
+
+{% endblock %}

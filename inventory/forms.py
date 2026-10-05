@@ -2,7 +2,7 @@
 from django import forms
 
 
-class StockAdjusmentForm(forms.Form):
+class StockAdjustmentForm(forms.Form):
    quantity = forms.IntegerField(
       min_value=1,
       label="Quantity",

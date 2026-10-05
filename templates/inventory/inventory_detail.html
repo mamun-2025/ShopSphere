@@ -29,6 +29,30 @@
             {{ inventory.product.stock}}
          </p>
 
+         
+         {% if perms.inventory.change_inventory %}
+
+            <div class="mt-4">
+
+               <a
+                  href="{% url 'inventory:increase' inventory.pk %}"
+                  class="btn btn-success"
+               >
+                  Increase Stock
+               </a>
+
+               <a
+                  href="{% url 'inventory:decrease' inventory.pk %}"
+                  class="btn btn-danger"
+               >
+                  Decrease Stock
+               </a>
+
+            </div>
+
+         {% endif %}
+
+
          <p>
             <strong>Low Stock Threshold:</strong>
             {{ inventory.low_stock_threshold }}

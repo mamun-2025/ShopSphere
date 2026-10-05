@@ -26,6 +26,16 @@
 
       <div>
 
+         {% if perms.inventory.view_inventory %}
+            <a 
+               href="{% url 'inventory:list' %}"
+               class="btn btn-success"
+            >
+            Inventory
+            </a>
+         {% endif %}
+
+
          {% if perms.categories.add_category %}
             <a 
                href="{% url 'category_list' %}"
@@ -35,12 +45,13 @@
             </a>
          {% endif %}
 
-         <a 
-            href="{% url 'product_list' %}"
-            class="btn btn-secondary"
-         >
-         Products
-         </a>
+            <a 
+               href="{% url 'product_list' %}"
+               class="btn btn-secondary"
+            >
+            Products
+            </a>
+
 
          {% if perms.products.add_product %}
             <a 

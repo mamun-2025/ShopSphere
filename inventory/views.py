@@ -4,7 +4,7 @@ from django.views.generic import ListView, DetailView, FormView
 from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
 
-from .forms import StockAdjusmentForm
+from .forms import StockAdjustmentForm
 from .models import Inventory
 
 
@@ -62,8 +62,8 @@ class InventoryStockIncreaseView(
    PermissionRequiredMixin,
    FormView,
 ):
-   form_class = StockAdjusmentForm
-   template_name = "inventory/stock_adjusment.html"
+   form_class = StockAdjustmentForm
+   template_name = "inventory/stock_adjustment.html"
 
    permission_required = "inventory.change_inventory"
 
@@ -108,8 +108,8 @@ class InventoryStockDecreaseView(
    PermissionRequiredMixin,
    FormView,
 ):
-   form_class = StockAdjusmentForm
-   template_name = "inventory/stock_adjusment.html"
+   form_class = StockAdjustmentForm
+   template_name = "inventory/stock_adjustment.html"
 
    permission_required = "inventory.change_inventory"
 
@@ -141,7 +141,7 @@ class InventoryStockDecreaseView(
             str(error),
          )
 
-         return self.form_valid[form]
+         return self.form_invalid(form)
 
 
       messages.success(
