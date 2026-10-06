@@ -215,6 +215,7 @@ Milestone 3 — File Handling
 * [ ] Shipping
 * [ ] Checkout
 * [ ] Orders
+* [ ] Payment System
 * [ ] Invoice (PDF)
 
 ### Output
