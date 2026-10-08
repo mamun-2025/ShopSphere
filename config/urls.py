@@ -11,6 +11,8 @@ urlpatterns = [
     path('products/', include('products.urls')),
     path('reviews/', include('reviews.urls')),
     path('inventory/', include('inventory.urls')),
+    path('cart/', include('carts.urls')),
+    
 ]
 if settings.DEBUG:
    urlpatterns += static(

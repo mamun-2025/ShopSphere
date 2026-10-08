@@ -74,6 +74,41 @@
          </p>
 
 
+         <!-- Add TO Cart -->
+         <div class="mt-4 mb-4">
+
+            {% if product.is_active and product.stock > 0 %}
+
+               <form method="post"
+                     action="{% url 'carts:add' product.id %}"
+               >
+                  {% csrf_token %}
+
+                  <button
+                     type="submit"
+                     class="btn btn-success"
+                  >
+                  🛒 Add to Cart
+                  </button>
+
+               </form>
+
+
+            {% elif not product.is_active %}
+
+               <span class="badge bg-danger fs-6">
+                  Product Inactive
+               </span>
+
+            {% else %}
+
+               <span class="badge bg-danger fs-6">
+                  Out of Stock
+               </span>
+               
+         </div>
+
+
 
          <!-- Product PDF -->
          {% if product.manual %}
