@@ -1,0 +1,66 @@
+
+
+
+{% extends "accounts/base.html" %}
+
+{% block titile %}
+
+   Update Cart Quantity
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+   <div class="card">
+
+      <div class="body">
+
+         <h2 class="mb-3">
+            Update Cart Quantity
+         </h2>
+
+         <p>
+            <strong>Product:</strong>
+            {{ view.cart_item.product.name }}
+         </p>
+
+         <p>
+            <strong>Available Stock:</strong>
+            {{ view.cart_item.product.stock }}
+         </p>
+
+         <p>
+            <strong>Current Quantity:<strong>
+            {{ view.cart_item.quantity }}
+         </p>
+
+         <hr>
+
+         <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button 
+               type="submit"
+               class="btn btn-primary"
+            >
+               Update Quantity
+            </button>
+            <a 
+               href="{% url 'product_detail' view.cart_item.product.slug %}"
+               class="btn btn-secondary"
+            >
+               Cancel
+            </a>
+
+         </form>
+
+      </div>
+
+   </div>
+
+</div>
+
+{% endblock %}
+

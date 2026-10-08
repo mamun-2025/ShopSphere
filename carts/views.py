@@ -8,6 +8,9 @@ from django.views import View
 from products.models import Product
 from .models import Cart, CartItem
 
+from django.views.generic import FormView
+from .forms import CartQuantityForm
+
 
 class AddToCartView(
    LoginRequiredMixin,
@@ -50,7 +53,7 @@ class AddToCartView(
                "Insufficient Stock.",
             )
             return redirect(
-               "products:detail",
+               "product_detail",
                slug=product.slug,
             )
 
@@ -74,11 +77,81 @@ class AddToCartView(
       )
 
       return redirect(
-         "products:detail",
+         "product_detail",
          slug=product.slug,
       )
 
          
 
+class UpdateCartQuantityView(
+   LoginRequiredMixin,
+   FormView,
+):
+   template_name = "carts/update_quantity.html"
+   form_class = CartQuantityForm
 
+   def dispatch(self, request, *args, **kwargs):
+
+      self.cart_item = get_object_or_404(
+         CartItem.objects.select_related(
+            "cart",
+            "product",
+         ),
+         pk=kwargs["item_id"],
+         cart__user=request.user,
+      )
+
+      return super().dispatch(
+         request, 
+         *args,
+         **kwargs
+      )
+
+
+   def get_initial(self):
+
+      return {
+         "cart_item": self.cart_item.quantity,
+      }
+
+
+   def form_valid(self, form):
+
+      quantity = form.cleaned_data["quantity"]
+
+      if quantity > self.cart_item.product.stock:
+          
+         form.add_error(
+             "quantity",
+             "Requested quantity exceeds avaialbe stock.",
+          )
+
+         return self.form_invalid(form)
+
+      self.cart_item.quantity = quantity
+
+      self.cart_item.save(
+         update_fields="quantity",
+      )
+
+      messages.success(
+         self.request,
+         "Cart quantity updated successfully.",
+      )
+
+      return redirect(
+         "product_detail",
+         slug=self.cart_item.product.slug,
+      )
+
+      # return redirect(
+      #    "carts:detail",
+      # )
+   
+
+      
+   
+
+
+   
 
