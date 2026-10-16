@@ -9,6 +9,8 @@ from .views import (
    ProductDeleteView
 )
 
+app_name = "products"
+
 urlpatterns = [
    
    path("", 

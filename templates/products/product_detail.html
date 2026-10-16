@@ -172,7 +172,7 @@
 
          <!-- Action buttons -->
          <a 
-            href="{% url 'product_list' %}"
+            href="{% url 'products:product_list' %}"
             class="btn btn-secondary"
          >
          Back to Product_List
@@ -180,7 +180,7 @@
          
          {% if perms.products.change_product %}
             <a 
-               href="{% url 'product_update' product.pk %}"
+               href="{% url 'products:product_update' product.pk %}"
                class="btn btn-primary"
             >
             Edit Product
@@ -189,7 +189,7 @@
 
          {% if perms.products.delete_product %}
             <a 
-               href="{% url 'product_delete' product.pk %}"
+               href="{% url 'products:product_delete' product.pk %}"
                class="btn btn-danger"
             >
             Delete Product

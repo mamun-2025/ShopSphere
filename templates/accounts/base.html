@@ -46,7 +46,7 @@
          {% endif %}
 
             <a 
-               href="{% url 'product_list' %}"
+               href="{% url 'products:product_list' %}"
                class="btn btn-secondary"
             >
             Products
@@ -55,7 +55,7 @@
 
          {% if perms.products.add_product %}
             <a 
-               href="{% url 'product_create' %}"
+               href="{% url 'products:product_create' %}"
                class="btn btn-info"
             >
             Add Products

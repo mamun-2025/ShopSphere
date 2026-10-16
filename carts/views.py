@@ -12,6 +12,8 @@ from django.views.generic import FormView
 from .forms import CartQuantityForm
 
 
+
+# Add to Cart
 class AddToCartView(
    LoginRequiredMixin,
    View,
@@ -30,7 +32,7 @@ class AddToCartView(
             "Product is out of stock."
          )
          return redirect(
-            "products:detail",
+            "products:product_detail",
             slug=product.slug,
          )
 
@@ -53,7 +55,7 @@ class AddToCartView(
                "Insufficient Stock.",
             )
             return redirect(
-               "product_detail",
+               "products:product_detail",
                slug=product.slug,
             )
 
@@ -67,7 +69,7 @@ class AddToCartView(
          CartItem.objects.create(
             cart=cart,
             product=product,
-            quantiy=1,
+            quantity=1,
          )
 
 
@@ -77,12 +79,14 @@ class AddToCartView(
       )
 
       return redirect(
-         "product_detail",
+         "products:product_detail",
          slug=product.slug,
       )
 
          
 
+
+# Update Cart Quantity
 class UpdateCartQuantityView(
    LoginRequiredMixin,
    FormView,
@@ -111,7 +115,7 @@ class UpdateCartQuantityView(
    def get_initial(self):
 
       return {
-         "cart_item": self.cart_item.quantity,
+         "quantity": self.cart_item.quantity,
       }
 
 
@@ -123,7 +127,7 @@ class UpdateCartQuantityView(
           
          form.add_error(
              "quantity",
-             "Requested quantity exceeds avaialbe stock.",
+             "Requested quantity exceeds available stock.",
           )
 
          return self.form_invalid(form)
@@ -131,7 +135,7 @@ class UpdateCartQuantityView(
       self.cart_item.quantity = quantity
 
       self.cart_item.save(
-         update_fields="quantity",
+         update_fields=["quantity"],
       )
 
       messages.success(
@@ -140,7 +144,7 @@ class UpdateCartQuantityView(
       )
 
       return redirect(
-         "product_detail",
+         "products:product_detail",
          slug=self.cart_item.product.slug,
       )
 
@@ -150,7 +154,33 @@ class UpdateCartQuantityView(
    
 
       
-   
+# Remove Cart 
+class RemoveFromCartView(
+   LoginRequiredMixin,
+   View,
+):
+   def post(self, request, item_id):
+
+      cart_item = get_object_or_404(
+         CartItem.objects.select_related("product"),
+         pk=item_id,
+         cart__user=request.user,
+      )
+
+      product = cart_item.product
+      product_name = product.name 
+
+      cart_item.delete()
+
+      messages.success(
+         request,
+         f"{product_name} removed from cart.",
+      )
+
+      return redirect(
+         "products:product_detail",
+         slug=product.slug,
+      )
 
 
    

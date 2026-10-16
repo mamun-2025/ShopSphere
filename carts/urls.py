@@ -16,5 +16,10 @@ urlpatterns = [
        views.UpdateCartQuantityView.as_view(),
        name="update_quantity",
     ),
+    path(
+       "item/<int:item_id>/remove/",
+       views.RemoveFromCartView.as_view(),
+       name="remove",
+    ),
     
 ]

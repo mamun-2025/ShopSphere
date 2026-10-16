@@ -1,6 +1,7 @@
 
 from django.contrib import admin
-from .models import Cart
+from .models import Cart, CartItem
+
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
@@ -24,4 +25,31 @@ class CartAdmin(admin.ModelAdmin):
 
    list_select_related = (
       "user",
+   )
+
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+   list_display = (
+      "id",
+      "cart",
+      "product",
+      "quantity",
+      "created_at",
+   )
+
+   search_fields = (
+      "cart__user__username",
+      "cart__user__email",
+      "product__name",
+      "product__sku",
+   )
+
+   list_select_related = (
+      "cart",
+      "product",
+   )
+
+   readonly_fields = (
+      "created_at",
    )
