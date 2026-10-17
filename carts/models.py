@@ -22,6 +22,13 @@ class Cart(models.Model):
       auto_now=True,
    )
 
+   @property
+   def subtotal(self):
+      return sum(
+         item.product.price * item.quantity
+         for item in self.items.select_related("product")
+      )
+
    def __str__(self):
       return f"Cart- {self.user.username}"
 
