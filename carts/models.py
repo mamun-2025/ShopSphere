@@ -29,6 +29,36 @@ class Cart(models.Model):
          for item in self.items.select_related("product")
       )
 
+
+   def get_stock_issues(self):
+
+      issues = []
+
+      cart_items = self.items.select_related("product")
+
+      for item in cart_items:
+
+         product = item.product
+
+         if not product.is_active:
+            issues.append(
+               f"{product.name} is no longer available."
+            )
+
+         elif product.stock == 0:
+            issues.append(
+               f"{product.name} is out of stock."
+            )
+
+         elif item.quantity > product.stock:
+            issues.append(
+               f"{product.name}: only"
+               f"{product.stock} item's available."
+            )
+
+      return issues
+
+
    def __str__(self):
       return f"Cart- {self.user.username}"
 

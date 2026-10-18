@@ -36,7 +36,7 @@ class AddToCartView(
             slug=product.slug,
          )
 
-      cart, created = Cart.objects.get_or_create(
+      cart, _ = Cart.objects.get_or_create(
          user=request.user,
       )
 
@@ -121,10 +121,19 @@ class UpdateCartQuantityView(
 
    def form_valid(self, form):
 
+      product = self.cart_item.product
       quantity = form.cleaned_data["quantity"]
 
-      if quantity > self.cart_item.product.stock:
-          
+      if not product.is_active:
+         form.add_error(
+            None,
+            "This product is no longer available.",
+         )
+
+         return self.form_invalid(form)
+
+      
+      if quantity > product.stock:    
          form.add_error(
              "quantity",
              "Requested quantity exceeds available stock.",
@@ -145,13 +154,10 @@ class UpdateCartQuantityView(
 
       return redirect(
          "products:product_detail",
-         slug=self.cart_item.product.slug,
+         slug=product.slug,
       )
 
-      # return redirect(
-      #    "carts:detail",
-      # )
-   
+
 
       
 # Remove Cart 
