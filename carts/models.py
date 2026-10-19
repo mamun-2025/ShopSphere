@@ -98,6 +98,12 @@ class CartItem(models.Model):
          ),
       ]
 
+
+   @property
+   def line_total(self):
+      return self.product.price * self.quantity
+
+
    def __str__(self):
       return f"{self.product.name } X {self.quantity}"
 
