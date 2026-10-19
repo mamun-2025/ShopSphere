@@ -107,5 +107,3 @@ class CartItem(models.Model):
    def __str__(self):
       return f"{self.product.name } X {self.quantity}"
 
-
-
