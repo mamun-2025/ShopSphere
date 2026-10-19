@@ -8,7 +8,7 @@ from django.views import View
 from products.models import Product
 from .models import Cart, CartItem
 
-from django.views.generic import FormView
+from django.views.generic import FormView, TemplateView
 from .forms import CartQuantityForm
 
 
@@ -153,8 +153,7 @@ class UpdateCartQuantityView(
       )
 
       return redirect(
-         "products:product_detail",
-         slug=product.slug,
+         "carts:detail"
       )
 
 
@@ -184,10 +183,28 @@ class RemoveFromCartView(
       )
 
       return redirect(
-         "products:product_detail",
-         slug=product.slug,
+         "carts:detail"
       )
 
 
    
+# CartDetail View
+class CartDetailView(LoginRequiredMixin, TemplateView):
+   template_name = "carts/cart_detail.html"
 
+   def get_context_data(self, **kwargs):
+      context = super().get_context_data(**kwargs)
+
+      cart, _ = Cart.objects.get_or_create(
+         user = self.request.user
+      )
+
+      context["cart"] = cart 
+      context["cart_items"] = (
+         cart.items.select_related("product")
+      )
+      context["subtotal"] = cart.subtotal
+      context["stock_issues"] = cart.get_stock_issues()
+
+      return context
+   

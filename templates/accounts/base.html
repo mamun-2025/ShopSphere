@@ -64,24 +64,35 @@
 
          
          {% if request.user.is_authenticated %}
+
+            <a 
+               href="{% url 'carts:detail' %}"
+               class="btn btn-primary me-2"
+            >
+             My Cart 
+            </a>
+
             <a 
                href="{% url 'accounts:profile' %}"
                class="btn btn-success"
             >
             Profile
             </a>
+
             <a 
                href="{% url 'accounts:edit_profile' %}"
                class="btn btn-warning"
             >
             Edit Profile
             </a>
+
             <a 
                href="{% url 'accounts:logout' %}"
                class="btn btn-danger"
             >
             Logout
             </a>
+            
             <a 
                href="{% url 'accounts:change_password' %}"
                class="btn btn-info"
@@ -120,7 +131,7 @@
       {% for message in messages %}
 
          <div 
-            class="alert alert-{{ message.tags }} alert-dimissible fade show"
+            class="alert alert-{{ message.tags }} alert-dismissible fade show"
             role="alert"
          >
 
@@ -129,8 +140,8 @@
             <button
                type="button"
                class="btn-close"
-               class-bs-dimiss="alert"
-               alert-label="Close"
+               data-bs-dimiss="alert"
+               area-label="Close"
             ></button>
 
          </div>

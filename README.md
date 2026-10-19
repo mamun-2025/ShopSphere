@@ -207,7 +207,7 @@ Milestone 3 — File Handling
 
 ### Topics
 
-* [ ] Shopping Cart
+* [✅] Shopping Cart
 * [ ] Session Cart
 * [ ] Wishlist
 * [ ] Coupons
