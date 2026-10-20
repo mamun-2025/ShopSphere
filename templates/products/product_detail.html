@@ -111,6 +111,29 @@
          </div>
 
 
+         <!-- Add To Wishlist -->
+         <div class="mt-4 mb-4">
+
+            <form 
+               method="post"
+               action="{% url 'wishlist:add' product.id %}"
+               class="d-inline"
+            >
+               {% csrf_token %}
+
+               <button
+                  type="submit"
+                  class="btn btn-outline-danger"
+               >
+                  <span aria-hidden="true">♥</span>
+                  Add to Wishlist
+               </button>
+
+            </form>
+            
+         </div>
+
+
 
          <!-- Product PDF -->
          {% if product.manual %}
