@@ -7,6 +7,7 @@ from . import views
 app_name = "wishlist"
 
 urlpatterns = [
+    path("", views.WishlistListView.as_view(), name="list"),
     path(
        "add/<int:product_id>/",
        views.AddToWishlistView.as_view(),
