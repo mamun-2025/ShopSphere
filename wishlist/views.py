@@ -55,4 +55,25 @@ class WishlistListView(LoginRequiredMixin, ListView):
       )
 
 
+
+# RemoveFromWishListView
+class RemoveFromWishlistView(LoginRequiredMixin, View):
+   def post(self, request, item_id):
+      item = get_object_or_404(
+         WishlistItem,
+         pk=item_id,
+         user=request.user,
+      )
+
+      product_name = item.product.name 
+      item.delete()
+
+      messages.success(
+         request,
+         f"{product_name} removed your wishlist.",
+      )
+
+      return redirect(
+         "wishlist:list",
+      )
    

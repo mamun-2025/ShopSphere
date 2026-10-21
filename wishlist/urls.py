@@ -13,4 +13,9 @@ urlpatterns = [
        views.AddToWishlistView.as_view(),
        name="add",
     ),
+    path(
+       "item/<int:item_id>/remove/",
+       views.RemoveFromWishlistView.as_view(),
+       name="remove",
+    ),
 ]

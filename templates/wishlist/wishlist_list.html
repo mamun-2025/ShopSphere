@@ -71,13 +71,46 @@
                         {{ item.created_at|date:"d M Y" }}
                      </p>
 
-                     <div class="mt-auto">
+                     <div class="mt-auto d-grid gap-2">
                         <a 
                            href="{% url 'products:product_detail' slug=item.product.slug %}"
                            class="btn btn-primary w-100"
                         >
                            View Product
                         </a>
+
+                        {% if item.product.is_active and item.product.stock > 0 %}
+                           <form 
+                              method="post"
+                              action="{% url 'carts:add' item.product.id %}"
+                           >
+                              {% csrf_token %}
+
+                              <input type="hidden" name="quantity" value="1">
+
+                              <button type="submit" class="btn btn-primary w-100">
+                                 Add to Cart 
+                              </button>
+                           </form>
+
+                        {% else %}
+                           <button class="btn btn-secondary w-100" disabled>
+                              Currently Unavailable
+                           </button>
+                        {% endif %}
+
+                        <form 
+                        method="post"
+                        action="{% url 'wishlist:remove' item.id %}"
+                        onsubmit="return confirm('Remove this product from your wishlist?');"
+                        >
+                           {% csrf_token %}
+
+                           <button type="submit" class="btn btn-outline-danger w-100">
+                              Remove from Wishlist
+                           </button>
+                        </form>
+
                      </div>
 
                   </div>
