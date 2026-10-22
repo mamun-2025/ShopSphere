@@ -1,0 +1,166 @@
+
+1️⃣ Linux আসলে কী?
+Linux is operating system of kernel
+
+2️⃣ WSL কী?
+WSL = Windows Subsystem for Linux 
+
+3️⃣ প্রথমে Check করি WSL আছে কিনা
+powershell = wsl --status
+
+4️⃣ Ubuntu installed কিনা দেখো
+powershell = wsl --list --verbose
+powershell = wsl -l -v 
+
+5️⃣ যদি Ubuntu না থাকে
+যদি এমন কিছু দেখো:
+There are no installed distributions.
+
+তাহলে Ubuntu install করতে পারো:
+wsl --install -d Ubuntu
+
+তারপর Windows restart চাইলে restart করবে।
+
+Restart-এর পরে Ubuntu প্রথমবার চালু হবে।
+
+
+6️⃣ Ubuntu প্রথমবার Open
+Start Menu থেকে:
+Ubuntu search করো।
+Open করো।
+
+প্রথমবার কিছু setup হতে পারে।
+
+তারপর Ubuntu তোমাকে username চাইবে:
+Enter new UNIX username:
+
+উদাহরণ:
+mamun
+
+তারপর password:
+New password:
+
+এখানে একটা গুরুত্বপূর্ণ বিষয়:
+Linux terminal-এ password টাইপ করার সময় কোনো character দেখা যাবে না।
+
+যেমন:
+New password: 
+তুমি 123456 টাইপ করলেও screen-এ:
+New password:
+এই অবস্থাই থাকবে।
+এটা normal।
+Password টাইপ করে Enter দেবে।
+
+তারপর আবার:
+Retype new password:
+একই password দেবে।
+
+
+7️⃣ এখন তুমি Linux-এর ভিতরে 🐧
+তোমার terminal-এ এমন কিছু দেখতে পারো:
+mamun@DESKTOP:~$
+
+এটা খুব গুরুত্বপূর্ণ।
+
+এখানে:
+mamun
+  ↓
+Linux username
+
+@
+  ↓
+
+DESKTOP
+  ↓
+computer/host name
+
+:
+  ↓
+
+~
+  ↓
+Home directory
+
+$
+  ↓
+Normal user
+
+তাই:
+mamun@DESKTOP:~$
+
+মানে মোটামুটি:
+"আমি Linux-এর ভিতরে mamun user হিসেবে আমার home directory-তে আছি এবং command দেওয়ার জন্য প্রস্তুত।"
+
+
+
+8️⃣ প্রথম Linux Command
+pwd = Print Working Directory 
+আমি বর্তমানে কোন directory-তে আছি?
+
+
+9️⃣ দ্বিতীয় Command
+ls = List 
+এটা current directory-এর file/folder দেখায়।
+
+
+🔟 Linux-এর সবচেয়ে গুরুত্বপূর্ণ ধারণা
+Windows-এ তুমি দেখো:
+C:
+D:
+
+Linux-এ সাধারণত filesystem শুরু হয়:
+/
+
+এটাকে বলে:
+
+Root directory
+
+Structure মোটামুটি:
+/
+├── home
+│   └── mamun
+│
+├── etc
+├── usr
+├── var
+├── tmp
+├── dev
+└── ...
+
+তোমার নিজের home:
+/home/mamun
+
+এবং shortcut:
+~
+
+তাই:
+cd ~
+
+মানে:
+নিজের home directory-তে যাও।
+
+
+1️⃣1️⃣ Windows এবং WSL-এর সম্পর্ক
+তোমার ক্ষেত্রে এটা খুব গুরুত্বপূর্ণ।
+
+Windows-এর:
+C:\Users\HP\Desktop
+
+WSL-এর ভিতর থেকে সাধারণত দেখা যায়:
+/mnt/c/Users/HP/Desktop
+
+অর্থাৎ:
+Windows C:
+     ↓
+/mnt/c
+
+এবং:
+C:\Users\HP
+
+হয়:
+/mnt/c/Users/HP
+
+তোমার ShopSphere যেহেতু Windows Desktop-এর ভিতরে ছিল, তাই তুমি এমন path দেখেছ:
+/mnt/c/Users/HP/Desktop/ShopSphere
+
+এখন এই path-টা তোমার জন্য খুব গুরুত্বপূর্ণ হয়ে যাবে।

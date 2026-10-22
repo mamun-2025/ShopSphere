@@ -1,0 +1,50 @@
+
+Interview Vocabulary:
+____________________
+| Terminal | কমান্ড দেওয়ার interface |
+| Command | নির্দেশ |
+| File | ফাইল |
+| Directory | Folder |
+| Path | কোনো file/directory-এর অবস্থান |
+| Root | সর্বোচ্চ filesystem directory |
+| Home directory | User-এর ব্যক্তিগত মূল directory |
+| Parent directory | এক level উপরের directory |
+| Current directory | বর্তমানে যে directory-তে আছি |
+| Absolute path | Root থেকে সম্পূর্ণ path |
+| Relative path | Current location থেকে path |
+| Hidden file | সাধারণভাবে দেখা যায় না এমন file |
+
+
+🏆 Lesson 1 — 1 Page Revision
+🐧 Linux Navigation
+
+কোথায় আছি?
+pwd
+
+এখানে কী আছে?
+ls
+
+Hidden files সহ:
+ls -a
+
+Detailed:
+ls -l
+
+Hidden + Detailed:
+ls -la
+
+Directory-তে ঢুকি:
+cd directory
+
+এক level উপরে:
+cd ..
+
+Root:
+cd /
+
+Home:
+cd ~
+
+Absolute path:
+cd /mnt/c/Users/HP/Desktop/ShopSphere
+
