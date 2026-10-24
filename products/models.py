@@ -71,6 +71,10 @@ class Product(models.Model):
       default=True,
    )
 
+   is_taxable = models.BooleanField(
+      default=True,
+   )
+
    created_at = models.DateTimeField(
       auto_now_add=True
    )
