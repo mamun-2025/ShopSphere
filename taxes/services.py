@@ -45,30 +45,30 @@ def calculate_cart_totals(cart):
       if item.product.is_taxable:
          taxable_subtotal += line_total
 
-      subtotal = money(subtotal)
-      taxable_subtotal = money(taxable_subtotal)
+   subtotal = money(subtotal)
+   taxable_subtotal = money(taxable_subtotal)
 
-      tax_rate_obj = get_default_tax_rate()
+   tax_rate_obj = get_default_tax_rate()
 
-      if tax_rate_obj is not None:
-         rate = tax_rate_obj.rate
-         tax_amount = money(
-            taxable_subtotal * rate / Decimal("100")
-         )
-         tax_name = tax_rate_obj.name 
+   if tax_rate_obj is not None:
+      rate = tax_rate_obj.rate
+      tax_amount = money(
+         taxable_subtotal * rate / Decimal("100")
+      )
+      tax_name = tax_rate_obj.name 
 
-      else:
-         rate = ZERO
-         tax_amount = ZERO
-         tax_name = "No tax configured"
+   else:
+      rate = ZERO
+      tax_amount = ZERO
+      tax_name = "No tax configured"
 
-      total = money(subtotal + tax_amount)
+   total = money(subtotal + tax_amount)
 
-      return {
-         "subtotal": subtotal,
-         "taxable_subtotal": taxable_subtotal,
-         "tax_rate": rate,
-         "tax_name": tax_name,
-         "tax_amount": tax_amount,
-         "total": total,
-      }
+   return {
+      "subtotal": subtotal,
+      "taxable_subtotal": taxable_subtotal,
+      "tax_rate": rate,
+      "tax_name": tax_name,
+      "tax_amount": tax_amount,
+      "total": total,
+   }
