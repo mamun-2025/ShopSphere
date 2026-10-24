@@ -1,0 +1,144 @@
+
+
+🧠 Lesson 2 — 1 Page Revision
+mkdir
+↓
+make directory
+
+mkdir folder
+
+touch
+↓
+create an empty file
+
+touch file.txt
+
+cd
+↓
+change directory
+
+cd folder
+
+..
+↓
+parent directory
+
+cd ..
+
+~
+↓
+home directory
+
+cd ~
+
+ls
+↓
+contents দেখো
+
+ls
+
+ls -l
+↓
+details + type
+
+প্রথম character:
+d → Directory
+- → File
+
+file
+↓
+object-এর type সম্পর্কে তথ্য
+
+file README.txt
+
+
+### একসাথে কয়েকটি File
+তুমি এক command-এ একাধিক file তৈরি করতে পারো:
+touch python.txt django.txt linux.txt
+
+### একসাথে কয়েকটি Directory
+একইভাবে:
+mkdir notes projects backup
+
+
+###
+"""
+Step 1 — Directories
+mkdir notes projects
+
+Step 2 — notes-এর ভিতরে files
+touch notes/linux.txt notes/commands.txt
+
+Step 3 — projects-এর ভিতরে file
+touch projects/ShopSphere.txt
+
+Step 4 — Root practice directory-তে README
+touch README.txt
+
+এখন Structure দেখো
+ls
+
+তুমি দেখতে পারো:
+README.txt
+notes
+projects
+
+এখন:
+ls notes
+
+Output:
+commands.txt
+linux.txt
+
+এবং:
+ls projects
+
+Output:
+ShopSphere.txt
+
+"""
+
+
+### mkdir -p ⭐
+এটা খুব useful command।
+
+ধরো তুমি একবারে তৈরি করতে চাও:
+mkdir -p backend/django/lessons/lesson01
+এক command-এ পুরো nested structure তৈরি করতে পারে।
+
+
+### touch দিয়ে nested file
+touch backend/django/lessons/lesson01/test.py 
+
+
+### File নাকি Directory — কীভাবে বুঝব?
+এখানে ls -l কাজে আসবে।
+ls -l
+
+ধরো:
+drwxr-xr-x ... notes
+-rw-r--r-- ... README.txt
+
+প্রথম character দেখো।
+d
+d
+
+মানে:
+Directory
+
+-
+-
+
+মানে সাধারণ file।
+
+তাই:
+drwxr-xr-x
+
+→ Directory
+
+এবং:
+-rw-r--r--
+
+→ File
+
+Permissions আমরা পরে বিস্তারিত শিখব।
