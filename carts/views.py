@@ -7,6 +7,7 @@ from django.views import View
 
 from products.models import Product
 from .models import Cart, CartItem
+from taxes.services import calculate_cart_totals
 
 from django.views.generic import FormView, TemplateView
 from .forms import CartQuantityForm
@@ -205,6 +206,9 @@ class CartDetailView(LoginRequiredMixin, TemplateView):
       )
       context["subtotal"] = cart.subtotal
       context["stock_issues"] = cart.get_stock_issues()
+
+      tax_summary = calculate_cart_totals(cart)
+      context.update(tax_summary)
 
       return context
    
