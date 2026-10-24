@@ -362,12 +362,14 @@ shopsphere/
 ├── accounts/
 ├── products/
 ├── categories/
+├── reviews/
 ├── inventory/
 ├── carts/
 ├── wishlist/
-├── coupons/
+├── taxes/
+├── shipping/
 ├── orders/
-├── reviews/
+├── payments/
 ├── api/
 ├── templates/
 ├── static/
