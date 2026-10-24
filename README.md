@@ -209,7 +209,7 @@ Milestone 3 — File Handling
 
 * [✅] Shopping Cart
 * [✅] Wishlist
-* [ ] Tax
+* [✅] Tax
 * [ ] Shipping
 * [ ] Checkout
 * [ ] Orders
