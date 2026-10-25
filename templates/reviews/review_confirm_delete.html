@@ -62,7 +62,7 @@
                   {% csrf_token %}
 
                   <a 
-                     href="{% url 'product_detail' object.product.slug %}"
+                     href="{% url 'products:product_detail' object.product.slug %}"
                      class="btn btn-secondary"
                   >
                   Cancel

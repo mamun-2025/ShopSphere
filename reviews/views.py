@@ -87,7 +87,7 @@ class ReviewCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
    def get_success_url(self):
       
       return reverse(
-         "product_detail",
+         "products:product_detail",
          kwargs={
             "slug": self.product.slug,
          },
@@ -122,7 +122,7 @@ class ReviewUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
    def get_success_url(self):
 
       return reverse(
-         "product_detail",
+         "products:product_detail",
          kwargs={
             "slug": self.object.product.slug,
          },
@@ -164,7 +164,7 @@ class ReviewDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
    def get_success_url(self):
       
       return reverse(
-         "product_detail",
+         "products:product_detail",
          kwargs={
             "slug": self.object.product.slug,
          },

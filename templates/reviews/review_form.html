@@ -73,7 +73,7 @@
                   {% if object %}
 
                      <a 
-                        href="{% url 'product_detail' object.product.slug %}"
+                        href="{% url 'products:product_detail' object.product.slug %}"
                         class="btn btn-secondary"
                      >
                      Cancel
@@ -82,7 +82,7 @@
                   {% else %}
 
                      <a 
-                     href="{% url 'product_detail' view.product.slug %}"
+                     href="{% url 'products:product_detail' view.product.slug %}"
                      class="btn btn-secondary"
                      >
                      Cancel
