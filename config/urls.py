@@ -13,6 +13,7 @@ urlpatterns = [
     path('inventory/', include('inventory.urls')),
     path('cart/', include('carts.urls')),
     path("wishlist/", include("wishlist.urls")),
+    path("shipping/", include("shipping.urls")),
     
 ]
 if settings.DEBUG:
@@ -20,5 +21,7 @@ if settings.DEBUG:
       settings.MEDIA_URL, 
       document_root=settings.MEDIA_ROOT
     )
+
+
 
    
