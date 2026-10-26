@@ -1,0 +1,89 @@
+
+
+{% extends "accounts/base.html" %}
+
+
+{% block content %}
+<div class="container py-4">
+
+   <h1 class="mb -4"> Delivery Options</h1>
+
+   <form method="post">
+      {% csrf_token %}
+
+      <div class="card mb-4">
+         <div class="card-header">
+            <h5 class="mb-0">Delivery Address</h5>
+         </div>
+
+         <div class="card-body">
+            {% for field in address_form %}
+               <div class="mb-3">
+                  <label
+                     for="{{ field.id_for_label }}"
+                     class="form-label"
+                  >
+                     {{ field.label }}
+                  </label>
+
+                  {{ filed }}
+
+                  {% for error in field.errors %}
+                     <div class="text-danger small">
+                        {{ error }}
+                     </div>
+                  {% endfor %}
+               </div>
+            {% endfor %}
+         </div>
+      </div>
+
+      <div class="card mb-4">
+         <div class="card-header">
+            <h5 class="mb-0">Choose Shipping Method</h5>
+         </div>
+
+         <div class="card-body">
+            {% if method_form.shipping_method.field.queryset %}
+               {% for radio in method_form.shipping_method %}
+                  <div class="form-check border rounded p-3 mb-3">
+                     {{ radio.tag }}
+
+                     <label
+                        class="form-check-label ms-2"
+                        for="{{ radio.id_for_label }}"
+                     >
+                        <strong>{{ radio.choice_label }}</strong>
+                     </label>
+                  </div>
+               {% endfor %}
+            {% else %}
+               <p class="text-danger mb-0">
+                  No active shipping methods available.
+                  Please contact the store.
+               </p>
+            {% endif %}
+
+            {% for error in method_form.shipping_method.errors %}
+               <div class="text-danger small">
+                  {{ error }}
+               </div>
+            {% endfor %}
+         </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+         Save Delivery Details
+      </button>
+      
+      <a 
+         href="{% url 'carts:detail' %}"
+         class="btn btn-outline-secondary"
+      >
+         Back to Cart 
+      </a>
+
+   </form>
+
+</div>
+{% endblock %}

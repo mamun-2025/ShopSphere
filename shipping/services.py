@@ -35,7 +35,7 @@ def calculate_shipping(cart, shipping_method):
 
 
 
-def shipping_selection(request):
+def get_shipping_selection(request):
    """
    Load the current user's saved shipping selection from session.
    Invalid or outdated selections safety return an empty selcection.

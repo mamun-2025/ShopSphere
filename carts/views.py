@@ -11,6 +11,7 @@ from taxes.services import calculate_cart_totals
 
 from django.views.generic import FormView, TemplateView
 from .forms import CartQuantityForm
+from shipping.services import calculate_shipping, get_shipping_selection 
 
 
 
@@ -207,8 +208,28 @@ class CartDetailView(LoginRequiredMixin, TemplateView):
       context["subtotal"] = cart.subtotal
       context["stock_issues"] = cart.get_stock_issues()
 
+      # Tax Calculation
       tax_summary = calculate_cart_totals(cart)
       context.update(tax_summary)
+
+      # Shipping Selection
+      shipping_method, shipping_address = get_shipping_selection(
+         self.request
+      )
+
+      shipping_summary = calculate_shipping(
+         cart, 
+         shipping_method,
+      )
+      context.update(shipping_summary)
+
+      context["shipping_address"] = shipping_address
+
+      # Final Estimated cart total = subtotal + tax + shipping
+      context["total"] = (
+         tax_summary["total"]
+         + shipping_summary["shipping_fee"]
+      )
 
       return context
    

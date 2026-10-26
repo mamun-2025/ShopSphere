@@ -182,32 +182,71 @@
                   <!-- Cart Subtotal -->
                   <div class="d-flex justify-content-between">
                      <span>Subtotal</span>
-
-                     <strong>
-                        ৳{{ subtotal|floatformat:2 }}
-                     </strong>
+                     <strong>৳{{ subtotal|floatformat:2 }}</strong>
                   </div>
 
                   <!-- Taxable Subtotal -->
                   <div class="d-flex justify-content-between">
                      <span>Taxable Subtotal</span>
-
-                     <strong>
-                        ৳{{ taxable_subtotal|floatformat:2 }}
-                     </strong>
+                     <strong>৳{{ taxable_subtotal|floatformat:2 }}</strong>
                   </div>
 
                   <!-- Tax -->
-                  <div class="d-flex justify-content-between">
+                  <div class="d-flex justify-content-between mb-2">
                      <span>
                         {{ tax_name }}
                         {{ tax_rate|floatformat:2 }}
                      </span>
-
-                     <strong>
-                        ৳{{ tax_amount|floatformat:2 }}
-                     </strong>
+                     <strong>৳{{ tax_amount|floatformat:2 }}</strong>
                   </div>
+
+                  <!-- Shipping Summary -->
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                     <span>Shipping</span>
+
+                     <div class="text-end">
+                        {% if shipping_method %}
+                           <div>{{ shipping_method.name }}</div>
+
+                           {% if free_shipping %}
+                              <span class="text-success small">
+                                 Free shipping applied
+                              </span>
+                           {% endif %}
+
+                           <div>
+                              {% if free_shipping %}
+                                 <span class="text-success">৳0.00</span>
+                              {% else %}
+                                 ৳{{ shipping_fee|floatformat:2 }}
+                              {% endif %}
+                           </div>
+                        {% else %}
+                           <span class="text-muted">Not Selected</span>
+                        {% endif %}
+                     </div>
+                  </div>
+
+                  <!-- Saved Delivery Address -->
+                  {% if shipping_address %}
+                     <div class="small text-muted mb-3">
+                        Deliver to: {{ shipping_address.full_name }},
+                        {{ shipping_address.area }},
+                        {{ shipping_address.city_or_district }}
+                     </div>
+                  {% endif %}
+
+                  <!-- Choose or Change Shipping -->
+                  <a 
+                     href="{% url'shipping:options} %"
+                     class="btn btn-outline-primary w-100 mb-3">
+                  >
+                     {% if shipping_method %}
+                        Change Delivery Details
+                     {% else %}
+                        Choose Delivery Method
+                     {% endif %}
+                  </a>
 
                   <hr>
 
@@ -216,11 +255,11 @@
                      <strong>Estimated Total</strong>
                      <strong class="fs-4 text-primary">
                          ৳{{ total|floatformat:2 }}
+                     </strong>
                   </div>
 
                   <p class="text-muted small">
-                     Shipping charges and discounts are not included.
-                     Final Tax and Total will be recalculated at checkout.
+                     Final Tax, shipping charges and discounts may be recalculated at checkout.
                   </p>
 
                   <!-- Checkout -->
