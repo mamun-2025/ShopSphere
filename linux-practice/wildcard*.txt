@@ -1,0 +1,44 @@
+
+#####
+Wildcard * — আজ শুধু পরিচিত হও
+Linux-এ:
+*
+
+একটি wildcard।
+
+যেমন:
+ls *.txt
+
+মানে:
+.txt দিয়ে শেষ হওয়া files দেখাও।
+
+যদি থাকে:
+python.txt
+django.txt
+linux.txt
+image.png
+
+তাহলে:
+ls *.txt
+
+দেখাবে:
+django.txt
+linux.txt
+python.txt
+
+⚠️ rm *.txt
+এটাও valid:
+rm *.txt
+
+মানে:
+current directory-এর matching .txt files remove করো।
+
+তাই beginner হিসেবে rm + wildcard ব্যবহার করার আগে extra careful হবে।
+
+
+#####
+একটা rule খুব শক্ত করে মনে রাখো:
+cp নিরাপদে duplicate তৈরি করে, 
+mv জিনিসের location/name পরিবর্তন করে, 
+আর rm সরিয়ে দেয়—
+তাই rm চালানোর আগে pwd + ls দিয়ে নিজের অবস্থান ও target যাচাই করা অভ্যাস করো।

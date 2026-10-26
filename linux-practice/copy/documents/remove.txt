@@ -1,0 +1,92 @@
+
+
+##### rm — Delete
+এখন সবচেয়ে dangerous command:
+rm
+
+rm = remove
+
+এটা file delete করতে ব্যবহার হয়।
+rm ব্যবহার করার আগে path এবং filename দুবার check করবে।
+
+
+##### rm দিয়ে একাধিক File
+a.txt 
+b.txt 
+c.txt 
+rm a.txt b.txt c.txt 
+
+
+##### rm -r — Directory Delete
+এখানে:
+-r
+
+মানে recursive।
+
+ধরো:
+old-notes/
+└── notes/
+    ├── linux.txt
+    └── commands.txt
+
+পুরো old-notes directory remove করতে:
+rm -r old-notes
+
+এতে directory এবং ভিতরের contents remove হবে।
+
+
+
+##### rm -i — Interactive / Safer
+eginner হিসেবে খুব useful:
+rm -i filename
+
+এখানে -i:
+interactive
+
+মানে Linux confirmation চাইতে পারে।
+
+যেমন:
+rm: remove regular file 'test.txt'?
+
+তারপর:
+y
+
+দিলে delete করবে।
+
+আর:
+n
+
+দিলে করবে না।
+
+
+##### rm -ri
+Directory-এর জন্য:
+rm -ri folder
+
+এতে recursive + interactive behaviour পাওয়া যায়।
+
+এটা beginner practice-এর সময় useful, কারণ delete করার আগে কী হচ্ছে দেখতে পারবে।
+
+
+
+##### rm -rf — এখন শুধু চিনে রাখো ⚠️
+তুমি পরে অনেক জায়গায় দেখবে:
+rm -rf folder
+
+এখানে:
+-r → recursive
+-f → force
+
+কিন্তু এখন এটা practice করার দরকার নেই।
+
+কারণ:
+rm -rf
+
+খুব সহজে অনেক contents remove করতে পারে এবং confirmation না-ও চাইতে পারে।
+
+বিশেষ করে:
+rm -rf /
+
+এর মতো command কখনো চালাবে না।
+
+Production/server environment-এ delete command দেওয়ার আগে path verify করা অভ্যাস করবে।

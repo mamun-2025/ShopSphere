@@ -1,0 +1,52 @@
+
+##### cp — Copy
+cp মানে:
+copy
+
+Syntax:
+cp source destination
+
+অর্থাৎ:
+source
+  ↓
+যেটা copy করব
+
+destination
+  ↓
+যেখানে copy করব
+
+# Example:
+cp linux-setup.txt copy
+
+এটাই cp-এর মূল ধারণা:
+cp
+↓
+Copy
+↓
+Original থাকে
+↓
+নতুন copy তৈরি হয়
+
+
+
+##### Directory Copy
+এখন আমরা পুরো directory copy করতে চাই।
+
+শুধু:
+cp directory copy 
+
+দিলে সাধারণত error হবে:
+cp: -r not specified; omitting directory 'notes'
+
+কারণ directory-এর ভিতরেও contents আছে।
+
+তাই ব্যবহার করব:
+cp -r directory copy 
+
+এখানে:
+-r
+
+মানে:
+recursive
+
+অর্থাৎ directory এবং তার ভিতরের contents-সহ copy করো।

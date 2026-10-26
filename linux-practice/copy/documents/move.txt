@@ -1,0 +1,43 @@
+
+
+##### mv — Move
+Move
+mv file.txt documents/
+
+Location পরিবর্তন।
+
+mv source destination
+
+mv move.txt documents.txt 
+mv file.txt documents.txt 
+
+এখানে documents/ আগে থেকে exist করতে হবে।
+
+যদি না থাকে:
+cp: cannot create regular file ...
+জাতীয় error আসতে পারে।
+
+
+
+##### mv - Rename
+Rename
+mv mv.txt move.txt 
+mv cp.txt copy.txt
+mv rm.txt remove.txt
+
+Name পরিবর্তন।
+
+mv source destination
+ 
+ 
+
+##### দুটো একসাথে
+mv file.txt documents/notes.txt
+
+
+
+##### Directory Move
+mv directory copy 
+
+##### Directory Rename 
+mv directory folder 
