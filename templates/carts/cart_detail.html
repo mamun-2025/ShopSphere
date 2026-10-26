@@ -195,7 +195,7 @@
                   <div class="d-flex justify-content-between mb-2">
                      <span>
                         {{ tax_name }}
-                        {{ tax_rate|floatformat:2 }}
+                        ({{ tax_rate|floatformat:2 }}%)
                      </span>
                      <strong>৳{{ tax_amount|floatformat:2 }}</strong>
                   </div>
@@ -238,8 +238,8 @@
 
                   <!-- Choose or Change Shipping -->
                   <a 
-                     href="{% url'shipping:options} %"
-                     class="btn btn-outline-primary w-100 mb-3">
+                     href="{% url'shipping:options' %}"
+                     class="btn btn-outline-primary w-100 mb-3"
                   >
                      {% if shipping_method %}
                         Change Delivery Details
@@ -251,7 +251,7 @@
                   <hr>
 
                   <!-- Estimated Total -->
-                  <div class="d-flex justify-conten-between align-items-center mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
                      <strong>Estimated Total</strong>
                      <strong class="fs-4 text-primary">
                          ৳{{ total|floatformat:2 }}
@@ -268,7 +268,7 @@
                      class="btn btn-primary w-100"
                      disabled
                   >
-                     Checkout - Comming soon
+                     Checkout - Coming Soon
                   </button>
 
                </div>
