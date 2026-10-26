@@ -74,13 +74,13 @@ class ShippingOptionsView(LoginRequiredMixin, View):
 
          messages.success(
             request,
-            "Delivery address and shipping method saved.",
+            "Shipping address an delivery method saved successfully.",
          )
          return redirect(
             "carts:detail"
          )
 
-      return redirect(
+      return render(
          request,
          self.template_name,
          {

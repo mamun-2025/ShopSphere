@@ -61,7 +61,7 @@ class ShippingAddressForm(forms.ModelForm):
 
 
 class ShippingMethodForm(forms.Form):
-   shippingMethod = forms.ModelChoiceField(
+   shipping_method = forms.ModelChoiceField(
       queryset=ShippingMethod.objects.none(),
       empty_label=None,
       widget=forms.RadioSelect,

@@ -6,7 +6,7 @@
 {% block content %}
 <div class="container py-4">
 
-   <h1 class="mb -4"> Delivery Options</h1>
+   <h1 class="mb-4"> Delivery Options</h1>
 
    <form method="post">
       {% csrf_token %}
@@ -26,7 +26,7 @@
                      {{ field.label }}
                   </label>
 
-                  {{ filed }}
+                  {{ field }}
 
                   {% for error in field.errors %}
                      <div class="text-danger small">
