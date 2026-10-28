@@ -16,7 +16,7 @@ class OrderItemInline(admin.TabularInline):
       "is_taxable",
       "tax_rate",
       "tax_amount",
-      "lien_total",
+      "line_total",
 
    )
 
