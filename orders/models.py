@@ -127,5 +127,74 @@ class Order(models.Model):
 
    
 
+# OrderItem Model
+class OrderItem(models.Model):
+   order = models.ForeignKey(
+      Order,
+      on_delete=models.CASCADE,
+      related_name="items",
+   )
+
+   # Keep the order even if the original product is deleted.
+   product = models.ForeignKey(
+      "products.Product",
+      on_delete=models.SET_NULL,
+      null=True,
+      blank=True,
+      related_name="order_items",
+   )
+
+   product_name = models.CharField(max_length=255)
+
+   unit_price = models.DecimalField(
+      max_digits=2,
+      decimal_places=2,
+      validators=[MinValueValidator(0)],
+   )
+
+   quantity = models.BooleanField(
+      validators=[
+         MinValueValidator(0)
+      ],
+   )
+
+   is_taxable = models.BooleanField(
+      default=True,
+   )
+
+   tax_rate = models.DecimalField(
+      max_digits=5,
+      decimal_places=2,
+      default=0,
+      validators=[
+         MinValueValidator(0)
+      ],
+   )
+
+   tax_amount = models.DecimalField(
+      max_digits=12,
+      decimal_places=2,
+      default=0,
+      validators=[
+         MinValueValidator(0)
+      ],
+   )
+
+   line_total = models.DecimalField(
+      max_digits=12,
+      decimal_places=2,
+      validators=[
+         MinValueValidator(0)
+      ],
+   )
+
+   class Meta:
+      ordering = ["id"]
+
+   def __str__(self):
+      return f"{self.product_name} X {self.quantity}"
+
+
+
 
 
