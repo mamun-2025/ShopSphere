@@ -1,7 +1,7 @@
 
 
 from django import forms
-from .models import  ShippingAddress, ShippingMethod
+from .models import  ShippingAddress, ShippingMethod, ShippingZone
 
 
 class ShippingAddressForm(forms.ModelForm):
@@ -12,6 +12,7 @@ class ShippingAddressForm(forms.ModelForm):
          "full_name",
          "phone",
          "address_line",
+         "zone",
          "area",
          "city_or_district",
          "postal_code",
@@ -32,6 +33,11 @@ class ShippingAddressForm(forms.ModelForm):
          "address_line": forms.TextInput(
             attrs={
                "class": "form-control"
+            }
+         ),
+         "zone": forms.Select(
+            attrs={
+               "class": "form-select"
             }
          ),
          "area": forms.TextInput(
@@ -58,6 +64,15 @@ class ShippingAddressForm(forms.ModelForm):
 
       }
 
+   def __init__(self, *args, **kwargs):
+      super().__init__(*args, **kwargs)
+
+      self.fields["zone"].queryset = ShippingZone.objects.filter(
+         is_active=True
+      )
+      self.fields["zone"].empty_label = "Choose delivery zone"
+      self.fields["zone"].required = True
+
 
 
 class ShippingMethodForm(forms.Form):
@@ -73,6 +88,7 @@ class ShippingMethodForm(forms.Form):
 
       self.fields["shipping_method"].queryset = (
          ShippingMethod.objects.filter(is_active=True)
+         .select_related("zone")
       )
 
 
