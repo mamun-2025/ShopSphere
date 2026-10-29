@@ -1,6 +1,29 @@
 
 from django.contrib import admin
-from .models import ShippingMethod, ShippingAddress
+from .models import ShippingZone, ShippingMethod, ShippingAddress
+
+
+@admin.register(ShippingZone)
+class ShippingZoneAdmin(admin.ModelAdmin):
+   list_display = (
+      "name",
+      "code",
+      "is_active",
+   )
+
+   list_filter = (
+      "is_active",
+   )
+
+   search_fields = (
+      "name",
+      "code",
+   )
+
+   prepopulated_fields = {
+      "code": ("name",)
+   }
+
 
 
 @admin.register(ShippingMethod)
