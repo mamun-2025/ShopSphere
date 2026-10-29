@@ -130,4 +130,18 @@ class CheckoutView(LoginRequiredMixin, View):
          "orders:detail",
          order_number=order.order_number,
       )
-         
+
+
+
+# OrderDetailView
+class OrderDetailView(LoginRequiredMixin, DetailView):
+   model = Order,
+   template_name = "orders/order_detail.html"
+   context_object_name = "order"
+
+   def get_queryset(self):
+      return (
+         Order.objects
+         .filter(user=self.request.user)
+         .prefetch_related("items")
+      )
