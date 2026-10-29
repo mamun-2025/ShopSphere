@@ -47,6 +47,8 @@ def create_order_from_cart(
    except Cart.DoesNotExist:
       raise ValidationError("Your cart does not exist.")
 
+
+
    # 2. Lock cart items.
    cart_items = list(
       CartItem.objects
@@ -57,6 +59,8 @@ def create_order_from_cart(
 
    if not cart_items:
       raise ValidationError("Your cart is empty.")
+
+
 
    # 3. Lock products and fetch their current database values.
    product_ids = [item.product_id for item in cart_items]
@@ -72,6 +76,7 @@ def create_order_from_cart(
    }
 
 
+
    # 4. Validate products and stock
    for item in cart_items:
       product = products.get(item.product_id)
@@ -84,6 +89,11 @@ def create_order_from_cart(
       if not product.is_active:
          raise ValidationError(
             f"{product.name} is no longer available."
+         )
+
+      if item.quantity < 1:
+         raise ValidationError(
+            f"Invalid quantity for {product.name}."
          )
 
       if product.stock < item.quantity:
@@ -105,6 +115,7 @@ def create_order_from_cart(
          )
 
 
+
       # Lock and validate the shipping method.
       shipping_method = (
          ShippingMethod.objects
@@ -121,11 +132,15 @@ def create_order_from_cart(
             "Please select an available shipping method."
          )
 
+
+
       # 7. Validate payment method.
       if payment_method != Order.PaymentMethod.COD:
          raise ValidationError(
             "Unsupported payment method."
          )
+
+
 
       # 8. Calculate current subtotal and taxable subtotal.
       subtotal = ZERO
@@ -133,28 +148,21 @@ def create_order_from_cart(
 
       for item in cart_items:
          product = products[item.product_id]
-         line_total = product.price * item.quantity
-
-         subtotal += line_total
-
-         if product.is_taxable:
-            taxable_subtotal += line_total
-
+         subtotal += money(product.price * item.quantity)
 
       subtotal = money(subtotal)
-      taxable_subtotal = money(taxable_subtotal)
+
 
 
       # Get the current configured tax rate.
       tax_rate_obj = get_default_tax_rate()
 
-      tax_rate = (
-         tax_rate.rate
-         if tax_rate_obj is not None
-         else ZERO
-      )
+      if tax_rate_obj is not None:
+         tax_rate = Decimal(str(tax_rate_obj.rate))
+      else:
+         tax_rate = ZERO
 
-      tax_rate = Decimal(tax_rate)
+
 
       # Calculate tax per line so stored line taxes add up
       # exactly to the order's tax amount.
@@ -166,10 +174,12 @@ def create_order_from_cart(
          line_total = money(product.price * item.quantity)
 
          if product.is_taxable:
+            item_tax_rate = tax_rate
             line_tax = money(
-               line_total * tax_rate / Decimal("100")
+               line_total * item_tax_rate / Decimal("100")
             )
          else:
+            item_tax_rate =  ZERO
             line_tax = ZERO
 
          total_tax += line_tax
@@ -181,7 +191,7 @@ def create_order_from_cart(
                "unit_price": money(product.price),
                "quantity": item.quantity,
                "is_taxable": product.is_taxable,
-               "tax_rate": tax_rate if product.is_taxable else ZERO,
+               "tax_rate": item_tax_rate,
                "tax_amount": line_tax,
                "line_total": line_total,
             }
@@ -194,13 +204,11 @@ def create_order_from_cart(
 
          if threshold is not None and subtotal >= threshold:
             shipping_fee = ZERO
-
          else:
             shipping_fee = money(shipping_method.cost)
 
-
          # 11. Calculate the final total on the server.
-         total = money(subtotal+total_tax+shipping_fee)
+         total = money(subtotal + total_tax + shipping_fee)
 
          # 12. Create the permanent order and address snapshot.
          order = Order.objects.create(
@@ -210,14 +218,13 @@ def create_order_from_cart(
             payment_status=Order.PaymentStatus.UNPAID,
             shipping_full_name=address.full_name,
             shipping_phone=address.phone,
-            shipping_area=address.address_line,
-            shipping_city_or_dirstrict=address.city_or_district,
-            shipping_postal=address.postal_code,
+            shipping_address_line=address.address_line,
+            shipping_area=address.area,
+            shipping_city_or_district=address.city_or_district,
+            shipping_postal_code=address.postal_code,
             shipping_instructions=address.delivery_instructions,
             shipping_method_name=shipping_method.name,
-            estimated_delivery_days=(
-               shipping_method.estimated_delivery_days,
-            ),
+            estimated_delivery_days=shipping_method.estimated_delivery_days,
             subtotal=subtotal,
             tax_amount=total_tax,
             shipping_fee=shipping_fee,

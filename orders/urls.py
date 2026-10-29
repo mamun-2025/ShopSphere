@@ -12,7 +12,7 @@ urlpatterns = [
        name="checkout",
     ),
     path(
-       "<uuid:order_number/",
+       "<uuid:order_number>/",
        OrderDetailView.as_view(),
        name="detail",
     ),

@@ -24,7 +24,7 @@ class CheckoutView(LoginRequiredMixin, View):
          user=request.user
       ).first()
 
-      if not cart or cart.items.exists():
+      if not cart or not cart.items.exists():
          messages.info(
             request,
             "Your cart is empty."
@@ -135,13 +135,19 @@ class CheckoutView(LoginRequiredMixin, View):
 
 # OrderDetailView
 class OrderDetailView(LoginRequiredMixin, DetailView):
-   model = Order,
+   model = Order
    template_name = "orders/order_detail.html"
    context_object_name = "order"
+   slug_field = "order_number"
+   slug_url_kwarg = "order_number"
 
    def get_queryset(self):
       return (
-         Order.objects
+         super().get_queryset()
          .filter(user=self.request.user)
          .prefetch_related("items")
       )
+   
+
+
+   

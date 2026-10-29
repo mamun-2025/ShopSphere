@@ -211,7 +211,7 @@ Milestone 3 — File Handling
 * [✅] Wishlist
 * [✅] Tax
 * [✅] Shipping
-* [ ] Checkout
+* [✅] Checkout
 * [ ] Orders
 * [ ] Payment System
 * [ ] Invoice (PDF)

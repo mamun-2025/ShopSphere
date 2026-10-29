@@ -13,7 +13,7 @@ class Order(models.Model):
 
    class Status(models.TextChoices):
       PENDING = "pending", "Pending"
-      CONFIRED = "confirmed", "Confirmed"
+      CONFIRMED = "confirmed", "Confirmed"
       PROCESSING = "processing", "Processing"
       SHIPPED = "shipped", "Shipped"
       DELIVERED = "delivered", "Delivered"
@@ -147,12 +147,12 @@ class OrderItem(models.Model):
    product_name = models.CharField(max_length=255)
 
    unit_price = models.DecimalField(
-      max_digits=2,
+      max_digits=12,
       decimal_places=2,
       validators=[MinValueValidator(0)],
    )
 
-   quantity = models.BooleanField(
+   quantity = models.PositiveIntegerField(
       validators=[
          MinValueValidator(0)
       ],
