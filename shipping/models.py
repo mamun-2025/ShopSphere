@@ -31,6 +31,14 @@ class ShippingMethod(models.Model):
       unique=True,
    )
 
+   zone = models.ForeignKey(
+      "ShippingZone",
+      on_delete=models.PROTECT,
+      related_name="shipping_methods",
+      null=True,
+      blank=True,
+   )
+
    description = models.CharField(
       max_length=255,
       blank=True,
@@ -88,6 +96,14 @@ class ShippingAddress(models.Model):
       settings.AUTH_USER_MODEL,
       on_delete=models.CASCADE,
       related_name="shipping_addresses",
+   )
+
+   zone = models.ForeignKey(
+      "ShippingZone",
+      on_delete=models.PROTECT,
+      related_name="shipping_addresses",
+      null=True,
+      blank=True,
    )
 
    full_name = models.CharField(max_length=150)

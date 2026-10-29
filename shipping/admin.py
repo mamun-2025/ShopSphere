@@ -30,6 +30,7 @@ class ShippingZoneAdmin(admin.ModelAdmin):
 class ShippingMethodAdmin(admin.ModelAdmin):
    list_display = (
       "name",
+      "zone",
       "cost",
       "free_shipping_threshold",
       "estimated_delivery_days",
@@ -37,6 +38,7 @@ class ShippingMethodAdmin(admin.ModelAdmin):
    )
 
    list_filter = (
+      "zone",
       "is_active",
    )
 
