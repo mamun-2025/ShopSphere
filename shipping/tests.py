@@ -21,7 +21,7 @@ class CalculateCartTotalsTests(SimpleTestCase):
       non_taxable_item = SimpleNamespace(
          product=SimpleNamespace(
             price=Decimal("300.00"),
-            is_taxalble=False,
+            is_taxable=False,
          ),
          quantity=1,
       )
@@ -33,7 +33,7 @@ class CalculateCartTotalsTests(SimpleTestCase):
       ]
 
 
-   @patch("tax.services.get_default_tax_rate")
+   @patch("taxes.services.get_default_tax_rate")
    def test_calculates_tax_correctly(self, mock_tax_rate):
       mock_tax_rate.return_value = SimpleNamespace(
          name="Test Tax",
@@ -43,12 +43,12 @@ class CalculateCartTotalsTests(SimpleTestCase):
       result = calculate_cart_totals(self.cart)
 
       self.assertEqual(result["subtotal"], Decimal("1300.00"))
-      self.assertEqual(result["subtotal"], Decimal("1000.00"))
+      self.assertEqual(result["taxable_subtotal"], Decimal("1000.00"))
 
       self.assertEqual(result["tax_amount"], Decimal("50.00"))
       self.assertEqual(result["total"], Decimal("1350.00"))
 
-   @patch("tax.services.get_default_tax_rate")
+   @patch("taxes.services.get_default_tax_rate")
    def test_no_configured_tax_means_zero_tax(self, mock_tax_rate):
       mock_tax_rate.return_value = None
 

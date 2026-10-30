@@ -104,14 +104,24 @@ def create_order_from_cart(
 
 
       # Validate the address belongs to this user.
-      address = ShippingAddress.objects.filter(
-         pk=shipping_address_id,
-         user=user,
-      ).first()
+      address = (
+         ShippingAddress.objects
+         .select_related("zone")
+         .filter(
+            pk=shipping_address_id,
+            user=user,
+         ).first()
+
+      )
 
       if address is None:
          raise ValidationError(
             "Please select a valid delivery address."
+         )
+
+      if address.zone is None or not address.zone.is_active:
+         raise ValidationError(
+            "The select delivery zone is unavailable."
          )
 
 
@@ -120,6 +130,7 @@ def create_order_from_cart(
       shipping_method = (
          ShippingMethod.objects
          .select_for_update()
+         .select_related("zone")
          .filter(
             pk=shipping_method_id,
             is_active=True,
@@ -132,6 +143,15 @@ def create_order_from_cart(
             "Please select an available shipping method."
          )
 
+      if (
+         shipping_method.zone_id is None
+         or not shipping_method.zone.is_active
+         or shipping_method.zone_id != address.zone_id
+      ):
+         raise ValidationError(
+            "The select delivery method does not match."
+            "Your delivery address"
+         )
 
 
       # 7. Validate payment method.
@@ -141,10 +161,8 @@ def create_order_from_cart(
          )
 
 
-
       # 8. Calculate current subtotal and taxable subtotal.
       subtotal = ZERO
-      taxable_subtotal = ZERO
 
       for item in cart_items:
          product = products[item.product_id]
@@ -168,6 +186,7 @@ def create_order_from_cart(
       # exactly to the order's tax amount.
       item_snapshots = []
       total_tax = ZERO
+      taxable_subtotal = ZERO
 
       for item in cart_items:
          product = products[item.product_id]
@@ -175,6 +194,8 @@ def create_order_from_cart(
 
          if product.is_taxable:
             item_tax_rate = tax_rate
+            taxable_subtotal += line_total
+
             line_tax = money(
                line_total * item_tax_rate / Decimal("100")
             )
@@ -197,74 +218,86 @@ def create_order_from_cart(
             }
          )
 
-         total_tax = money(total_tax)
+      total_tax = money(total_tax)
+      taxable_subtotal = money(taxable_subtotal)
 
-         # 10.Calculate shipping on pre-tax merchandise subtotal
-         threshold = shipping_method.free_shipping_threshold
+      # 10.Calculate shipping on pre-tax merchandise subtotal
+      threshold = shipping_method.free_shipping_threshold
 
-         if threshold is not None and subtotal >= threshold:
-            shipping_fee = ZERO
-         else:
-            shipping_fee = money(shipping_method.cost)
+      if threshold is not None and subtotal >= threshold:
+         shipping_fee = ZERO
+      else:
+         shipping_fee = money(shipping_method.cost)
 
-         # 11. Calculate the final total on the server.
-         total = money(subtotal + total_tax + shipping_fee)
+      service_fee = ZERO
 
-         # 12. Create the permanent order and address snapshot.
-         order = Order.objects.create(
-            user=user,
-            payment_method=payment_method,
-            status=Order.Status.PENDING,
-            payment_status=Order.PaymentStatus.UNPAID,
-            shipping_full_name=address.full_name,
-            shipping_phone=address.phone,
-            shipping_address_line=address.address_line,
-            shipping_area=address.area,
-            shipping_city_or_district=address.city_or_district,
-            shipping_postal_code=address.postal_code,
-            shipping_instructions=address.delivery_instructions,
-            shipping_method_name=shipping_method.name,
-            estimated_delivery_days=shipping_method.estimated_delivery_days,
-            subtotal=subtotal,
-            tax_amount=total_tax,
-            shipping_fee=shipping_fee,
-            total=total,
+      # 11. Calculate the final total on the server.
+      total = money(
+         subtotal
+         + total_tax
+         + shipping_fee
+         + service_fee
+      )
+
+      # 12. Create the permanent order and address snapshot.
+      order = Order.objects.create(
+         user=user,
+         payment_method=payment_method,
+         status=Order.Status.PENDING,
+         payment_status=Order.PaymentStatus.UNPAID,
+
+         shipping_full_name=address.full_name,
+         shipping_phone=address.phone,
+         shipping_address_line=address.address_line,
+         shipping_area=address.area,
+         shipping_city_or_district=address.city_or_district,
+         shipping_postal_code=address.postal_code,
+         shipping_instructions=address.delivery_instructions,
+
+         shipping_method_name=shipping_method.name,
+         estimated_delivery_days=shipping_method.estimated_delivery_days,
+
+         subtotal=subtotal,
+         tax_amount=total_tax,
+         shipping_fee=shipping_fee,
+         service_fee=service_fee,
+         total=total,
+      )
+
+      # 13. Create order item snapshots
+      order_items = [
+         OrderItem(
+            order=order,
+            product=snapshot["product"],
+            product_name=snapshot["product_name"],
+            unit_price=snapshot["unit_price"],
+            quantity=snapshot["quantity"],
+            is_taxable=snapshot["is_taxable"],
+            tax_rate=snapshot["tax_rate"],
+            tax_amount=snapshot["tax_amount"],
+            line_total=snapshot["line_total"],
+
          )
+         for snapshot in item_snapshots
+      ]
 
-         # 13. Create order item snapshots
-         order_items = [
-            OrderItem(
-               order=order,
-               product=snapshot["product"],
-               product_name=snapshot["product_name"],
-               unit_price=snapshot["unit_price"],
-               quantity=snapshot["quantity"],
-               is_taxable=snapshot["is_taxable"],
-               tax_rate=snapshot["tax_rate"],
-               tax_amount=snapshot["tax_amount"],
-               line_total=snapshot["line_total"],
+      OrderItem.objects.bulk_create(order_items)
 
-            )
-            for snapshot in item_snapshots
-         ]
-
-         OrderItem.objects.bulk_create(order_items)
-
-         # 14. Reduce stock only after all validations pass.
-         for item in cart_items:
-            product = products[item.product_id]
-            product.stock -= item.quantity
-            product.save(update_fields=["stock"])
+      # 14. Reduce stock only after all validations pass.
+      for item in cart_items:
+         product = products[item.product_id]
+         product.stock -= item.quantity
+         product.save(update_fields=["stock"])
 
 
-         # 15. Clear the cart
-         CartItem.objects.filter(
-            cart=cart
-         ).delete()
+      # 15. Clear the cart
+      CartItem.objects.filter(
+         cart=cart
+      ).delete()
 
-         return order 
+      return order 
 
-      
+   
 
 
 
