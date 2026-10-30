@@ -47,11 +47,31 @@
 
          <hr>
 
+         
          <h4>Items</h4>
 
          {% for item in order.items.all %}
-            <div class="d-flex justify-content-between border-bottom py-3">
-               <div>
+
+            <div class="d-flex align-items-center gap-3 border-bottom py-3">
+
+               {% if item.product and item.product.image %}
+                  <img 
+                     src="{{ item.product.image.url }}"
+                     alt="{{ item.product.name }}"
+                     class="rounded border"
+                     style="width: 90px; height: 90px; object-fit: cover;"
+                  >
+               {% else %}
+                  <div 
+                     class="bg-light border rounded d-flex align-items-center justify-content-center text-muted small"
+                     style="width: 90px; height: 90px; flex-shrink: 0;"
+                  >
+                     No Image
+                  </div>
+               {% endif %}
+
+               <div class="flex-grow-1">
+
                   <strong>{{ item.product_name }}</strong>
 
                   <div class="text-muted small">
@@ -67,9 +87,10 @@
                <div class="text-end">
                   <strong>৳{{ item.line_total|floatformat:2 }}</strong>
                </div>
+
             </div>
          {% empty %}
-            <P>No items found for this order.</p>
+            <p>No items found for this order.</p>
          {% endfor %}
 
          <hr>
@@ -104,7 +125,7 @@
          <hr>
 
          <div class="d-flex justify-content-between mb-2">
-            <span>Subtotal</span>
+            <span>Product Subtotal</span>
             <span>
                ৳{{ order.subtotal|floatformat:2 }}
             </span>
@@ -118,11 +139,20 @@
          </div>
 
          <div class="d-flex justify-content-between mb-2">
-            <span>Shipping</span>
+            <span>Delivery Fee</span>
             <span>
                 ৳{{ order.shipping_fee|floatformat:2 }}
             </span>
          </div>
+
+         <div class="d-flex justify-content-between mb-2">
+            <span>Service Fee</span>
+            <span>
+               ৳{{ order.service_fee|floatformat:2 }}
+            </span>
+         </div>
+
+         <hr>
 
          <div class="d-flex justify-content-between mb-3">
             <strong class="fs-5">Total</strong>

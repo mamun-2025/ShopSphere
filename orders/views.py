@@ -1,5 +1,5 @@
 
-
+from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
@@ -63,20 +63,30 @@ class CheckoutView(LoginRequiredMixin, View):
          shipping_method,
       )
 
+      service_fee = Decimal("0.00")
+      shipping_fee = shipping_summary["shipping_fee"]
+
+      total = (
+         tax_summary["total"],
+         + shipping_fee,
+         + service_fee,
+      )
+
       context = {
          "cart": cart,
          "cart_items": cart.items.select_related("product"),
+
          "shipping_method": shipping_method,
          "shipping_address": shipping_address,
+
          "shipping_fee": shipping_summary["shipping_fee"],
          "free_shipping": shipping_summary["free_shipping"],
+
+         "service_fee": service_fee,
+         "total": total,
+
          **tax_summary,
       }
-
-      context["total"] = (
-         tax_summary["total"]
-         + shipping_summary["shipping_fee"]
-      )
 
       return render(
          request,
