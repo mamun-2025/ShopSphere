@@ -14,9 +14,8 @@ from .models import ShippingZone
 class ShippingOptionsView(LoginRequiredMixin, View):
    template_name = "shipping/shipping_options.html"
 
-   
-   def get_cart(self, request):
-      return Cart.objects.filter(user=request.user).first()
+   def get_cart(self, user):
+      return Cart.objects.filter(user=user).first()
       
    def render_forms(self, request, address_form, method_form):
       return render(
@@ -63,10 +62,9 @@ class ShippingOptionsView(LoginRequiredMixin, View):
             "carts:detail"
          )
 
-      zone_id = request.POST.get("address_zone")
+      zone_id = request.POST.get("address-zone")
 
       zone = ShippingZone.objects.filter(
-         request,
          pk=zone_id,
          is_active=True,
       ).first() if zone_id else None 
@@ -79,6 +77,7 @@ class ShippingOptionsView(LoginRequiredMixin, View):
       method_form = ShippingMethodForm(
          request.POST,
          prefix="method",
+         zone=zone,
       )
 
       address_valid = address_form.is_valid()

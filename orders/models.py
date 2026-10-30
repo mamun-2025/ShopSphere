@@ -103,6 +103,15 @@ class Order(models.Model):
       ],   
    )
 
+   service_fee = models.DecimalField(
+      max_digits=12,
+      decimal_places=2,
+      default=0,
+      validators=[
+         MinValueValidator(0)
+      ],
+   )
+
    total = models.DecimalField(
       max_digits=12,
       decimal_places=2, 

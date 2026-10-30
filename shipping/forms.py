@@ -91,7 +91,7 @@ class ShippingMethodForm(forms.Form):
       methods = ShippingMethod.objects.filter(
          is_active=True,
          zone__is_active=True,
-         zone__is_null=False,
+         zone__isnull=False,
       ).select_related("zone")
 
       if zone is not None:
