@@ -220,6 +220,7 @@ class CartDetailView(LoginRequiredMixin, TemplateView):
       shipping_summary = calculate_shipping(
          cart, 
          shipping_method,
+         shipping_address,
       )
       context.update(shipping_summary)
 

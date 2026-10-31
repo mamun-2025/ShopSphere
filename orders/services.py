@@ -18,7 +18,7 @@ CENT = Decimal("0.01")
 
 
 def money(value):
-   return Decimal(value).quantize(
+   return Decimal(str(value)).quantize(
       CENT,
       rounding=ROUND_HALF_UP,
    )
@@ -96,7 +96,7 @@ def create_order_from_cart(
       if product.stock < item.quantity:
          raise ValidationError(
             f"Insufficient stock for {product.name}. "
-            f"Avilable: {product.stock}."
+            f"Available: {product.stock}."
          )
 
 
@@ -118,9 +118,8 @@ def create_order_from_cart(
 
    if address.zone is None or not address.zone.is_active:
       raise ValidationError(
-         "The select delivery zone is unavailable."
+         "The selected delivery zone is unavailable."
       )
-
 
 
    # 6.Lock and validate the shipping method.
@@ -146,8 +145,7 @@ def create_order_from_cart(
       or shipping_method.zone_id != address.zone_id
    ):
       raise ValidationError(
-         "The select delivery method does not match."
-         "Your delivery address"
+         "The selected delivery method does not match your delivery address."
       )
 
 
@@ -164,7 +162,7 @@ def create_order_from_cart(
    for item in cart_items:
       product = products[item.product_id]
 
-      line_total += money(product.price * item.quantity)
+      line_total = money(product.price * item.quantity)
       subtotal += line_total 
 
    subtotal = money(subtotal)
@@ -252,6 +250,7 @@ def create_order_from_cart(
       shipping_postal_code=address.postal_code,
       shipping_instructions=address.delivery_instructions,
 
+      shipping_zone_name=address.zone.name,
       shipping_method_name=shipping_method.name,
       estimated_delivery_days=shipping_method.estimated_delivery_days,
 

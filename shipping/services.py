@@ -79,8 +79,8 @@ def get_shipping_selection(request):
       pk=method_id,
       is_active=True,
       zone__is_active=True,
-      zone__is_null=False,
-   ).select_related("zone").is_first()
+      zone__isnull=False,
+   ).select_related("zone").first()
 
    address = ShippingAddress.objects.filter(
       pk=address_id,

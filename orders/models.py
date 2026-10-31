@@ -72,6 +72,12 @@ class Order(models.Model):
       blank=True,
    )
 
+   shipping_zone_name = models.CharField(
+      max_length=100,
+      blank=True,
+      default="",
+   )
+   
    shipping_method_name = models.CharField(max_length=100)
    estimated_delivery_days = models.PositiveSmallIntegerField(
       default=3,
@@ -163,7 +169,7 @@ class OrderItem(models.Model):
 
    quantity = models.PositiveIntegerField(
       validators=[
-         MinValueValidator(0)
+         MinValueValidator(1)
       ],
    )
 

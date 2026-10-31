@@ -10,7 +10,7 @@ ZERO = Decimal("0.00")
 
 def money(value):
    """Round a monetary value to two decimal places."""
-   return Decimal(value).quantize(
+   return Decimal(str(value)).quantize(
       MONEY_PLACES,
       rounding=ROUND_HALF_UP,
    )

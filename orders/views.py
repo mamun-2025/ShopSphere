@@ -61,13 +61,14 @@ class CheckoutView(LoginRequiredMixin, View):
       shipping_summary = calculate_shipping(
          cart,
          shipping_method,
+         shipping_address,
       )
 
       service_fee = Decimal("0.00")
       shipping_fee = shipping_summary["shipping_fee"]
 
       total = (
-         tax_summary["total"],
+         tax_summary["total"]
          + shipping_fee,
          + service_fee,
       )
