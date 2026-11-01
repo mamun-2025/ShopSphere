@@ -76,14 +76,18 @@
          Save Delivery Details
       </button>
       
-      <a 
-         href="{% url 'carts:detail' %}"
-         class="btn btn-outline-secondary"
-      >
-         Back to Cart 
-      </a>
+      {% if checkout_source == "cart" %}
+         <a 
+            href="{% url 'carts:detail' %}"
+            class="btn btn-outline-secondary"
+         >
+            Back to Cart 
+         </a>
+      {% endif %}
+
 
    </form>
 
 </div>
 {% endblock %}
+

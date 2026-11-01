@@ -6,6 +6,8 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from carts.models import Cart
+from products.models import Product 
+
 from .forms import ShippingMethodForm, ShippingAddressForm
 from .models import ShippingZone
 
@@ -14,9 +16,64 @@ from .models import ShippingZone
 class ShippingOptionsView(LoginRequiredMixin, View):
    template_name = "shipping/shipping_options.html"
 
-   def get_cart(self, user):
-      return Cart.objects.filter(user=user).first()
-      
+   def get_checkout_source(self, request):
+      return request.session.get("checkout_source", "cart")
+
+   def validate_checkout_source(self, request):
+      """
+      Validate either Cart Checkout or Buy Now Checkout.
+      Does not modify Cart or Wishlist.
+      """
+
+      source = self.get_checkout_source(request)
+
+      if source == "cart":
+         cart = Cart.objects.filter(
+            user=request.user
+         ).first()
+
+         if not cart or not cart.items.exists():
+            return False, "Your cart is empty."
+
+         stock_issues = cart.get_stock_issues()
+
+         if stock_issues:
+            return False, "Please resolve stock issues in your cart."
+
+         return True, None 
+
+      if source == "buy_now":
+         product_id = request.session.get("buy_now_product_id")
+         quantity = request.session.get("buy_now_quantity")
+
+         try:
+            quantity = int(quantity)
+            product_id = int(product_id)
+         except (TypeError, ValueError):
+            return False, "Your Buy Now session is invalid. Please try again."
+
+         if quantity <= 1:
+            return False, "Invalid product quantity for Buy Now checkout."
+
+         product = Product.objects.filter(
+            pk=product_id,
+            is_active=True,
+         ).first()
+
+         if product is None:
+            return False, "The product is no longer available."
+
+         if product.stock < quantity:
+            return False, (
+               f"Insufficient stock for {product.name}."
+               f"Available stock: {product.stock}."
+            )
+
+         return True, None 
+
+      return False, "Invalid checkout session."
+
+
    def render_forms(self, request, address_form, method_form):
       return render(
          request,
@@ -24,20 +81,23 @@ class ShippingOptionsView(LoginRequiredMixin, View):
          {
             "address_form": address_form,
             "method_form": method_form,
+            "checkout_source": self.get_checkout_source(request),
          },
       )
 
-   def get(self, request):
-      cart = self.get_cart(request.user)
 
-      if not cart or not cart.items.exists():
-         messages.info(
-            request,
-            "Add a product to your cart before choosing delivery.",
-         )
-         return redirect(
-            "carts:detial"
-         )
+   def get(self, request):
+      valid, error = self.validate_checkout_source(request)
+
+      if not valid:
+         messages.error(request, error)
+
+         if self.get_checkout_source(request) == "buy_now":
+            request.session.pop("checkout_source", None)
+            request.session.pop("buy_now_product_id", None)
+            request.session.pop("buy_now_quantity", None)
+
+         return redirect("carts:detail")
 
       address_form = ShippingAddressForm(prefix="address")
       method_form = ShippingMethodForm(prefix="method")
@@ -51,23 +111,22 @@ class ShippingOptionsView(LoginRequiredMixin, View):
 
 
    def post(self, request):
-      cart = self.get_cart(request.user)
+      valid, error = self.validate_checkout_source(request)
 
-      if not cart or not cart.items.exists():
-         messages.error(
-            request,
-            "Your cart is empty"
-         )
-         return redirect(
-            "carts:detail"
-         )
+      if not valid:
+         messages.error(request, error)
+         return redirect("shipping:options")
 
       zone_id = request.POST.get("address-zone")
 
-      zone = ShippingZone.objects.filter(
+      zone = (
+         ShippingZone.objects.filter(
          pk=zone_id,
          is_active=True,
-      ).first() if zone_id else None 
+         ).first() 
+         if zone_id 
+         else None 
+      )
 
       address_form = ShippingAddressForm(
          request.POST,
@@ -120,6 +179,7 @@ class ShippingOptionsView(LoginRequiredMixin, View):
       try:
          address.full_clean()
          address.save()
+
       except ValidationError as exc:
          for field, errors in exc.message_dict.items():
             for error in errors:
@@ -139,7 +199,7 @@ class ShippingOptionsView(LoginRequiredMixin, View):
 
       messages.success(
          request,
-         "Shipping address and delivery method saved sucessfully.",
+         "Shipping address and delivery method saved successfully.",
       )
       return redirect(
          "carts:detail"
