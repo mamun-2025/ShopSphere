@@ -7,6 +7,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import DetailView
 
+from django.views.decorators.http import require_POST
+from django.utils.decorators import method_decorator
+
+from products.models import Product
 from carts.models import Cart
 from shipping.services import calculate_shipping, get_shipping_selection
 from taxes.services import calculate_cart_totals
@@ -141,6 +145,72 @@ class CheckoutView(LoginRequiredMixin, View):
          "orders:detail",
          order_number=order.order_number,
       )
+
+
+
+
+# Buy Now View
+class BuyNowView(LoginRequiredMixin, View):
+   def post(self, request, product_id):
+      # 1. Read quantity from POST.
+      try:
+         quantity = int(request.POST.get("quantity", 1))
+      except (TypeError, ValueError):
+         messages.error(request, "Please enter a valid quantity.")
+         return redirect(
+            "products:detail", 
+            slug="",
+         )
+
+      # 2. Validate quantity.
+      if quantity < 1:
+         messages.error(request, "Quantity must be at least 1.")
+         return redirect(
+            "products:detail",
+            slug="",
+         )
+
+      # 3. Fetch the active product.
+      product = Product.objects.filter(
+         pk=product_id,
+         is_active=True,
+      ).first()
+
+      if product is None:
+         messages.error(request, "This product is unavailable.")
+         return redirect("products:list")
+
+      # 4. Validate stock.
+      if product.stock < quantity:
+         messages.error(
+            request,
+            f"Insufficient stock. Available: {product.stock}.",
+         )
+         return redirect(
+            "products:detail",
+            slug=product.slug,
+         )
+
+      # 5. Store the Buy Now intent in the session.
+      request.session["checkout_source"] = "buy_now"
+      request.session["buy_now_product_id"] = product.pk 
+      request.session["buy_now_quantity"] = quantity
+
+      # 6. Remove old shipping selection.
+      request.session.pop("shipping_address_id", None)
+      request.session.pop("shipping_method_id", None)
+
+      messages.success(
+         request,
+         "Product selected. Please choose your delivery details.",
+      )
+
+      return redirect("shipping:options")
+
+
+
+
+
 
 
 

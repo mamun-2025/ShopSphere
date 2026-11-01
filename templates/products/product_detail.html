@@ -110,6 +110,39 @@
 
          </div>
 
+         <!-- Buy Now -->
+         {% if product.is_active and product.stock > 0 %}
+            <form 
+               method="post"
+               action="{% url 'orders:buy_now' product_id %}"
+               class="mt-2"
+            >
+               {% csrf_token %}
+               
+               <label for="buy-now-quantity" class="form-label">
+                  Quantity
+               </label>
+
+               <input 
+                  type="number"
+                  id="buy-now-quantity"
+                  name="quantity"
+                  value="1"
+                  min="1"
+                  max="{{ product.stock }}"
+                  class="form-control mb-2"
+                  required
+               >
+
+               <button 
+                  type="submit"
+                  class="btn btn-primary"
+               > 
+               ⚡ Buy Now
+               </button>
+            </form>
+         {% endif %}
+
 
          <!-- Add To Wishlist -->
          <div class="mt-4 mb-4">
