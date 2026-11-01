@@ -1,9 +1,11 @@
 
 from decimal import Decimal
+from types import SimpleNamespace
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import DetailView
 
@@ -12,11 +14,11 @@ from django.utils.decorators import method_decorator
 
 from products.models import Product
 from carts.models import Cart
-from shipping.services import calculate_shipping, get_shipping_selection
-from taxes.services import calculate_cart_totals
+from shipping.services import calculate_shipping_for_subtotal, get_shipping_selection
+from taxes.services import calculate_items_totals
 
 from .models import Order
-from .services import create_order_from_cart
+from .services import create_order_from_items, create_order_from_cart
 
 
 # CheckOut View
@@ -206,10 +208,6 @@ class BuyNowView(LoginRequiredMixin, View):
       )
 
       return redirect("shipping:options")
-
-
-
-
 
 
 

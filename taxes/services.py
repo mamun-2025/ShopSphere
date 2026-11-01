@@ -26,41 +26,47 @@ def get_default_tax_rate():
    )
 
 
-def calculate_cart_totals(cart):
+def calculate_items_totals(cart):
    """
-   Calculate cart subtotal, taxable subtotal, tax, and total.
+   Calculate totals from a list of objects containing:
+   product and quantity.
 
-   Tax is calculated only on active cart lines' taxable products.
-   Product availability and stock validation remain separate concerns.
+   Tax is rounded per item, matching OrderItem calculation.
    """
-   cart_items = cart.items.select_related("product").all()
-
+ 
    subtotal = ZERO
    taxable_subtotal = ZERO
+   tax_amount = ZERO
 
-   for item in cart_items:
-      line_total = item.product.price * item.quantity 
+   tax_rate_obj = get_default_tax_rate()
+
+   if tax_rate_obj is not None:
+      rate = Decimal(str(tax_rate_obj.rate))
+      tax_name = tax_rate_obj.name 
+   else:
+      rate = ZERO
+      tax_name = "No tax configured"
+
+
+   for item in items:
+      line_total = money(
+         item.product.price * item.quantity
+      )
+
       subtotal += line_total
 
       if item.product.is_taxable:
          taxable_subtotal += line_total
 
+         line_tax = money(
+            line_total * rate / Decimal("100")
+         )
+
+         tax_amount += line_tax
+
    subtotal = money(subtotal)
    taxable_subtotal = money(taxable_subtotal)
-
-   tax_rate_obj = get_default_tax_rate()
-
-   if tax_rate_obj is not None:
-      rate = tax_rate_obj.rate
-      tax_amount = money(
-         taxable_subtotal * rate / Decimal("100")
-      )
-      tax_name = tax_rate_obj.name 
-
-   else:
-      rate = ZERO
-      tax_amount = ZERO
-      tax_name = "No tax configured"
+   tax_amount = money(tax_amount)
 
    total = money(subtotal + tax_amount)
 
@@ -72,3 +78,12 @@ def calculate_cart_totals(cart):
       "tax_amount": tax_amount,
       "total": total,
    }
+
+
+
+def calculate_cart_totals(cart):
+   items = list(
+      cart.items.select_related("product").all()
+   )
+
+   return calculate_items_totals(items)
