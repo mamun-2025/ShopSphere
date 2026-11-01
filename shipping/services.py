@@ -5,29 +5,30 @@ from .models import ShippingMethod, ShippingAddress
 ZERO = Decimal("0.00")
 
 
-def calculate_shipping(cart, shipping_method, shipping_address):
+def calculate_shipping_for_subtotal(
+      subtotal,
+      shipping_method,
+      shipping_address=None,
+):
    """
-   Calculate shipping fee using the server-side cart subtotal
-   
-   A shipping method must be active and belong to an active zone.
-   If an address is provided, it's zone must match the method's zone.
+   Calculate shipping fee based on subtotal and shipping method.
+
+   Works for both Cart Checkout and Buy Now Checkout.
+   Subtotal means product value before tax.
    """
-   if shipping_method is None or not shipping_method.is_active:
+   if (
+      shipping_method is None
+      or not shipping_method.is_active
+      or not shipping_method.zone_id
+      or not shipping_method.zone.is_active 
+   ):
       return {
          "shipping_method": None,
          "shipping_fee": ZERO,
          "free_shipping": False,
       }
 
-   # The method must belong to an active delivery zone.
-   if not shipping_method.zone_id or not shipping_method.is_active:
-      return {
-         "shipping_method": None,
-         "shpping_fee": ZERO,
-         "free_shipping": False,
-      }
 
-   # If an address is provided, verify its zone.
    if shipping_address is not None:
       if (
          not shipping_address.zone_id
@@ -40,22 +41,39 @@ def calculate_shipping(cart, shipping_method, shipping_address):
             "free_shipping": False,
          }
 
-
-   subtotal = cart.subtotal
-   threshold = shipping_method.free_shipping_threshold
+   subtotal = Decimal(str(subtotal))
+   threshold = shipping_method.free_shipping_threshold 
 
    if threshold is not None and subtotal >= threshold:
       return {
          "shipping_method": shipping_method,
          "shipping_fee": ZERO,
-         "free_shipping": True,
+         "free_shipping": True, 
       }
 
    return {
       "shipping_method": shipping_method,
-      "shipping_fee": shipping_method.cost,
+      "shipping_fee": Decimal(str(shipping_method.cost)),
       "free_shipping": False,
    }
+
+
+def calculate_shipping(cart, shipping_method, shipping_address=None):
+   """
+   Backward-compatible wrapper for existing Cart Checkout and Buy Now Checkout code.
+   """
+   if cart is None:
+      subtotal = ZERO 
+   else:
+      subtotal = cart.subtotal 
+
+
+   return calculate_shipping_for_subtotal(
+      subtotal=subtotal,
+      shipping_method=shipping_method,
+      shipping_address=shipping_address,
+   )
+
 
 
 
