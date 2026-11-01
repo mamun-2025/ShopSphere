@@ -25,90 +25,95 @@ def money(value):
 
 
 @transaction.atomic
-def create_order_from_cart(
+def create_order_from_items(
    *,
    user,
+   items,
    shipping_address_id,
    shipping_method_id,
    payment_method=Order.PaymentMethod.COD,
 ):
    """
-   Validate the current cart, create a permanent order,
-   reduce stock, and clear the cart atomically.
+   Create an order from a list of product/quantity pairs.
+
+   Example: 
+      items=[
+         {"product_id": 10, "quantity": 2},
+      ]
+
+   This function does not read, modify, or clear the cart.
    """
 
-   # 1. Lock this user's cart.
-   try:
-      cart = (
-         Cart.objects
-         .select_for_update()
-         .get(user=user)
+
+   # 1. Validate and normalize requested items.
+   if not items:
+      raise ValidationError(
+         "There are no products to order."
       )
-   except Cart.DoesNotExist:
-      raise ValidationError("Your cart does not exist.")
+
+   quantities = {}
+
+   for item in items:
+      try:
+         product_id = int(item["product_id"])
+         quantity = int(item["quantity"])
+      except (KeyError, TypeError,ValueError):
+         raise ValidationError(
+            "Invalid product or quantity."
+         )
+
+      if product_id < 1 or quantity < 1:
+         raise ValidationError(
+            "Product and quantity must be valid."
+         )
+
+      quantities[product_id] = (
+         quantities.get(product_id, 0) + quantity
+      )
 
 
-   # 2. Lock cart items.
-   cart_items = list(
-      CartItem.objects
-      .select_for_update()
-      .filter(cart=cart)
-      .order_by("pk")
-   )
-
-   if not cart_items:
-      raise ValidationError("Your cart is empty.")
-
-
-   # 3. Lock products and fetch their current database values.
-   product_ids = [item.product_id for item in cart_items]
-
+   # 2. Lock products and read current database values.
    products = {
-      product.pk: product 
+      product.pk: product
       for product in (
          Product.objects
          .select_for_update()
-         .filter(pk__in=product_ids)
+         .filter(pk__in=quantities.keys())
          .order_by("pk")
       )
    }
 
+   if len(products) != len(quantities):
+      raise ValidationError(
+         "One or more products are no longer available."
+      )
 
-   # 4. Validate products and stock
-   for item in cart_items:
-      product = products.get(item.product_id)
 
-      if product is None:
-         raise ValidationError(
-            "A product in your cart is no longer available."
-         )
+   # 3. Validate product status and stock.
+   for product_id, quantity in quantities.items():
+      product = products[product_id]
 
       if not product.is_active:
          raise ValidationError(
             f"{product.name} is no longer available."
          )
 
-      if item.quantity < 1:
+      if product.stock < quantity:
          raise ValidationError(
-            f"Invalid quantity for {product.name}."
-         )
-
-      if product.stock < item.quantity:
-         raise ValidationError(
-            f"Insufficient stock for {product.name}. "
+            f"Insufficient stock for {product.name}."
             f"Available: {product.stock}."
          )
 
 
-   # 5.Validate the address belongs to this user.
+   # 4. Lock and validate the user's shipping address.
    address = (
       ShippingAddress.objects
+      .select_for_update()
       .select_related("zone")
       .filter(
          pk=shipping_address_id,
          user=user,
       ).first()
-
    )
 
    if address is None:
@@ -116,13 +121,13 @@ def create_order_from_cart(
          "Please select a valid delivery address."
       )
 
-   if address.zone is None or not address.zone.is_active:
+   if address.zone is None and not address.zone.is_active:
       raise ValidationError(
          "The selected delivery zone is unavailable."
       )
 
 
-   # 6.Lock and validate the shipping method.
+   # 5. Lock and validate the shipping method.
    shipping_method = (
       ShippingMethod.objects
       .select_for_update()
@@ -131,7 +136,6 @@ def create_order_from_cart(
          pk=shipping_method_id,
          is_active=True,
       ).first()
-
    )
 
    if shipping_method is None:
@@ -145,78 +149,73 @@ def create_order_from_cart(
       or shipping_method.zone_id != address.zone_id
    ):
       raise ValidationError(
-         "The selected delivery method does not match your delivery address."
+         "The delivery method does not match your address."
       )
 
 
-   # 7. Validate payment method.
+   # 6. Validate the payment method.
    if payment_method != Order.PaymentMethod.COD:
       raise ValidationError(
          "Unsupported payment method."
       )
 
 
-   # 8. Calculate current subtotal and taxable subtotal.
+   # 7. Calculate merchandise subtotal.
    subtotal = ZERO
 
-   for item in cart_items:
-      product = products[item.product_id]
-
-      line_total = money(product.price * item.quantity)
-      subtotal += line_total 
+   for product_id, quantity in quantities.items():
+      product = products[product_id]
+      subtotal += money(product.price * quantity)
 
    subtotal = money(subtotal)
 
 
-   # 9.Get the current configured tax rate.
+   # 8. Get configured tax rate.
    tax_rate_obj = get_default_tax_rate()
 
-   if tax_rate_obj is not None:
-      tax_rate = Decimal(str(tax_rate_obj.rate))
-   else:
-      tax_rate = ZERO
+   tax_rate = (
+      Decimal(str(tax_rate_obj.rate))
+      if tax_rate_obj is not None
+      else ZERO
+   )
 
 
-   # 10. Calculate tax per order item.
+   # 9. Calculate tax and create item snapshots.
    item_snapshots = []
-   total_tax = ZERO
-   taxable_subtotal = ZERO
+   total_tax = ZERO 
 
-   for item in cart_items:
-      product = products[item.product_id]
+   for product_id, quantity in quantities.items():
+      product = products[product_id]
 
-      line_total = money(product.price * item.quantity)
+      unit_price = money(product.price)
+      line_total = money(unit_price * quantity)
 
       if product.is_taxable:
          item_tax_rate = tax_rate
-         taxable_subtotal += line_total
-
          line_tax = money(
             line_total * item_tax_rate / Decimal("100")
          )
       else:
-         item_tax_rate =  ZERO
+         item_tax_rate = ZERO
          line_tax = ZERO
 
       total_tax += line_tax
 
-      item_snapshots.append(
-         {
-            "product": product,
-            "product_name": product.name,
-            "unit_price": money(product.price),
-            "quantity": item.quantity,
-            "is_taxable": product.is_taxable,
-            "tax_rate": item_tax_rate,
-            "tax_amount": line_tax,
-            "line_total": line_total,
-         }
-      )
+      item_snapshots.append({
+         "product": product,
+         "product_name": product.name,
+         "unit_price": unit_price,
+         "quantity": quantity,
+         "is_taxable": product.is_taxable,
+         "tax_rate": item_tax_rate,
+         "tax_amount": line_tax,
+         "line_total": line_total,
+      })
 
    total_tax = money(total_tax)
-   taxable_subtotal = money(taxable_subtotal)
 
-   # 11.Calculate shipping on pre-tax merchandise subtotal
+
+   # 10. Calculate shipping on pre-tax merchandise subtotal.
    threshold = shipping_method.free_shipping_threshold
 
    if threshold is not None and subtotal >= threshold:
@@ -224,10 +223,10 @@ def create_order_from_cart(
    else:
       shipping_fee = money(shipping_method.cost)
 
-   service_fee = ZERO
+   service_fee = ZERO 
 
 
-   # 12. Calculate the final total on the server.
+   # 11. Calculate final total on the server 
    total = money(
       subtotal
       + total_tax
@@ -235,20 +234,21 @@ def create_order_from_cart(
       + service_fee
    )
 
-   # 13. Create the permanent order and address snapshot.
+
+   # 12. Create order and snapshot shipping details.
    order = Order.objects.create(
       user=user,
       payment_method=payment_method,
       status=Order.Status.PENDING,
       payment_status=Order.PaymentStatus.UNPAID,
 
-      shipping_full_name=address.full_name,
+      shipping_full_name = address.full_name,
       shipping_phone=address.phone,
       shipping_address_line=address.address_line,
       shipping_area=address.area,
       shipping_city_or_district=address.city_or_district,
       shipping_postal_code=address.postal_code,
-      shipping_instructions=address.delivery_instructions,
+      shippint_instructions=address.delivery_instructions,
 
       shipping_zone_name=address.zone.name,
       shipping_method_name=shipping_method.name,
@@ -261,8 +261,9 @@ def create_order_from_cart(
       total=total,
    )
 
-   # 14. Create order item snapshots
-   order_items = [
+
+   # 13. Create order item snapshots
+   OrderItem.objects.bulk_create([
       OrderItem(
          order=order,
          product=snapshot["product"],
@@ -273,26 +274,99 @@ def create_order_from_cart(
          tax_rate=snapshot["tax_rate"],
          tax_amount=snapshot["tax_amount"],
          line_total=snapshot["line_total"],
-
       )
       for snapshot in item_snapshots
+   ])
+
+
+   # 14. Deduct stock after all validations.
+   for product_id, quantity in quantities.items():
+      product = products[product_id]
+      product.stock -= quantity
+      product.save(update_fiels=["stock"])
+
+   return order
+
+
+
+
+@transaction.atomic
+def create_order_from_cart(
+   *,
+   user,
+   shipping_address_id,
+   shipping_method_id,
+   payment_method=Order.PaymentMethod.COD,
+):
+   """
+   Create an order from the user's cart.
+   Clear the cart only after successful order creation.
+   """
+
+   try:
+      cart = (
+         Cart.objects
+         .select_for_update()
+         .get(user=user)
+      )
+   except Cart.DoesNotExist:
+      raise ValidationError("Your cart does not exist.")
+
+   cart_items = list(
+      CartItem.objects
+      .select_for_update()
+      .filter(cart=cart)
+      .order_by("pk")
+   )
+
+   if not cart_items:
+      raise ValidationError("Your cart is empty.")
+
+   order_items = [
+      {
+         "product_id": item.product_id,
+         "quantity": item.quantity,
+      }
+      for item in cart_items
    ]
 
-   OrderItem.objects.bulk_create(order_items)
+   order = create_order_from_items(
+      user=user,
+      items=order_items,
+      shipping_address_id=shipping_address_id,
+      shipping_method_id=shipping_method_id,
+      payment_method=payment_method,
+   )
 
-   # 15. Reduce stock only after all validations pass.
-   for item in cart_items:
-      product = products[item.product_id]
-      product.stock -= item.quantity
-      product.save(update_fields=["stock"])
-
-
-   # 16. Clear the cart
+   # Only Cart Checkout clears cart items.
    CartItem.objects.filter(
       cart=cart
    ).delete()
 
    return order 
+
+
+
+
+
+
+
+
+
+      
+
+
+
+
+
+   
+
+
+   
+
+
+
+
 
    
 
