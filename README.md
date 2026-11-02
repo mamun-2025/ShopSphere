@@ -209,15 +209,17 @@ Milestone 3 — File Handling
 
 * [✅] Shopping Cart
 * [✅] Wishlist
-* [✅] Tax
-* [✅] Shipping
-* [✅] Checkout
-* [✅] Orders
+* [✅] Tax Management
+* [✅] Shipping Management
+* [✅] Checkout System
+* [✅] Core Order Management
 * [ ] Payment System
-* [ ] Invoice (PDF)
+* [ ] Admin Order Management
+* [ ] Invoice Generation (PDF)
 
 ### Output
 
+* [ ] Complete E-commerce Business Logic
 * [ ] Complete Order Processing System
 
 ---
