@@ -16,13 +16,13 @@
 
             <thead class="table-light">
                <tr>
-                  <th>Order Number<th>
-                  <th>Date<th>
-                  <th>Payment Method<th>
-                  <th>Payment Status<th>
-                  <th>Order Status<th>
-                  <th>Total<th>
-                  <th>Action<th>
+                  <th>Order Number</th>
+                  <th>Date</th>
+                  <th>Payment Method</th>
+                  <th>Payment Status</th>
+                  <th>Order Status</th>
+                  <th>Total</th>
+                  <th>Action</th>
                </tr>
             </thead>
 
@@ -32,6 +32,7 @@
                   <td>{{ order.order_number }}</td>
                   <td>{{ order.created_at|date:"d M Y, h:i A" }}</td>
                   <td>{{ order.get_payment_method_display }}</td>
+                  <td>{{ order.get_payment_status_display }}</td>
                   <td>{{ order.get_status_display }}</td>
                   <td>{{ order.total|floatformat:2 }}</td>
                   <td>
@@ -43,7 +44,13 @@
                      </a>
                   </td>
                </tr>
-               {% endif %}
+               {% empty %}
+               <tr>
+                  <td colspan="7" class="text-center">
+                     No Orders Found
+                  </td>
+               </tr>
+               {% endfor %}
             </tbody>
 
          </table>
