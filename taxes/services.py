@@ -26,7 +26,7 @@ def get_default_tax_rate():
    )
 
 
-def calculate_items_totals(cart):
+def calculate_items_totals(items):
    """
    Calculate totals from a list of objects containing:
    product and quantity.

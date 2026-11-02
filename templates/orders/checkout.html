@@ -18,7 +18,7 @@
             </div>
 
             <div class="card-body">
-               {% for item in cart_items %}
+               {% for item in checkout_items %}
 
                   <div class="d-flex align-items-center gap-3 mb-3">
                      
@@ -57,13 +57,13 @@
 
                   </div>
 
-                  {% if not forlop.last %}
+                  {% if not forloop.last %}
                      <hr>
                   {% endif %}
 
                {% empty %}
                   <p class="text-muted mb-0">
-                     No products in your cart
+                     No products in your order.
                   </p>
                {% endfor %}
             </div>
@@ -130,7 +130,7 @@
                <div class="d-flex justify-content-between mb-2">
                   <span>Delivery Fee</span>
                   <span>
-                     {{ shipping_fee|floatformat:2 }}
+                     ৳{{ shipping_fee|floatformat:2 }}
                   </span>
                </div>
 
@@ -165,13 +165,21 @@
                   </button>
                </form>
                
-               <a 
+               {% if checkout_source == "cart" %}
+                  <a 
                   href="{% url 'carts:detail' %}"
                   class="btn btn-outline-secondary w-100 mt-2"
-               > 
-               Back to Cart 
-               </a>
-
+                  > 
+                  Back to Cart 
+                  </a>
+               {% else %}
+                  <a 
+                     href="{% url 'products:list' %}"
+                     class="btn btn-outline-secondary w-100 mt-2"
+                  >
+                  Continue Shopping
+                  </a>
+               {% endif %}
             </div>
          </div>
       </div>
