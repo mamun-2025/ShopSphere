@@ -25,30 +25,119 @@ from .services import create_order_from_items, create_order_from_cart
 class CheckoutView(LoginRequiredMixin, View):
    template_name = "orders/checkout.html"
 
+   def get_checkout_source(self, request):
+      return request.session.get("checkout_source", "cart")
+
+   def get_checkout_items(self, request):
+      """
+      Return a unified list of items for Cart or Buy Now.
+      Each item has product, quantity and line_total.
+      """
+      source = self.get_checkout_source(request)
+
+      if source == "cart":
+         cart = Cart.objects.filter(
+            user=request.user
+         ).first()
+
+         if not cart:
+            raise ValidationError(
+               "Your cart does not exist."
+            )
+
+         cart_items = list(
+            cart.items.select_related("product").all()
+         )
+
+         if not cart_items:
+            raise ValidationError("Your cart is empty.")
+
+         stock_issues = cart.get_stock_issues()
+
+         if stock_issues:
+            messages.error(
+               request,
+               "Please resolve stock issues before checkout.",
+            )
+
+         items = []
+
+         for item in cart_items:
+            items.append(
+               SimpleNamespace(
+                  product=item.product,
+                  quantity=item.quantity,
+                  line_total=(
+                     item.product.price * item.quantity
+                  ),
+               )
+            )
+
+         return items
+
+
+      if source == "buy_now":
+         product_id = request.session.get(
+            "buy_now_product_id"
+         )
+         quantity = request.session.get(
+            "buy_now_quantity"
+         )
+
+         try:
+            product_id = int(product_id)
+            quantity = int(quantity)
+         except (TypeError, ValueError):
+            raise ValidationError(
+               "Your buy now session is invalid. Please try again."
+            )
+
+         if quantity < 1:
+            raise ValidationError("Invalid product quantity.")
+
+         product = Product.objects.filter(
+            pk=product_id,
+            is_active=True,
+         ).first()
+
+         if product is None:
+            raise ValidationError(
+               "The product is no longer available."
+            )
+
+         if product.stock < quantity:
+            raise ValidationError(
+               f"Insufficient stock for {product.name}."
+               f"Available: {product.stock}."
+            )
+
+         return [
+            SimpleNamespace(
+               product=product,
+               quantity=quantity,
+               line_total=product.price * quantity,
+            )
+         ]
+
+      raise ValidationError("Invalid checkout source.")
+
+
    def get(self, request):
-      cart = Cart.objects.filter(
-         user=request.user
-      ).first()
+      try:
+         checkout_items = self.get_checkout_source(request)
 
-      if not cart or not cart.items.exists():
-         messages.info(
-            request,
-            "Your cart is empty."
-         )
-         return redirect(
-            "carts:detail"
-         )
+      except ValidationError as exc:
+         for error in exc.messages:
+            messages.error(request, error)
 
-      stock_issues = cart.get_stock_issues()
+         if self.get_checkout_source(request) == "buy_now":
+            request.session.pop("checkout_source", None)
+            request.session.pop("buy_now_product_id", None)
+            request.session.pop("buy_now_quantity", None)
 
-      if stock_issues:
-         messages.error(
-            request,
-            "Please resolve stock issues before checkout.",
-         )
-         return redirect(
-            "carts:detail"
-         )
+         return redirect("carts:detail")
+
+      
 
       shipping_method, shipping_address = get_shipping_selection(
          request
@@ -63,12 +152,19 @@ class CheckoutView(LoginRequiredMixin, View):
             "shipping:options"
          )
 
-      tax_summary = calculate_cart_totals(cart)
-      shipping_summary = calculate_shipping(
-         cart,
-         shipping_method,
-         shipping_address,
+      tax_summary = calculate_items_totals(checkout_items)
+      shipping_summary = calculate_shipping_for_subtotal(
+         subtotal=tax_summary["subtotal"],
+         shipping_method=shipping_method,
+         shipping_address=shipping_address,
       )
+
+      if shipping_summary["shipping_method"] is None:
+         messages.error(
+            request,
+            "Your shipping selection is no longer valid."
+         )
+         return redirect("shipping:options")
 
       service_fee = Decimal("0.00")
       shipping_fee = shipping_summary["shipping_fee"]
@@ -80,13 +176,13 @@ class CheckoutView(LoginRequiredMixin, View):
       )
 
       context = {
-         "cart": cart,
-         "cart_items": cart.items.select_related("product"),
+         "checkout_items": checkout_items,
+         "checkout_source": self.get_checkout_source(request),
 
          "shipping_method": shipping_method,
          "shipping_address": shipping_address,
 
-         "shipping_fee": shipping_summary["shipping_fee"],
+         "shipping_fee": shipping_fee,
          "free_shipping": shipping_summary["free_shipping"],
 
          "service_fee": service_fee,
@@ -119,34 +215,73 @@ class CheckoutView(LoginRequiredMixin, View):
             "shipping:options"
          )
 
+      source = self.get_checkout_source(request)
+
       try:
-         order = create_order_from_cart(
-            user=request.user,
-            shipping_address_id=shipping_address_id,
-            shipping_method_id=shipping_method_id,
-         )
-      except ValidationError as exc:
-         for error in exc.messages:
-            messages.error(
-               request,
-               error,
-            )
-         return redirect(
-            "orders:checkout"
+         if source == "cart":
+            order = create_order_from_cart(
+               user=request.user,
+               shipping_address_id=shipping_address_id,
+               shipping_method_id=shipping_method_id,
          )
 
-      # Clear the selection only after the order is created.
+         elif source == "buy_now":
+            product_id = request.session.get(
+               "buy_now_product_id"
+            )
+            quantity = request.session.get(
+               "buy_now_quantity"
+            )
+
+            try:
+               product_id = int(product_id)
+               quantity = int(quantity)
+            except (TypeError, ValueError):
+               raise ValidationError(
+                  "Your Buy Now session is invalid."
+               )
+
+            order = create_order_from_cart(
+               user=request.user,
+               items=[
+                  {
+                     "product_id": product_id,
+                     "quantity": quantity,
+                  }
+               ],
+               shipping_address_id=shipping_address_id,
+               shipping_method_id=shipping_method_id,
+            )
+
+         else:
+            raise ValidationError("Invalid checkout source.")
+
+
+      except ValidationError as exc:
+         for error in exc.messages:
+            messages.error(request, error)
+
+         return redirect("orders:checkout")
+
+
+      # Clear checkout session only after successful order creation.
       request.session.pop("shipping_method_id", None)
       request.session.pop("shipping_address_id", None)
+      request.session.pop("checkout_source", None)
+      request.session.pop("buy_now_product_id", None)
+      request.session.pop("buy_now_quantity", None)
 
       messages.success(
          request,
-         "Your order has been placed.",
+         "Your order has been placed successfully.",
       )
+
       return redirect(
          "orders:detail",
          order_number=order.order_number,
       )
+
+            
 
 
 
