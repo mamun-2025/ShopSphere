@@ -124,7 +124,7 @@ class CheckoutView(LoginRequiredMixin, View):
 
    def get(self, request):
       try:
-         checkout_items = self.get_checkout_source(request)
+         checkout_items = self.get_checkout_items(request)
 
       except ValidationError as exc:
          for error in exc.messages:
@@ -171,8 +171,8 @@ class CheckoutView(LoginRequiredMixin, View):
 
       total = (
          tax_summary["total"]
-         + shipping_fee,
-         + service_fee,
+         + shipping_fee
+         + service_fee
       )
 
       context = {
@@ -241,7 +241,7 @@ class CheckoutView(LoginRequiredMixin, View):
                   "Your Buy Now session is invalid."
                )
 
-            order = create_order_from_cart(
+            order = create_order_from_items(
                user=request.user,
                items=[
                   {
@@ -282,7 +282,6 @@ class CheckoutView(LoginRequiredMixin, View):
       )
 
             
-
 
 
 

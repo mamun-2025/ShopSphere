@@ -52,7 +52,7 @@ class ShippingOptionsView(LoginRequiredMixin, View):
          except (TypeError, ValueError):
             return False, "Your Buy Now session is invalid. Please try again."
 
-         if quantity <= 1:
+         if quantity < 1:
             return False, "Invalid product quantity for Buy Now checkout."
 
          product = Product.objects.filter(
@@ -96,6 +96,8 @@ class ShippingOptionsView(LoginRequiredMixin, View):
             request.session.pop("checkout_source", None)
             request.session.pop("buy_now_product_id", None)
             request.session.pop("buy_now_quantity", None)
+
+            return redirect("products:list")
 
          return redirect("carts:detail")
 
@@ -201,6 +203,10 @@ class ShippingOptionsView(LoginRequiredMixin, View):
          request,
          "Shipping address and delivery method saved successfully.",
       )
+
+      if self.get_checkout_source(request) == "buy_now":
+         return redirect("orders:checkout")
+      
       return redirect(
          "carts:detail"
       )

@@ -248,7 +248,7 @@ def create_order_from_items(
       shipping_area=address.area,
       shipping_city_or_district=address.city_or_district,
       shipping_postal_code=address.postal_code,
-      shippint_instructions=address.delivery_instructions,
+      shipping_instructions=address.delivery_instructions,
 
       shipping_zone_name=address.zone.name,
       shipping_method_name=shipping_method.name,
@@ -283,7 +283,7 @@ def create_order_from_items(
    for product_id, quantity in quantities.items():
       product = products[product_id]
       product.stock -= quantity
-      product.save(update_fiels=["stock"])
+      product.save(update_fields=["stock"])
 
    return order
 

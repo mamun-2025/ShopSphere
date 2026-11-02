@@ -212,7 +212,7 @@ Milestone 3 — File Handling
 * [✅] Tax
 * [✅] Shipping
 * [✅] Checkout
-* [ ] Orders
+* [✅] Orders
 * [ ] Payment System
 * [ ] Invoice (PDF)
 
