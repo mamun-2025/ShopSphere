@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import DetailView
+from django.views.generic import ListView, DetailView
 
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
@@ -363,4 +363,17 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
    
 
 
-   
+# Order History View
+class OrderHistoryView(LoginRequiredMixin, ListView):
+   model = Order
+   template_name = "orders/order_history.html"
+   context_object_name = "orders"
+   paginate_by = 10
+
+   def get_queryset(self):
+      return (
+         Order.objects
+         .filter(user=self.request.user)
+         .prefetch_related("items")
+         .order_by("-created_at")
+      )
