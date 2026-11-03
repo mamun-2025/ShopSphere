@@ -33,8 +33,38 @@
                   <td>{{ order.created_at|date:"d M Y, h:i A" }}</td>
                   <td>{{ order.get_payment_method_display }}</td>
                   <td>{{ order.get_payment_status_display }}</td>
-                  <td>{{ order.get_status_display }}</td>
+
+                  <!-- Order Status Badge -->
+                  <td>
+                     {% if order.status == "pending" %}
+                        <span class="badge bg-warning text-dark">
+                           {{ order.get_status_display }}
+                        </span>
+                     {% elif order.status == "confirmed" %}
+                        <span class="badge bg-info text-dark">
+                           {{ order.get_status_display }}
+                        </span>
+                     {% elif order.status == "processing" %}
+                        <span class="badge bg-primary">
+                           {{ order.get_status_display }}
+                        </span>
+                     {% elif order.status == "shipped" %}
+                        <span class="badge bg-secondary">
+                           {{ order.get_status_display }}
+                        </span>
+                     {% elif order.status == "delivered" %}
+                        <span class="badge bg-success">
+                           {{ order.get_status_display }}
+                        </span>
+                     {% elif order.status == "cancelled" %}
+                        <span class="badge bg-danger">
+                           {{ order.get_status_display }}
+                        </span>
+                     {% endif %}
+                  </td>
+
                   <td>{{ order.total|floatformat:2 }}</td>
+                  
                   <td>
                      <a 
                         href="{% url 'orders:detail' order.order_number %}"

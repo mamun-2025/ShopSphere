@@ -25,7 +25,7 @@
 
             <a 
                href="{% url 'orders:history' %}"
-               class="btn btn-outline-secondary"
+               class="btn btn-outline-danger"
             >
             My Orders
             </a>
@@ -44,7 +44,32 @@
 
          <p>
             <strong>Order Status:</strong>
-            {{ order.get_status_display }}
+            
+            {% if order.status == "pending" %}
+               <span class="badge bg-warning text-dark">
+                  {{ order.get_status_display }}
+               </span>
+            {% elif order.status == "confirmed" %}
+               <span class="badge bg-info text-dark">
+                  {{ order.get_status_display }}
+               </span>
+            {% elif order.status == "processing" %}
+               <span class="badge bg-primary">
+                  {{ order.get_status_display }}
+               </span>
+            {% elif order.status == "shipped" %}
+               <span class="badge bg-secondary">
+                  {{ order.get_status_display }}
+               </span>
+            {% elif order.status == "delivered" %}
+               <span class="badge bg-success">
+                  {{ order.get_status_display }}
+               </span>
+            {% elif order.status == "cancelled" %}
+               <span class="badge bg-danger">
+                  {{ order.get_status_display }}
+               </span>
+            {% endif %} 
          </p>
 
          <p>
@@ -53,7 +78,7 @@
          </p>
 
          <p>
-            <strong>Payment Status</strong>
+            <strong>Payment Status:</strong>
             {{ order.get_payment_status_display }}
          </p>
 
@@ -63,8 +88,8 @@
          </p>
 
          <p>
-            <strong>Estimated Delivery</strong>
-            {{ order.estimated_delivery_days }}days
+            <strong>Estimated Delivery:</strong>
+            {{ order.estimated_delivery_days }} days
          </p>
 
          <hr>
@@ -214,7 +239,7 @@
    <div class="d-flex gap-2 flex-wrap mt-3">
       <a 
          href="{% url 'orders:history' %}"
-         class="btn btn-outline-primary"
+         class="btn btn-outline-success mt-3"
       >
       My Orders
       </a>
