@@ -121,7 +121,7 @@ def create_order_from_items(
          "Please select a valid delivery address."
       )
 
-   if address.zone is None and not address.zone.is_active:
+   if address.zone is None or not address.zone.is_active:
       raise ValidationError(
          "The selected delivery zone is unavailable."
       )
@@ -344,6 +344,151 @@ def create_order_from_cart(
    ).delete()
 
    return order 
+
+
+
+# Customer can cancel only before shipping.
+CUSTOMER_CANCELLABLE_STATUSES = {
+   Order.Status.PENDING,
+   Order.Status.CONFIRMED,
+   Order.Status.PROCESSING,
+}
+
+# Admin's allowed status transitions
+ALLOWED_STATUS_TRANSITIONS = {
+   Order.Status.PENDING: {
+      Order.Status.CONFIRMED,
+      Order.Status.CANCELLED,
+   },
+   Order.Status.CONFIRMED: {
+      Order.Status.PROCESSING,
+      Order.Status.CANCELLED,
+   },
+   Order.Status.PROCESSING: {
+      Order.Status.SHIPPED,
+      Order.Status.CANCELLED,
+   },
+   Order.Status.SHIPPED: {
+      Order.Status.DELIVERED,
+   },
+   Order.Status.DELIVERED: set(),
+   Order.Status.CANCELLED: set(),
+}
+
+
+
+# Restore Order Stock 
+def _restore_order_stock(order):
+
+   quantities = {}
+
+   order_items = (
+      OrderItem.objects
+      .filter(order=order)
+      .values_list("product_id", "quantity")
+   )
+
+   for product_id, quantity in order_items:
+      if product_id is None:
+         continue
+
+      quantities[product_id] = (
+         quantities.get(product_id, 0) + quantity
+      )
+
+   products = {
+      product.pk: product 
+      for product in (
+         Product.objects
+         .select_for_update()
+         .filter(pk__in=quantities.keys())
+         .order_by("pk")
+      )
+   }
+
+   for product_id, quantity in quantities.items():
+      product = products.get(product_id)
+
+      if product is not None:
+         product.stock += quantity
+         product.save(update_fields=["stock"])
+
+
+
+# Update Order Status
+@transaction.atomic
+def update_order_status(*, order_id, new_status):
+   """
+   Update an order status using allowed transitions.
+   Intended for Admin-side stastus management.
+   """
+
+   try:
+      order = (
+         Order.objects
+         .select_for_update()
+         .get(pk=order_id)
+      )
+   except Order.DoesNotExist:
+      raise ValidationError("Order does not exist.")
+
+   allowed_statuses = ALLOWED_STATUS_TRANSITIONS.get(
+      order.status,
+      set(),
+   )
+
+   if new_status not in allowed_statuses:
+      raise ValidationError(
+         f"Cannot change order status from"
+         f"{order.get_status_display()} to {new_status}."
+      )
+
+   if new_status == Order.Status.CANCELLED:
+      _restore_order_stock(order)
+
+   order.status = new_status
+   order.save(update_fields=["status", "updated_at"])
+
+   return order 
+
+
+
+# Cancel Order 
+@transaction.atomic
+def cancel_order(*, order_id, user):
+   """
+   Cancel an eligible order belonging to the customer.
+   Restore product stock exactly once.
+   """
+
+   try:
+      order = (
+         Order.objects
+         .select_for_update()
+         .get(
+            pk=order_id,
+            user=user,
+         )
+      )
+   except Order.DoesNotExist:
+      raise ValidationError(
+         "Order not found."
+      )
+
+   if order.status not in CUSTOMER_CANCELLABLE_STATUSES:
+      raise ValidationError(
+         "This order can no longer cancelled."
+      )
+
+   _restore_order_stock(order)
+
+   order.status = Order.Status.CANCELLED
+   order.save(update_fields=["status", "updated_at"])
+
+   return order
+
+
+
 
 
 
