@@ -364,9 +364,7 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
    def get_context_data(self, **kwargs):
       context = super().get_context_data(**kwargs)
 
-      order = self.object 
-
-      context["order_items"] = order.items.all()
+      context["order_items"] = self.object.items.all()
 
       return context
    

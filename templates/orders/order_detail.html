@@ -2,6 +2,7 @@
 
 {% extends "accounts/base.html" %}
 
+{% block title %}Order Details | ShopSphere{% endblock %}
 
 {% block content %}
 
@@ -10,15 +11,31 @@
    <div class="card shadow-sm">
       <div class="card-body p-4">
 
-         <h1 class="text-success mb-2">
-            Order Placed Successfully
-         </h1>
+         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
 
-         <p class="text-muted">
-            Thank you for shopping with ShopSphere.
-         </p>
+            <div>
+               <h2 class="text-success mb-2">
+                  Order Details
+               </h2>
+
+               <p class="text-muted mb-0">
+                  Thank you for shopping with ShopSphere
+               </p>
+            </div>
+
+            <a 
+               href="{% url 'orders:history' %}"
+               class="btn btn-outline-secondary"
+            >
+            My Orders
+            </a>
+
+         </div>
 
          <hr>
+
+         <!-- Order Information -->
+         <h4>Order Information</h4>
 
          <p>
             <strong>Order Number:</strong>
@@ -45,12 +62,17 @@
             {{ order.created_at|date:"d M Y, h:i A" }}
          </p>
 
+         <p>
+            <strong>Estimated Delivery</strong>
+            {{ order.estimated_delivery_days }}days
+         </p>
+
          <hr>
 
-         
-         <h4>Items</h4>
+         <!-- Order Products -->
+         <h4>Ordered Products</h4>
 
-         {% for item in order.items.all %}
+         {% for item in order_items %}
 
             <div class="d-flex align-items-center gap-3 border-bottom py-3">
 
@@ -95,6 +117,7 @@
 
          <hr>
 
+         <!-- Shipping Information -->
          <h4>Delivery Address</h4>
 
          <p class="mb-1">{{ order.shipping_full_name }}</p>
@@ -118,11 +141,20 @@
          {% endif %}
 
          <p class="mt-3">
-               <strong>Shipping Method:</strong>
-               {{ order.shipping_method_name }}
+            <strong>Shipping Zone:</strong>
+            {{ order.shipping_zone_name|default:"N/A" }}
+         </p>
+
+         <p class="mt-3">
+            <strong>Shipping Method:</strong>
+            {{ order.shipping_method_name }}
          </p>
 
          <hr>
+
+
+         <!-- Price Summary -->
+         <h4>Price Summary</h4>
 
          <div class="d-flex justify-content-between mb-2">
             <span>Product Subtotal</span>
@@ -155,29 +187,46 @@
          <hr>
 
          <div class="d-flex justify-content-between mb-3">
+
             <strong class="fs-5">Total</strong>
+
             <strong class="fs-4 text-primary">
                 ৳{{ order.total|floatformat:2 }}
             </strong>
+
          </div>
 
+         <!-- COD Message -->
          {% if order.payment_method == "cod" and order.payment_status == "unpaid" %}
+
             <div class="alert alert-info mt-4 mb-0">
                Payment is currently set to Cash on Delivery.
+
                Your order is awaiting confirmation.
             </div>
+
          {% endif %}
 
       </div>
    </div>
 
-   <a 
+   <!-- Navigation -->
+   <div class="d-flex gap-2 flex-wrap mt-3">
+      <a 
+         href="{% url 'orders:history' %}"
+         class="btn btn-outline-primary"
+      >
+      My Orders
+      </a>
+
+      <a 
       href="{% url 'products:product_list' %}"
       class="btn btn-primary mt-3"
-   >
-   Continue Shopping
-   </a>
+      >
+      Continue Shopping
+      </a>
 
+   </div>
 
 </div>
 
