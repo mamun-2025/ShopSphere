@@ -41,25 +41,29 @@ The platform aims to provide:
 
 # 🛠️ Technology Stack
 
-1. Programming Language ➡️ Python
-2. Backend Framework ➡️ Django
-3. Database ORM ➡️ Django ORM
-4. Database ➡️ PostgreSQL
-5. API Development ➡️ Django REST Framework (DRF)
-6. Authentication ➡️ Custom User Model, RBAC, JWT
-7. Payment Gateway ➡️ SSLCommerz Sandbox
-8. Frontend ➡️ HTML, CSS, JavaScript, Bootstrap
-9. File Handling ➡️ Pillow, Django FileField, ImageField
-10. Background Tasks ➡️ Celery
-11. Message Broker/Cache ➡️ Redis
-12. Real-Time Communication ➡️ Django Channels, WebSocket, ASGI
-13. GPS & Location ➡️ Browser Geolocation API
-14. Map Integration ➡️ Map API
-15. Web Server ➡️ Gunicorn, Uvicorn, Nginx
-16. Containerization ➡️ Docker, Docker Compose
-17. Operating System ➡️ Linux
-18. Version Control ➡️ Git, GitHub
+```text
+   Category                      Technology
+   ____________________          _______________________________________
+1. Programming Language          ➡️ Python
+2. Backend Framework             ➡️ Django
+3. Database ORM                  ➡️ Django ORM
+4. Database                      ➡️ PostgreSQL
+5. API Development               ➡️ Django REST Framework (DRF)
+6. Authentication                ➡️ Custom User Model, RBAC, JWT
+7. Payment Gateway               ➡️ SSLCommerz Sandbox
+8. Frontend                      ➡️ HTML, CSS, JavaScript, Bootstrap
+9. File Handling                 ➡️ Pillow, Django FileField, ImageField
+10. Background Tasks             ➡️ Celery
+11. Message Broker/Cache         ➡️ Redis
+12. Real-Time Communication      ➡️ Django Channels, WebSocket, ASGI
+13. GPS & Location               ➡️ Browser Geolocation API
+14. Map Integration              ➡️ Map API
+15. Web Server                   ➡️ Gunicorn, Uvicorn, Nginx
+16. Containerization             ➡️ Docker, Docker Compose
+17. Operating System             ➡️ Linux
+18. Version Control              ➡️ Git, GitHub
 
+```
 ---
 
 # 🛣️ Development Roadmap
