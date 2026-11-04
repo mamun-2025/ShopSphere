@@ -42,10 +42,10 @@ The platform aims to provide:
 # 🛠️ Technology Stack
 
 1. Programming Language: Python
-Backend Framework: Django
-Database ORM: Django ORM
-Database: PostgreSQL
-API Development: Django REST Framework (DRF)
+2. Backend Framework: Django
+3. Database ORM: Django ORM
+4. Database: PostgreSQL
+5. API Development: Django REST Framework (DRF)
 Authentication: Custom User Model, RBAC, JWT
 Payment Gateway: SSLCommerz Sandbox
 Frontend: HTML, CSS, JavaScript, Bootstrap
