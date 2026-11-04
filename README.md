@@ -41,7 +41,7 @@ The platform aims to provide:
 
 # 🛠️ Technology Stack
 
-Programming Language: Python
+1. Programming Language: Python
 Backend Framework: Django
 Database ORM: Django ORM
 Database: PostgreSQL
