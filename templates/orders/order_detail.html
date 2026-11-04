@@ -87,6 +87,55 @@
             {{ order.created_at|date:"d M Y, h:i A" }}
          </p>
 
+         {% if order.status == "pending" or order.status == "confirmed" or order.status == "processing" %}
+
+            <div class="alert alert-warning mt-4">
+
+               <h5 class="alert-heading">Cancel Order</h5>
+
+               <p>
+                  You can cancel this order before it is shipped.
+                  Once shipped, cancellation will no longer be available.
+               </p>
+
+               <form 
+                  method="POST"
+                  action="{% url 'orders:cancel' order.order_number %}"
+                  onsubmit="return confirm('Are you sure you want to cancel this order?');"
+               >
+                  {% csrf_token %}
+
+                  <button 
+                     type="submit"
+                     class="btn btn-danger"
+                  >
+                  Cancel Order
+                  </button>
+
+               </form>
+
+            </div>
+         
+            {% elif order.status == "shipped" %}
+
+               <div class="alert alert-secondary mt-4">
+                  This order has been shipped and can no longer be cancelled.
+               </div>
+
+            {% elif order.status == "delivered" %}
+
+               <div class="alert alert-success mt-4">
+                  This order has already been delivered.
+               </div>
+            
+            {% elif order.status == "cancelled" %}
+            
+               <div class="alert alert-danger mt-4">
+                  This order has been cancelled.
+               </div>
+            
+            {% endif %}
+
          <p>
             <strong>Estimated Delivery:</strong>
             {{ order.estimated_delivery_days }} days
