@@ -18,7 +18,7 @@ from shipping.services import calculate_shipping_for_subtotal, get_shipping_sele
 from taxes.services import calculate_items_totals
 
 from .models import Order
-from .services import create_order_from_items, create_order_from_cart
+from .services import create_order_from_items, create_order_from_cart, cancel_order
 
 
 # CheckOut View
@@ -384,3 +384,46 @@ class OrderHistoryView(LoginRequiredMixin, ListView):
          .prefetch_related("items")
          .order_by("-created_at")
       )
+
+
+
+# Cancel Order View
+class CancelOrderView(LoginRequiredMixin, View):
+
+   def post(self, request, *args, **kwargs):
+
+      order_number = kwargs.get("order_number")
+
+      try:
+         order = Order.objects.get(
+            order_number=order_number,
+            user=request.user,
+         )
+
+         cancel_order(
+            order_id=order.pk,
+            user=request.user,
+         )
+
+         messages.success(
+            request,
+            "Your order has been cancelled successfully."
+         )
+
+      except Order.DoesNotExist:
+         messages.error(
+            "Order not found."
+         )
+
+      except ValidationError as error:
+         messages.error(
+            request,
+            error.messages[0]
+         )
+
+      return redirect(
+         "orders:detail",
+         order_number=order_number,
+      )
+
+
