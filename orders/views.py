@@ -388,7 +388,7 @@ class OrderHistoryView(LoginRequiredMixin, ListView):
 
 
 # Cancel Order View
-class CancelOrderView(LoginRequiredMixin, View):
+class OrderCancelView(LoginRequiredMixin, View):
 
    def post(self, request, *args, **kwargs):
 
