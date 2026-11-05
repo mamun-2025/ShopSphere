@@ -271,15 +271,15 @@ The project is divided into 14 milestones. Each milestone introduces specific ba
 * [✅] Order Creation
 * [✅] Order History
 * [✅] Order Details
-* [ ] Customer Order Cancellation Testing
-* [ ] Order Status Transition Validation
+* [✅] Customer Order Cancellation Testing
+* [✅] Order Status Transition Validation
 
 4. Payment System
 
-* [ ] Payment App Setup
-* [ ] Payment Model
-* [ ] Payment Methods
-* [ ] Payment Status Management
+* [✅] Payment App Setup
+* [✅] Payment Model
+* [✅] Payment Methods
+* [✅] Payment Status Management
 * [ ] Multiple Payment Attempts
 * [ ] Payment Processing
 * [ ] SSLCommerz Sandbox Integration
