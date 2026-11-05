@@ -4,7 +4,7 @@ from .models import Payment
 
 
 @admin.register(Payment)
-class PayemntAdmin(admin.ModelAdmin):
+class PaymentAdmin(admin.ModelAdmin):
    list_display = (
       "payment_reference",
       "order",
@@ -13,7 +13,7 @@ class PayemntAdmin(admin.ModelAdmin):
       "currency",
       "method",
       "status",
-      "geteway_transaction_id",
+      "gateway_transaction_id",
       "created_at",
    )
 
@@ -41,7 +41,9 @@ class PayemntAdmin(admin.ModelAdmin):
 
    list_per_page = 25
 
-   ordering = ("-created_at")
+   ordering = (
+      "-created_at",
+   )
 
    fieldsets = (
       (
@@ -92,7 +94,7 @@ class PayemntAdmin(admin.ModelAdmin):
       "currency",
       "method",
       "status",
-      "gateway_traction_id",
+      "gateway_transaction_id",
       "created_at",
       "updated_at",
    )

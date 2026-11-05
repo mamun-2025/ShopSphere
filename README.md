@@ -280,7 +280,7 @@ The project is divided into 14 milestones. Each milestone introduces specific ba
 * [✅] Payment Model
 * [✅] Payment Methods
 * [✅] Payment Status Management
-* [ ] Multiple Payment Attempts
+* [✅] Multiple Payment Attempts
 * [ ] Payment Processing
 * [ ] SSLCommerz Sandbox Integration
 * [ ] Server-Side Payment Verification
