@@ -6,6 +6,18 @@ from orders.models import Order
 from payments.models import Payment
 
 
+ONLINE_PAYMENT_METHODS = {
+   Payment.Method.SSLCOMMERZ,
+   Payment.Method.BKASH,
+   Payment.Method.NAGAD,
+}
+
+ACTIVE_PAYMENT_STATUSES = {
+   Payment.Status.PENDING,
+   Payment.Status.PROCESSING,
+}
+
+
 @transaction.atomic
 def create_payment_attempt(
    *,
@@ -13,7 +25,7 @@ def create_payment_attempt(
    user, 
    method,
 ):
-   # Locck the Order row
+   # 1.Locck the Customer's order
    try:
       order = (
          Order.objects
@@ -29,29 +41,24 @@ def create_payment_attempt(
          "Order not found or you do not have permission."
       )
 
-   # 2. Check supported online payment methods
-   allowed_methods = [
-      Payment.Method.SSLCOMMERZ,
-      Payment.Method.BKASH,
-      Payment.Method.NAGAD,
-   ]
- 
-   if method not in allowed_methods:
+   # 2. Validate Payment Method
+   if method not in ONLINE_PAYMENT_METHODS:
       raise ValidationError(
          "Unsupported online payment method."
       )
 
-   # 3. Prevent payment for cancelled orders
-   if order.status == "cancelled":
+   # 3. Only pending orders can start online payment
+   if order.status != Order.Status.PENDING:
       raise ValidationError(
-         "Cannot pay for a cancelled order."
+         "Online payment is only available for pedning orders."
       )
 
-   if order.payment_status == "paid":
+   # 4. Prevent duplicate successful payment
+   if order.payment_status == Order.PaymentStatus.PAID:
       raise ValidationError(
          "This order has already been paid."
       )
-
+   
    successful_payment = order.payments.filter(
       status=Payment.Status.SUCCESS
    ).exists()
@@ -61,11 +68,9 @@ def create_payment_attempt(
          "This order has already been paid."
       )
 
+   # 5. Prevent multiple active attempts
    active_payment = order.payments.filter(
-      status__in=[
-         Payment.Status.PENDING,
-         Payment.Status.PROCESSING,
-      ]
+      status__in=ACTIVE_PAYMENT_STATUSES
    ).exists()
 
    if active_payment:
@@ -73,11 +78,13 @@ def create_payment_attempt(
          "An active payment attempt already exists."
       )
 
+   # 6. Validate amount
    if order.total is None or order.total <= 0:
       raise ValidationError(
          "Invalid order amount."
       )
 
+   # 7. Create payment attempt
    new_payment = Payment.objects.create(
       order=order,
       user=user,
