@@ -1,9 +1,13 @@
 
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
 from orders.models import Order
 from payments.models import Payment
+
+from django.conf import settings
 
 
 ONLINE_PAYMENT_METHODS = {
@@ -84,6 +88,15 @@ def create_payment_attempt(
          "Invalid order amount."
       )
 
+   if method == Payment.Method.SSLCOMMERZ:
+      if not (
+         Decimal("10.00") <= order.total <= Decimal("500000.00")
+      ):
+         raise ValidationError(
+            "SSLCommerz supports payment amounts"
+            "between BDT 10 and BDT 500000."
+         )
+
    # 7. Create payment attempt
    new_payment = Payment.objects.create(
       order=order,
@@ -94,6 +107,26 @@ def create_payment_attempt(
       status=Payment.Status.PENDING,
    )
 
+   order.payment_method = method
+
+   order.save(
+      update_fields=[
+         "payment_method",
+         "updated_at",
+      ]
+   )
+
    return new_payment
 
 
+
+# Create transaction ID Generator
+def generate_transaction_id(payment):
+
+   reference = payment.payment_reference.hex
+
+   return f"SHOP-{reference[:25]}"
+
+
+
+# Create Payment Payload 
