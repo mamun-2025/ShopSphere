@@ -2,6 +2,9 @@
 
 from django.contrib.messages import constants as messages
 from pathlib import Path
+from decouple import config 
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -156,3 +159,25 @@ MESSAGE_TAGS = {
    messages.ERROR: "danger",
 
 }
+
+
+
+# SSLCommerz configuration
+SSLCOMMERZ_STORE_ID = config(
+   "SSLCOMMERZ_STORE_ID"
+)
+
+SSLCOMMERZ_STORE_PASSWORD = config(
+   "SSOLCOMMERZ_STORE_PASSWORD"
+)
+
+SSLCOMMERZ_IS_SANDBOX = config(
+   "SSLCOMMERZ_IS_SANDBOX",
+   default=True,
+   cast=bool,
+)
+
+SITE_URL = config(
+   "SITE_URL",
+   default="http://127.0.0.1:8000",
+)
