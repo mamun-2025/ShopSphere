@@ -21,6 +21,9 @@ class Order(models.Model):
 
    class PaymentMethod(models.TextChoices):
       COD = "cod", "Cash on Delivery"
+      SSLCOMMERZ = "sslcommerz", "SSLCommerz"
+      BKASH = "bkash", "bkash"
+      NAGAD = "nagad", "Nagad"
 
    class PaymentStatus(models.TextChoices):
       UNPAID = "unpaid", "Unpaid"

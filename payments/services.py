@@ -50,7 +50,7 @@ def create_payment_attempt(
    # 3. Only pending orders can start online payment
    if order.status != Order.Status.PENDING:
       raise ValidationError(
-         "Online payment is only available for pedning orders."
+         "Online payment is only available for pending orders."
       )
 
    # 4. Prevent duplicate successful payment

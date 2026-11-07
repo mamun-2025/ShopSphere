@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q
 from django.core.validators import MinValueValidator
+from decimal import Decimal
 
 
 class Payment(models.Model):
@@ -45,7 +46,7 @@ class Payment(models.Model):
    amount = models.DecimalField(
       max_digits=12,
       decimal_places=2,
-      validators=[MinValueValidator("0.01")],
+      validators=[MinValueValidator(Decimal("0.01"))],
    )
 
    currency = models.CharField(
@@ -105,6 +106,14 @@ class Payment(models.Model):
             ),
             name="unique_gateway_transaction",
          ),
+         models.UniqueConstraint(
+            fields=["order"],
+            condition=Q(
+               status__in=["pending", "processing"]
+            ),
+            name="unique_active_payment_per_order",
+         ),
+         
       ]
 
    def __str__(self):
