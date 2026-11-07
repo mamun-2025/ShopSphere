@@ -71,6 +71,12 @@ class Payment(models.Model):
       blank=True,
    )
 
+   gateway_session_key = models.CharField(
+      max_length=100,
+      null=True,
+      blank=True,
+   )
+
    created_at = models.DateTimeField(
       auto_now_add=True,
    )
