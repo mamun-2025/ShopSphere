@@ -28,5 +28,6 @@ urlpatterns = [
        views.sslcommerz_cancel,
        name="sslcommerz_cancel",
     ),
+   
     
 ]

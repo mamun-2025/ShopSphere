@@ -29,7 +29,7 @@ def get_sslcommerz_initiate_url():
 
 
 
-# SSLCommerz Session API Creation
+# 4. SSLCommerz Session API Creation
 def validate_payment_data(payment_data):
 
    try:
@@ -51,17 +51,23 @@ def validate_payment_data(payment_data):
 
    tran_id = payment_data.get("tran_id")
 
-   if not tran_id or len(tran_id) > 30:
+   if (
+      not isinstance(tran_id, str)
+      or not tran_id
+      or len(tran_id) > 30
+   ):
       raise ValueError("Invalid transaction ID.")
 
 
+
+# 5. Create Payment Session
 def create_payment_session(*, payment_data):
    validate_payment_data(payment_data)
 
    payload = {
       **payment_data,
       "store_id": settings.SSLCOMMERZ_STORE_ID,
-      "store_passw": settings.SSLCOMMERZ_STORE_PASSWORD,
+      "store_passwd": settings.SSLCOMMERZ_STORE_PASSWORD,
    }
 
    response = requests.post(
@@ -73,6 +79,9 @@ def create_payment_session(*, payment_data):
    response.raise_for_status()
 
    result = response.json()
+
+   if not isinstance(result, dict):
+      raise ValueError("Invalid gateway response.")
 
    if result.get("status") != "SUCCESS":
       raise ValueError(

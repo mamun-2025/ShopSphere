@@ -12,6 +12,8 @@ from payments.gateways.sslcommerz import create_payment_session
 
 from django.conf import settings
 
+from django.urls import reverse
+
 
 
 
@@ -142,36 +144,39 @@ def build_sslcommerz_payload(payment):
 
    site_url = settings.SITE_URL.rstrip("/")
 
-   tran_id = payment.gateway_transaction_id 
+   def callback_url(name):
+      path = reverse(f"payments:{name}")
+      return f"{site_url}{path}"
 
    payment_data = {
       "total_amount": str(payment.amount),
       "currency": payment.currency,
-      "tran_id": tran_id,
+      "tran_id": payment.gateway_transaction_id,
 
       # Calback URLs
-      "success_url": (
-         f"{site_url}/payments/sslcommerz/success/"
+      "success_url": callback_url(
+         "sslcommerz_success"
       ),
 
-      "fail_url": (
-         f"{site_url}/payments/sslcommerz/fail/"
+      "fail_url": callback_url(
+         "sslcommerz_fail"
       ),
 
-      "cancel_url": (
-         f"{site_url}/payments/sslcommerz/cancel/"
+      "cancel_url": callback_url(
+         "sslcommerz_cancel"
       ),
 
-      "ipn_url": (
-         f"{site_url}/payments/sslcommerz/ipn/"
+      "ipn_url": callback_url(
+         "sslcommerz_ipn"
       ),
+      
 
       # Customer Information
       "cus_name": order.shipping_full_name,
-      "cus_email": order.email,
+      "cus_email": user.email,
       "cus_phone": order.shipping_phone,
 
-      "cus_add1": order.shipping_address_line,
+      "cus_addl": order.shipping_address_line,
       "cus_city": order.shipping_city_or_district,
       "cus_postcode": order.shipping_postal_code,
       "cus_country": "Bangladesh",
@@ -183,10 +188,15 @@ def build_sslcommerz_payload(payment):
 
       # Shipping Information
       "shipping_method": "YES",
+      "num_of_item": sum(
+         item.quantity for item in order.items.all()
+      ),
+
       "ship_name": order.shipping_full_name,
-      "ship_add1": order.shipping_address_line,
+      "ship_addl": order.shipping_address_line,
+      "ship_area": order.shipping_area,
       "ship_city": order.shipping_city_or_district,
-      "ship_postcode": order.shipping_postal_code,
+      "ship_postcode": order.shipping_postal_code or "0000",
       "ship_country": "Bangladesh",
 
    }
@@ -224,14 +234,16 @@ def start_sslcommerz_payment(*, order_id, user):
    # 2. Reload Payment Information
    payment = (
       Payment.objects
-      .select_for_update("order", "user")
+      .select_related("order", "user")
       .get(
          pk=payment.pk,
       )
    )
 
+
    # 3. Build Gateway Payload
    payment_data = build_sslcommerz_payload(payment)
+
 
    # 4. Create Gateway Session
    try:
@@ -239,15 +251,16 @@ def start_sslcommerz_payment(*, order_id, user):
          payment_data=payment_data,
       )
    except ValueError as exc:
-      # Explicit gateway rejection or invalid response.
-      # Do not classify an unknown network outcome here.
 
+      # Only mark FAILED when the gateway
+      # explicitly rejects the request.
       Payment.objects.filter(
          pk=payment.pk,
          status=Payment.Status.PENDING,
       ).update(
          status=Payment.Status.FAILED,
       )
+
       raise ValidationError(str(exc))
 
    except requests.RequestException as exc:
@@ -259,6 +272,7 @@ def start_sslcommerz_payment(*, order_id, user):
          "payment gateway response is uncertain."
          "Please contact support before retrying."
       ) from exc 
+
 
    # 5. Save Gateway Session Information
    session_key = result.get("sessionkey")
@@ -281,6 +295,8 @@ def start_sslcommerz_payment(*, order_id, user):
          "Payment state changed unexpectedly."
       )
 
+   payment.refresh_from_db()
+
    # 6. Return Gateway url
    return {
       "payment": payment,
@@ -291,7 +307,7 @@ def start_sslcommerz_payment(*, order_id, user):
 
 
 # Create Callback Identification Service
-def indentify_sslcommerz_callback(*, callback_data):
+def identify_sslcommerz_callback(*, callback_data):
 
    # 1. Get transaction ID
    tran_id = callback_data.get("tran_id")
@@ -305,7 +321,7 @@ def indentify_sslcommerz_callback(*, callback_data):
    try:
       payment = (
          Payment.objects
-         .select_for_update("order", "user")
+         .select_related("order", "user")
          .get(
             gateway_transaction_id=tran_id,
             method=Payment.Method.SSLCOMMERZ,
@@ -316,30 +332,32 @@ def indentify_sslcommerz_callback(*, callback_data):
          "Payment transaction not found."
       )
 
+
    # 3. Check original currency if supplied
    currency = callback_data.get("currency_type")
 
-   if currency and currency != payment.currency:
+   if currency != payment.currency:
       raise ValidationError(
          "Transaction currency mismatch."
       )
 
+
    # 4. Check original amount if supplied
    amount = callback_data.get("currency_amount")
 
-   if amount is not None:
-      try:
-         callback_amount = Decimal(str(amount))
+   if not amount:
+      raise ValidationError("Callback amount is missing.")
 
-      except (InvalidOperation, TypeError):
-         raise ValidationError(
-            "Invalid callback amount."
-         )
+   try:
+      callback_amount = Decimal(str(amount))
 
-      if callback_amount != payment.amount:
-         raise ValidationError(
-            "Transaction amount mismatch."
-         )
+   except (InvalidOperation, TypeError):
+      raise ValidationError("Invalid callback amount.")
+
+   if callback_amount != payment.amount:
+      raise ValidationError(
+         "Transaction amount mismatch."
+      )
 
    return payment
    

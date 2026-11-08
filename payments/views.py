@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 
-from payments.services import start_sslcommerz_payment, indentify_sslcommerz_callback
+from payments.services import start_sslcommerz_payment, identify_sslcommerz_callback
 
 
 @login_required
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 @require_POST
 def sslcommerz_success(request):
    try:
-      payment = indentify_sslcommerz_callback(
+      payment = identify_sslcommerz_callback(
          callback_data=request.POST,
       )
 
@@ -65,7 +65,7 @@ def sslcommerz_success(request):
 @require_POST
 def sslcommerz_fail(request):
    try:
-      payment = indentify_sslcommerz_callback(
+      payment = identify_sslcommerz_callback(
          callback_data=request.POST,
       )
 
@@ -95,7 +95,7 @@ def sslcommerz_fail(request):
 @require_POST
 def sslcommerz_cancel(request):
    try:
-      payment = indentify_sslcommerz_callback(
+      payment = identify_sslcommerz_callback(
          callback_data=request.POST, 
       )
 
