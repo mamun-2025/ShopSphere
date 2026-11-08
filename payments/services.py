@@ -1,7 +1,7 @@
 
 import requests
 
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -286,3 +286,60 @@ def start_sslcommerz_payment(*, order_id, user):
       "payment": payment,
       "gateway_url": result["GatewayPageURL"],
    }
+
+
+
+
+# Create Callback Identification Service
+def indentify_sslcommerz_callback(*, callback_data):
+
+   # 1. Get transaction ID
+   tran_id = callback_data.get("tran_id")
+
+   if not tran_id:
+      raise ValidationError(
+         "Transaction ID is missing."
+      )
+
+   # 2. Find Payment Attempt
+   try:
+      payment = (
+         Payment.objects
+         .select_for_update("order", "user")
+         .get(
+            gateway_transaction_id=tran_id,
+            method=Payment.Method.SSLCOMMERZ,
+         )
+      )
+   except Payment.DoesNotExist:
+      raise ValidationError(
+         "Payment transaction not found."
+      )
+
+   # 3. Check original currency if supplied
+   currency = callback_data.get("currency_type")
+
+   if currency and currency != payment.currency:
+      raise ValidationError(
+         "Transaction currency mismatch."
+      )
+
+   # 4. Check original amount if supplied
+   amount = callback_data.get("currency_amount")
+
+   if amount is not None:
+      try:
+         callback_amount = Decimal(str(amount))
+
+      except (InvalidOperation, TypeError):
+         raise ValidationError(
+            "Invalid callback amount."
+         )
+
+      if callback_amount != payment.amount:
+         raise ValidationError(
+            "Transaction amount mismatch."
+         )
+
+   return payment
+   
