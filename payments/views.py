@@ -60,3 +60,60 @@ def sslcommerz_success(request):
    )
 
 
+# Create Failed Callback
+@csrf_exempt
+@require_POST
+def sslcommerz_fail(request):
+   try:
+      payment = indentify_sslcommerz_callback(
+         callback_data=request.POST,
+      )
+
+   except ValidationError:
+      return HttpResponseBadRequest(
+         "Invalid Payment Callback."
+      )
+
+   logger.info(
+      "SSLCommerz failed callback received."
+      "Payment Reference: %s",
+      payment.payment_reference,
+   )
+
+   # Do not update payment status from
+   # unverified browser callback data.
+   return HttpResponse(
+      "Gateway reported a payment fialure. "
+      "Payment status is awaiting verification.",
+      status=200,
+   )
+
+
+
+# Create Cancel Callback
+@csrf_exempt
+@require_POST
+def sslcommerz_cancel(request):
+   try:
+      payment = indentify_sslcommerz_callback(
+         callback_data=request.POST, 
+      )
+
+   except ValidationError:
+      return HttpResponseBadRequest(
+         "Invalid payment callback."
+      )
+
+   logger.info(
+      "SSLCommerz cancel callback received. "
+      "Payment Reference: %s",
+      payment.payment_reference,
+   )
+
+    # Do not mark the payment as CANCELLED
+    # until its final status is established.
+    return HttpResponse(
+       "Payment cancellation received. "
+       "Payment status is awaiting verification.",
+       status=200,
+    )
