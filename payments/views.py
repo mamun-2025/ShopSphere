@@ -110,10 +110,10 @@ def sslcommerz_cancel(request):
       payment.payment_reference,
    )
 
-    # Do not mark the payment as CANCELLED
-    # until its final status is established.
-    return HttpResponse(
-       "Payment cancellation received. "
-       "Payment status is awaiting verification.",
-       status=200,
-    )
+   # Do not mark the payment as CANCELLED
+   # until its final status is established.
+   return HttpResponse(
+      "Payment cancellation received. "
+      "Payment status is awaiting verification.",
+      status=200,
+   )
