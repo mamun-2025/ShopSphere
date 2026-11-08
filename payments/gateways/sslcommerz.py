@@ -64,7 +64,7 @@ def validate_payment_data(payment_data):
 
    if (
       not isinstance(tran_id, str)
-      or not tran_id
+      or not tran_id.strip()
       or len(tran_id) > 30
    ):
       raise ValueError("Invalid transaction ID.")
@@ -126,12 +126,14 @@ def create_payment_session(*, payment_data):
       raise ValueError("Invalid gateway response.")
 
    if result.get("status") != "SUCCESS":
-      raise ValueError(
-         result.get(
-            "failedreason",
-            "Payment session creation failed."
-         )
-      )
+
+      reason = result.get("failedreason")
+
+      if not isinstance(reason, str) or not reason:
+         reason = "Payment session creation failed."
+
+      raise ValueError(reason)
+   
 
    gateway_url = result.get("GatewayPageURL")
 
