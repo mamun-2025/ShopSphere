@@ -15,6 +15,7 @@ LIVE_BASE_URL = "https://securepay.sslcommerz.com"
 
 # 2. Get Base URL
 def get_sslcommerz_base_url():
+
    if settings.SSLCOMMERZ_IS_SANDBOX:
       return SANDBOX_BASE_URL
 
@@ -23,6 +24,7 @@ def get_sslcommerz_base_url():
 
 # 3. Get Initiate Payment API URL
 def get_sslcommerz_initiate_url():
+
    base_url = get_sslcommerz_base_url()
 
    return f"{base_url}/gwprocess/v4/api.php"
@@ -43,11 +45,20 @@ def validate_payment_data(payment_data):
    if not amount.is_finite():
       raise ValueError("Invalid payment amount.")
 
+   if amount.as_tuple().exponent < -2:
+      raise ValueError(
+         "Payment amount cannot have more than 2 decimal places."
+      )
+
    if not Decimal("10.00") <= amount <= Decimal("500000.00"):
-      raise ValueError("Payment amount outside the allowed range.")
+      raise ValueError(
+         "Payment amount outside the allowed range."
+      )
 
    if payment_data.get("currency") != "BDT":
-      raise ValueError("Only BDT currency is supported.")
+      raise ValueError(
+         "Only BDT currency is supported."
+      )
 
    tran_id = payment_data.get("tran_id")
 
@@ -59,9 +70,35 @@ def validate_payment_data(payment_data):
       raise ValueError("Invalid transaction ID.")
 
 
+# 5. Validate Gateway URL
+def validate_gateway_url(gateway_url):
 
-# 5. Create Payment Session
+   if not isinstance(gateway_url, str):
+      raise ValueError("Invalid gateway URL.")
+
+   parsed_url = urlparse(gateway_url)
+
+   allowed_hosts = {
+      "sandbox.sslcommerz.com",
+      "securepay.sslcommerz.com",
+   }
+
+   if (
+      parsed_url.scheme != "https"
+      or parsed_url.hostname not in allowed_hosts
+      or parsed_url.port not in (None, 443)
+      or parsed_url.username is not None
+      or parsed_url.password is not None
+   ):
+      raise ValueError("Untrusted gateway URL.")
+
+   return gateway_url
+
+
+
+# 6. Create Payment Session
 def create_payment_session(*, payment_data):
+
    validate_payment_data(payment_data)
 
    payload = {
@@ -78,8 +115,13 @@ def create_payment_session(*, payment_data):
 
    response.raise_for_status()
 
-   result = response.json()
-
+   try:
+      result = response.json()
+   except requests.exceptions.JSONDecodeError as exc:
+      raise ValueError(
+         "Invalid response received from payment gateway."
+      ) from exc 
+   
    if not isinstance(result, dict):
       raise ValueError("Invalid gateway response.")
 
@@ -96,20 +138,13 @@ def create_payment_session(*, payment_data):
    if not gateway_url:
       raise ValueError("GatewayPageURL is missing.")
 
-   parsed_url = urlparse(gateway_url)
+   validate_gateway_url(gateway_url)
 
-   allowed_hosts = {
-      "sandbox.sslcommerz.com",
-      "securepay.sslcommerz.com",
-   }
-
-   if (
-      parsed_url.scheme != "https"
-      or parsed_url.hostname not in allowed_hosts
-   ):
-      raise ValueError("Untrusted gateway URL.")
-
+   if not result.get("sessionkey"):
+      raise ValueError("Gateway session key is missing.")
 
    return result
+
+   
 
 
