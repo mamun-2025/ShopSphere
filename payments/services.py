@@ -1,4 +1,6 @@
 
+import requests
+
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
@@ -6,8 +8,11 @@ from django.db import transaction
 
 from orders.models import Order
 from payments.models import Payment
+from payments.gateways.sslcommerz import create_payment_session
 
 from django.conf import settings
+
+
 
 
 ONLINE_PAYMENT_METHODS = {
@@ -187,3 +192,97 @@ def build_sslcommerz_payload(payment):
    }
 
    return payment_data
+
+
+
+
+# Create SSLCommerz API Call
+def start_sslcommerz_payment(*, order_id, user):
+
+   # 1. Create Payment Attempt
+   with transaction.atomic():
+
+      payment = create_payment_attempt(
+         order_id=order_id,
+         user=user,
+         method=Payment.Method.SSLCOMMERZ,
+      )
+
+      # Generate Unique transaction ID
+      tran_id = generate_transaction_id(payment)
+
+      # Save transaction ID before API request
+      payment.gateway_transaction_id = tran_id
+
+      payment.save(
+         update_fields=[
+            "gateway_transaction_id",
+            "updated_at",
+         ]
+      )
+
+   # 2. Reload Payment Information
+   payment = (
+      Payment.objects
+      .select_for_update("order", "user")
+      .get(
+         pk=payment.pk,
+      )
+   )
+
+   # 3. Build Gateway Payload
+   payment_data = build_sslcommerz_payload(payment)
+
+   # 4. Create Gateway Session
+   try:
+      result = create_payment_session(
+         payment_data=payment_data,
+      )
+   except ValueError as exc:
+      # Explicit gateway rejection or invalid response.
+      # Do not classify an unknown network outcome here.
+
+      Payment.objects.filter(
+         pk=payment.pk,
+         status=Payment.Status.PENDING,
+      ).update(
+         status=Payment.Status.FAILED,
+      )
+      raise ValidationError(str(exc))
+
+   except requests.RequestException as exc:
+      # Network error / timeout:
+      # Gateway may already have created a session.
+      # Keep the attempt pending for reconciliation.
+
+      raise ValidationError(
+         "payment gateway response is uncertain."
+         "Please contact support before retrying."
+      ) from exc 
+
+   # 5. Save Gateway Session Information
+   session_key = result.get("sessionkey")
+
+   if not session_key:
+      raise ValidationError(
+         "Gateway session key was not returned."
+         "Payment status requires reconciliation."
+      )
+
+   updated = Payment.objects.filter(
+      pk=payment.pk,
+      status=Payment.Status.PENDING,
+   ).update(
+      gateway_session_key=session_key,
+   )
+
+   if updated != 1:
+      raise ValidationError(
+         "Payment state changed unexpectedly."
+      )
+
+   # 6. Return Gateway url
+   return {
+      "payment": payment,
+      "gateway_url": result["GatewayPageURL"],
+   }
