@@ -130,3 +130,60 @@ def generate_transaction_id(payment):
 
 
 # Create Payment Payload 
+def build_sslcommerz_payload(payment):
+
+   order = payment.order
+   user = payment.user 
+
+   site_url = settings.SITE_URL.rstrip("/")
+
+   tran_id = payment.gateway_transaction_id 
+
+   payment_data = {
+      "total_amount": str(payment.amount),
+      "currency": payment.currency,
+      "tran_id": tran_id,
+
+      # Calback URLs
+      "success_url": (
+         f"{site_url}/payments/sslcommerz/success/"
+      ),
+
+      "fail_url": (
+         f"{site_url}/payments/sslcommerz/fail/"
+      ),
+
+      "cancel_url": (
+         f"{site_url}/payments/sslcommerz/cancel/"
+      ),
+
+      "ipn_url": (
+         f"{site_url}/payments/sslcommerz/ipn/"
+      ),
+
+      # Customer Information
+      "cus_name": order.shipping_full_name,
+      "cus_email": order.email,
+      "cus_phone": order.shipping_phone,
+
+      "cus_add1": order.shipping_address_line,
+      "cus_city": order.shipping_city_or_district,
+      "cus_postcode": order.shipping_postal_code,
+      "cus_country": "Bangladesh",
+
+      # Product Information
+      "product_name": f"ShopSphere Order {order.pk}",
+      "product_category": "ecommerce",
+      "product_profile": "physical-goods",
+
+      # Shipping Information
+      "shipping_method": "YES",
+      "ship_name": order.shipping_full_name,
+      "ship_add1": order.shipping_address_line,
+      "ship_city": order.shipping_city_or_district,
+      "ship_postcode": order.shipping_postal_code,
+      "ship_country": "Bangladesh",
+
+   }
+
+   return payment_data
