@@ -19,6 +19,7 @@ from taxes.services import calculate_items_totals
 
 from .models import Order
 from .services import create_order_from_items, create_order_from_cart, cancel_order
+from payments.services import start_sslcommerz_payment
 
 
 # CheckOut View
@@ -199,6 +200,25 @@ class CheckoutView(LoginRequiredMixin, View):
 
 
    def post(self, request):
+
+      # 1. Validate payment method
+      payment_method = request.POST.get("payment_method")
+
+      allowed_payment_methods = {
+         Order.PaymentMethod.COD,
+         Order.PaymentMethod.SSLCOMMERZ,
+      }
+
+      if payment_method not in allowed_payment_methods:
+         messages.error(
+            request,
+            "Please select a valid payment method."
+         )
+
+         return redirect("orders:checkout")
+
+
+      # 2. Validate shipping information
       shipping_method_id = request.session.get(
          "shipping_method_id"
       )
@@ -215,14 +235,19 @@ class CheckoutView(LoginRequiredMixin, View):
             "shipping:options"
          )
 
+
+      # 3. Get checkout source
       source = self.get_checkout_source(request)
 
+
+      # 4. Create order
       try:
          if source == "cart":
             order = create_order_from_cart(
                user=request.user,
                shipping_address_id=shipping_address_id,
                shipping_method_id=shipping_method_id,
+               payment_method=payment_method,
          )
 
          elif source == "buy_now":
@@ -236,6 +261,7 @@ class CheckoutView(LoginRequiredMixin, View):
             try:
                product_id = int(product_id)
                quantity = int(quantity)
+
             except (TypeError, ValueError):
                raise ValidationError(
                   "Your Buy Now session is invalid."
@@ -251,6 +277,7 @@ class CheckoutView(LoginRequiredMixin, View):
                ],
                shipping_address_id=shipping_address_id,
                shipping_method_id=shipping_method_id,
+               payment_method=payment_method,
             )
 
          else:
@@ -264,25 +291,61 @@ class CheckoutView(LoginRequiredMixin, View):
          return redirect("orders:checkout")
 
 
-      # Clear checkout session only after successful order creation.
+      # 5. Clear checkout session only after successful order creation.
       request.session.pop("shipping_method_id", None)
       request.session.pop("shipping_address_id", None)
       request.session.pop("checkout_source", None)
       request.session.pop("buy_now_product_id", None)
       request.session.pop("buy_now_quantity", None)
 
-      messages.success(
-         request,
-         "Your order has been placed successfully.",
-      )
 
-      return redirect(
-         "orders:detail",
-         order_number=order.order_number,
-      )
+      # 6. Handle Cash on Delivery
+      if payment_method == Order.PaymentMethod.COD:
+         messages.success(
+            request,
+            "Your order has been placed successfully."
+         )
+
+         return redirect(
+            "orders:detail",
+            order_number=order.order_number,
+         )
+
+      # 7. Start SSLCommerz payment 
+      if payment_method == Order.PaymentMethod.SSLCOMMERZ:
+         try:
+            result = start_sslcommerz_payment(
+               order_id=order.pk,
+               user=request.user,
+            )
+
+         except ValidationError as exc:
+            for error in exc.messages:
+               messages.error(request, error)
+
+            return redirect(
+               "orders:detail",
+               order_number=order.order_number,
+            )
+
+
+         # 8. Redirect customer to SSLCommerz
+         gateway_url = result.get("gateway_url")
+
+         if not gateway_url:
+            messages.error(
+               request,
+               "Unable to initialize SSLCommerz payment."
+            )
+
+            return redirect(
+               "orders:detail",
+               order_number=order.order_number,
+            )
+
+         return redirect(gateway_url)
 
             
-
 
 
 # Buy Now View

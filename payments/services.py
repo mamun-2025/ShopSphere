@@ -193,7 +193,7 @@ def build_sslcommerz_payload(payment):
       ),
 
       "ship_name": order.shipping_full_name,
-      "ship_addl": order.shipping_address_line,
+      "ship_add1": order.shipping_address_line,
       "ship_area": order.shipping_area,
       "ship_city": order.shipping_city_or_district,
       "ship_postcode": order.shipping_postal_code or "0000",
