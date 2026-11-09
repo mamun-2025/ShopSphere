@@ -150,21 +150,104 @@
                   </strong>
                </div>
 
-               <p class="small text-muted">
-                  Payment Method: Cash On Delivery
-               </p>
+               
+               <h5 class="mb-3">Choose Payment Method</h5>
+
+               <style>
+                  .payment-option {
+                     display: block;
+                     border: 2px solid #dee2e6;
+                     border-radius: 12px;
+                     padding: 16px;
+                     margin-bottom: 12px;
+                     cursor: pointer;
+                     transition: all 0.2s ease;
+                  }
+
+                  .payment-option:hover {
+                     border-color: #0d6efd;
+                     background-color: #f0f6ff;
+                  }
+
+                  .payment-option:has(input:checked) {
+                     border-color: #0d6efd;
+                     background-color: #eef5ff;
+                  }
+
+                  .payment-option input {
+                     cursor: pointer;
+                  }
+               </style>
 
                <form method="post">
                   {% csrf_token %}
+
+                  <!-- COD -->
+                  <label class="payment-option">
+                     <div class="d-flex align-items-center gap-3">
+
+                        <input
+                           type="radio"
+                           name="payment_method"
+                           value="cod"
+                           checked
+                           required
+                        >
+
+                        <div class="flex-grow-1">
+                           <div class="fw-bold">
+                              Cash on Delivery (COD)
+                           </div>
+
+                           <div class="small text-muted mt-1">
+                              Pay when your order is delivered.
+                           </div>
+                        </div>
+
+                        <span class="badge bg-success">
+                           Available
+                        </span>
+
+                     </div>
+                  </label>
+
+                  <!-- SSLCommerz -->
+                  <label class="payment-option">
+                     <div class="d-flex align-items-center gap-3">
+
+                        <input
+                           type="radio"
+                           name="payment_method"
+                           value="sslcommerz"
+                           required
+                        >
+
+                        <div class="flex-grow-1">
+                           <div class="fw-bold">
+                              SSLCommerz
+                           </div>
+
+                           <div class="small text-muted mt-1">
+                              Pay securely using the SSLCommerz sandbox gateway.
+                           </div>
+                        </div>
+
+                        <span class="badge bg-primary">
+                           Online
+                        </span>
+
+                     </div>
+                  </label>
 
                   <button
                      type="submit"
                      class="btn btn-primary btn-lg w-100"
                   >
-                  Place Order
+                     Place Order
                   </button>
                </form>
-               
+
+
                {% if checkout_source == "cart" %}
                   <a 
                   href="{% url 'carts:detail' %}"
