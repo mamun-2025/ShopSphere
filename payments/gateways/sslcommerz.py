@@ -149,4 +149,47 @@ def create_payment_session(*, payment_data):
 
    
 
+# 7. Get Validation API URL 
+def get_sslcommerz_validation_url():
 
+   base_url = get_sslcommerz_base_url()
+
+   return (
+      f"{base_url}/validator/api/validationserverAPI.php"
+   )
+
+
+# 8. Validate SSLCommerz Transaction
+def validate_sslcommerz_transaction(*, val_id):
+
+   if not isinstance(val_id, str) or not val_id.strip():
+      raise ValueError("Invalid Validation ID.")
+
+   params = {
+      "val_id": val_id,
+      "store_id": settings.SSLCOMMERZ_STORE_ID,
+      "store_passwd": settings.SSLCOMMERZ_STORE_PASSWORD,
+      "format": "json",
+   }
+
+   response = requests.get(
+      get_sslcommerz_validation_url(),
+      params=params,
+      timeout=(5, 20),
+   )
+
+   response.raise_for_status()
+
+   try:
+      result = response.json()
+   except requests.exceptions.JSONDecodeError as exc:
+      raise ValueError(
+         "Invalid validation response from SSLCommerz."
+      ) from exc 
+
+   if not isinstance(result, dict):
+      raise ValueError(
+         "Unexpected validation response."
+      )
+
+   return result
