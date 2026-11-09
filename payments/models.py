@@ -77,6 +77,23 @@ class Payment(models.Model):
       blank=True,
    )
 
+   gateway_validation_id = models.CharField(
+      max_length=50,
+      null=True,
+      blank=True,
+   )
+
+   gateway_bank_transaction_id = models.CharField(
+      max_length=100,
+      null=True,
+      blank=True,
+   )
+
+   gateway_risk_level = models.PositiveSmallIntegerField(
+      null=True,
+      blank=True,
+   )
+
    created_at = models.DateTimeField(
       auto_now_add=True,
    )
