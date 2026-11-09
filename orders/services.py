@@ -154,7 +154,12 @@ def create_order_from_items(
 
 
    # 6. Validate the payment method.
-   if payment_method != Order.PaymentMethod.COD:
+   ALLOWED_PAYMENT_METHODS = {
+      Order.PaymentMethod.COD,
+      Order.PaymentMethod.SSLCOMMERZ,
+   }
+
+   if payment_method not in ALLOWED_PAYMENT_METHODS:
       raise ValidationError(
          "Unsupported payment method."
       )
