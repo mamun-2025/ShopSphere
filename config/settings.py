@@ -181,3 +181,5 @@ SITE_URL = config(
    "SITE_URL",
    default="http://127.0.0.1:8000",
 )
+
+
