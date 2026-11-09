@@ -464,7 +464,7 @@ def verify_sslcommerz_payment(*, tran_id, val_id):
       if locked_payment.status == Payment.Status.SUCCESS:
 
          if (
-            locked_payment.gateway_transaction_id == val_id
+            locked_payment.gateway_validation_id == val_id
             and order.payment_status == Order.PaymentStatus.PAID
          ):
             return locked_payment

@@ -1,5 +1,6 @@
 
 import logging
+import requests
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -156,3 +157,96 @@ def sslcommerz_cancel(request):
       "Payment status is awaiting verification.",
       status=200,
    )
+
+
+
+# Create SSLCommerz IPN View
+@csrf_exempt
+@require_POST
+def sslcommerz_ipn(request):
+
+   # 1. Recieve IPN data from sslcommerz
+   callback_status = request.POST.get("status")
+   tran_id = request.POST.get("tran_id")
+   val_id = request.POST.get("val_id")
+
+   # 2. Validate required fields 
+   if not tran_id or not val_id or not callback_status:
+
+      logger.warning(
+         "Invalid SSLCommerz IPN notification received."
+      )
+
+      return HttpResponseBadRequest(
+         "Invalid IPN notification"
+      )
+
+   # 3. Handle non-success notifications
+   if callback_status not in {"VALID", "VALIDATED"}:
+
+      logger.info(
+         "SSLCommerz IPN received with non-success status."
+         "Transaction ID: %s, Status: %s",
+         tran_id,
+         callback_status,
+      )
+
+      # Do not mark payment as FAILED or CANCELLED 
+      # based only on an unverified notifiction.
+
+      return HttpResponse(
+         "IPN notification received.",
+         status=200,
+      )
+
+   # 4. Verify payment through SSLCommerz Validation API
+   try:
+      payment = verify_sslcommerz_payment(
+         tran_id=tran_id,
+         val_id=val_id,
+      )
+
+   except ValidationError:
+      logger.warning(
+         "SSLCommerz IPN verification rejected. "
+         "Transaction ID: %s",
+         tran_id,
+      )
+
+      return HttpResponse(
+         "IPN verification failed.",
+         status=400,
+      )
+
+   except (
+      requests.RequestException,
+      ValueError,
+   ):
+      logger.exception(
+         "SSLCommerz IPN verification temporarily failed. "
+         "Transaction ID: %s",
+         tran_id,
+      )
+
+      # Gateway/network response is uncertain.
+      # Keep the existing payment status unchanged.
+
+      return HttpResponse(
+         "Payment verification temporarily unavailable.",
+         status=503,
+      )
+
+   # 5. Log verified payment information
+   logger.info(
+      "SSLCommerz IPN processes successfully."
+      "Payment Reference: %s, Status: %s",
+      payment.payment_reference,
+      payment.status,
+   )
+
+   # 6. Acknowlege IPN notification
+   return HttpResponse(
+      "IPN notification processed successfully.",
+      status=200,
+   )
+
