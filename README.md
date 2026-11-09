@@ -283,7 +283,7 @@ The project is divided into 14 milestones. Each milestone introduces specific ba
 * [✅] Multiple Payment Attempts
 * [ ] Payment Processing — Payment Service ও Lifecycle
 * [✅] SSLCommerz Sandbox Integration
-* [ ] Server-Side Payment Verification
+* [✅] Server-Side Payment Verification
 * [ ] Payment Callback / IPN
 * [ ] Duplicate Payment Prevention (Idempotency)
 * [ ] Payment Failure Handling

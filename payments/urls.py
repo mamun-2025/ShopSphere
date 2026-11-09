@@ -28,6 +28,11 @@ urlpatterns = [
        views.sslcommerz_cancel,
        name="sslcommerz_cancel",
     ),
+    path(
+       "sslcommerz/ipn/",
+       views.sslcommerz_ipn,
+       name="sslcommerz_ipn",
+    ),
    
     
 ]
