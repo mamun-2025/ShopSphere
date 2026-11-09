@@ -321,7 +321,6 @@ The project is divided into 14 milestones. Each milestone introduces specific ba
 * [ ] Complete E-commerce Business Logic
 * [ ] Payment Processing System
 * [ ] Complete Order Management System
-* [ ] Coupon & Discount System
 * [ ] PDF Invoice Generation
 
 
