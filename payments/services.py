@@ -8,7 +8,7 @@ from django.db import transaction
 
 from orders.models import Order
 from payments.models import Payment
-from payments.gateways.sslcommerz import create_payment_session
+from payments.gateways.sslcommerz import create_payment_session, validate_sslcommerz_transaction
 
 from django.conf import settings
 
@@ -360,4 +360,192 @@ def identify_sslcommerz_callback(*, callback_data):
       )
 
    return payment
+
+
+
+
+# Verify SSLCommerz Payment
+def verify_sslcommerz_payment(*, tran_id, val_id):
+
+   # 1. Find our Payment
+   try:
+      payment = Payment.objects.get(
+         gateway_transaction_id=tran_id,
+         method=Payment.Method.SSLCOMMERZ,
+      )
+
+   except Payment.DoesNotExist:
+      raise ValidationError("Payment not found.")
+
+   # 2. Call SSLCommerz Validation API
+   result = validate_sslcommerz_transaction(
+      val_id=val_id,
+   )
+
+   # 3. Validate gateway status
+   if result.get("status") not in {"VALID", "VALIDATED"}:
+      raise ValidationError(
+         "SSLCommerz transaction is not valid."
+      )
+
+   # 4. Match transaction ID
+   if result.get("tran_id") != payment.gateway_transaction_id:
+      raise ValidationError(
+         "Transaction ID mismatch."
+      )
+
+   # 5. Match validation ID
+   if result.get("val_id") != val_id:
+      raise ValidationError(
+         "Validation Id mismatch."
+      )
+
+   # 6. Match currency
+   if result.get("currency_type") != payment.currency:
+      raise ValidationError(
+         "Payment currency mismatch."
+      )
+
+   # 7. Match original amount
+   try:
+      verified_amount = Decimal(
+         str(result["currency_amount"])
+      )
+
+   except (KeyError, InvalidOperation, TypeError):
+      raise ValidationError(
+         "Invalid verified payment amount."
+      )
+
+   if (
+      not verified_amount.is_finite()
+      or verified_amount != payment.amount
+   ):
+      raise ValidationError(
+         "Payment amount mismatch."
+      )
+
+   # 8. Validate risk level 
+   try:
+      risk_level = int(result.get("risk_level", -1))
+
+   except (ValueError, TypeError):
+      raise ValidationError(
+         "Invalid payment risk level."
+      )
+
+   if risk_level not in (0, 1):
+      raise ValidationError(
+         "Unknown payment risk level."
+      )
+
+   # 9. Lock Order first, then Payment.
+   # Gateway network request has already completed.
+   with transaction.atomic():
+
+      order = (
+         Order.objects
+         .select_for_update()
+         .get(
+            pk=payment.order_id
+         )
+      )
+
+      locked_payment = (
+         Payment.objects
+         .select_for_update()
+         .get(
+            pk=payment.pk
+         )
+      )
+
+      # 10. Idempotency
+      # Already successful? Return without updating again.
+      if locked_payment.status == Payment.Status.SUCCESS:
+
+         if (
+            locked_payment.gateway_transaction_id == val_id
+            and order.payment_status == Order.PaymentStatus.PAID
+         ):
+            return locked_payment
+
+         raise ValidationError(
+            "Payment is already completed."
+         )
+
+      # 11. Only active payments can be verified.
+      if locked_payment.status not in ACTIVE_PAYMENT_STATUSES:
+         raise ValidationError(
+            "Payment is not in an active state."
+         )
    
+
+      # 12. Prevent another successful payment 
+      other_success = (
+         order.payments 
+         .filter(status=Payment.Status.SUCCESS)
+         .exclude(
+            pk=locked_payment.pk
+         ).exists()
+      )
+
+      if other_success or order.payment_status == Order.PaymentStatus.PAID:
+         raise ValidationError(
+            "Another payment has already paid this order."
+         )
+
+      # 13. Save gateway verification information
+      locked_payment.gateway_validation_id = val_id
+
+      locked_payment.gateway_bank_transaction_id = (
+         result.get("bank_tran_id") or ""
+      )
+
+      locked_payment.gateway_risk_level = risk_level
+
+      # 14. Risky payment: do not fulfil automatically 
+      if risk_level == 1:
+         
+         locked_payment.status = Payment.Status.PROCESSING
+
+         locked_payment.save(
+            update_fields=[
+               "gateway_validation_id",
+               "gateway_bank_transaction_id",
+               "gateway_risk_level",
+               "status",
+               "updated_at",
+            ]
+         )
+
+         return locked_payment
+
+      # 15. Save and verified payment 
+      locked_payment.status = Payment.Status.SUCCESS
+
+      locked_payment.save(
+         update_fields=[
+            "gateway_validation_id",
+            "gateway_bank_transaction_id",
+            "gateway_risk_level",
+            "status",
+            "updated_at",
+         ]
+      )
+
+      # 16. Update Order Payment status
+      order.payment_status = Order.PaymentStatus.PAID
+
+      order.save(
+         update_fields=[
+            "payment_status",
+            "updated_at",
+         ]
+      )
+
+      return locked_payment
+
+
+
+
+

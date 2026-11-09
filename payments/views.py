@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 
-from payments.services import start_sslcommerz_payment, identify_sslcommerz_callback
+from payments.services import start_sslcommerz_payment, identify_sslcommerz_callback, verify_sslcommerz_payment
 
 
 @login_required
@@ -45,17 +45,56 @@ def sslcommerz_success(request):
          "Invalid payment callback."
       )
 
+   val_id = request.POST.get("val_id")
+
+   if not val_id:
+      return HttpResponseBadRequest(
+         "Missing Validation ID."
+      )
+
+   try: 
+      payment = verify_sslcommerz_payment(
+         tran_id=payment.gateway_transaction_id,
+         val_id=val_id,
+      )
+
+   except ValidationError:
+      logger.warning(
+         "SSLCommerz payment verification failed. "
+         "Payment Reference: %s",
+         payment.payment_reference,
+      )
+
+      return HttpResponse(
+         "Payment verification failed.",
+         status=400,
+      )
+
+   except Exception:
+      logger.exception(
+         "SSLCommerz verification error. "
+         "Payment Reference: %s",
+         payment.payment_reference,
+      )
+
+      return HttpResponse(
+         "Payment verification is pending.",
+         status=503,
+      )
+
    logger.info(
-      "SSLCommerz success callback received. "
-      "Payment Reference: %s",
+      "SSLCommerz payment verification completed. "
+      "Payment Reference: %s, Status: %s",
       payment.payment_reference,
+      payment.status,
    )
 
    # Do not mark payment as SUCCESS here.
    # Server-side verification is required.
    return HttpResponse(
       "Payment Response received."
-      "Verification is pending",
+      "Verification status: "
+      f"{payment.status}",
       status=200,
    )
 
