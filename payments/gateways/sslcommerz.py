@@ -107,6 +107,16 @@ def create_payment_session(*, payment_data):
       "store_passwd": settings.SSLCOMMERZ_STORE_PASSWORD,
    }
 
+   # DEBUG: Check outgoing callback URLs
+   print("\n========== OUTGOING SSLCommerz CALLBACK URLs ==========")
+
+   print("SUCCESS URL:", payload.get("success_url"))
+   print("FAIL URL:", payload.get("fail_url"))
+   print("CANCEL URL:", payload.get("cancel_url"))
+   print("IPN URL:", payload.get("ipn_url"))
+
+   print("=======================================================\n")
+
    response = requests.post(
       get_sslcommerz_initiate_url(),
       data=payload,

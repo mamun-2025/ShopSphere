@@ -148,6 +148,14 @@ def build_sslcommerz_payload(payment):
       path = reverse(f"payments:{name}")
       return f"{site_url}{path}"
 
+   print("\n========== SSLCommerz Callback URLs ==========")
+   print("SITE_URL:", site_url)
+   print("SUCCESS:", callback_url("sslcommerz_success"))
+   print("FAIL:", callback_url("sslcommerz_fail"))
+   print("CANCEL:", callback_url("sslcommerz_cancel"))
+   print("IPN:", callback_url("sslcommerz_ipn"))
+   print("==============================================\n")
+
    payment_data = {
       "total_amount": str(payment.amount),
       "currency": payment.currency,
@@ -250,6 +258,7 @@ def start_sslcommerz_payment(*, order_id, user):
       result = create_payment_session(
          payment_data=payment_data,
       )
+
    except ValueError as exc:
 
       # Only mark FAILED when the gateway
@@ -273,6 +282,11 @@ def start_sslcommerz_payment(*, order_id, user):
          "Please contact support before retrying."
       ) from exc 
 
+   print("\n========== SSLCommerz Gateway Response ==========")
+   print("Status:", result.get("status"))
+   print("GatewayPageURL:", result.get("GatewayPageURL"))
+   print("Session Key Present:", bool(result.get("sessionkey")))
+   print("=================================================\n")
 
    # 5. Save Gateway Session Information
    session_key = result.get("sessionkey")
