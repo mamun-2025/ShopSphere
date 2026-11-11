@@ -11,6 +11,12 @@ from django.views.decorators.csrf import csrf_exempt
 
 from payments.services import start_sslcommerz_payment, identify_sslcommerz_callback, verify_sslcommerz_payment
 
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView, DetailView
+from django.db.models import Q
+from .models import Payment
+
+
 
 @login_required
 @require_POST
@@ -250,3 +256,91 @@ def sslcommerz_ipn(request):
       status=200,
    )
 
+
+
+# Admin Payment List View
+class AdminPaymentListView(
+   LoginRequiredMixin,
+   UserPassesTestMixin,
+   ListView,
+): 
+   model = Payment
+   template_name = "payments/admin/payment_list.html"
+   context_object_name = "payments"
+   paginate_by = 10
+
+   def test_func(self):
+      return self.request.user.is_superuser
+
+   def get_queryset(self):
+      queryset = (
+         Payment.objects
+         .select_related("user", "order")
+         .order_by("-created_at")
+      )
+
+      search_query = self.request.GET.get(
+         "q", ""
+      ).strip()
+
+      if search_query:
+         queryset = queryset.filter(
+            Q(gateway_transaction_id__icontains=search_query)
+            | Q(user__username__icontains=search_query)
+            | Q(user__email__icontains=search_query)
+         )
+
+      status_filter = self.request.GET.get(
+         "status", ""
+      )
+
+      valid_statuses = dict(Payment.Status.choices)
+
+      if status_filter in valid_statuses:
+         queryset = queryset.filter(
+            status=status_filter
+         )
+
+      method_filter = self.request.GET.get(
+         "method", ""
+      )
+
+      valid_methods = dict(Payment.Method.choices)
+
+      if method_filter in valid_methods:
+         queryset = queryset.filter(
+            method=method_filter
+         )
+
+      return queryset
+
+   def get_context_data(self, **kwargs):
+      context = super().get_context_data(**kwargs)
+
+      context["search_query"] = self.request.GET.get("q", "")
+      context["status_filter"] = self.request.GET.get("status", "")
+      context["method_filter"] = self.request.GET.get("method", "")
+      context["status_choices"] = Payment.Status.choices
+      context["method_choices"] = Payment.Method.choices
+      context["total_payments"] = Payment.objects.count()
+
+      return context
+
+
+
+# Admin Payment Detail View
+class AdminPaymentDetailView(
+   LoginRequiredMixin,
+   UserPassesTestMixin,
+   DetailView,
+):
+   model = Payment
+   template_name = "payments/admin/payment_detail.html"
+   context_object_name = "payment"
+
+   def test_func(self):
+      return self.request.user.is_superuser
+
+   def get_queryset(self):
+      return Payment.objects.select_related("user", "order")
+   

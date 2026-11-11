@@ -182,6 +182,14 @@
                     Customers
                 </a>
 
+                <a
+                    href="{% url 'payments:admin_payment_list' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'admin_payment_list' or request.resolver_match.url_name == 'admin_payment_detail' %}active{% endif %}"
+                >
+                    <i class="bi bi-credit-card"></i>
+                    Payments
+                </a>
+
 
                 <hr class="border-secondary">
 

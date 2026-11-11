@@ -8,6 +8,7 @@ app_name = "payments"
 
 
 urlpatterns = [
+   # SSLCommerz Payment
     path(
        "sslcommerz/start/<int:order_id>/",
        views.sslcommerz_payment_start,
@@ -33,6 +34,18 @@ urlpatterns = [
        views.sslcommerz_ipn,
        name="sslcommerz_ipn",
     ),
+
+    # Admin Payment Management
+    path(
+       "admin/payments/",
+       views.AdminPaymentListView.as_view(),
+       name="admin_payment_list",
+    ),
+    path(
+       "admin/payments/<int:pk>/",
+       views.AdminPaymentDetailView.as_view(),
+       name="admin_payment_detail",
+    ),
+
    
-    
 ]
