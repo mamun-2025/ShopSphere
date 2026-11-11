@@ -1,27 +1,23 @@
 
 
-
-{% extends "accounts/base.html" %}
+{% extends "orders/admin/base.html" %}
 
 {% block title %}Admin Dashboard | ShopSphere{% endblock %}
 
-{% block content %}
+{% block page_heading %}
+    Order Dashboard
+{% endblock %}
 
-<div class="container-fluid py-4">
 
-    <!-- Dashboard Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold mb-1">Order Dashboard</h2>
-            <p class="text-muted mb-0">
-                Monitor and manage your store orders.
-            </p>
-        </div>
+{% block admin_content %}
 
-        <a href="{% url 'orders:admin_dashboard' %}"
-           class="btn btn-outline-primary">
-            Refresh
-        </a>
+<div class="container-fluid p-0">
+
+    <!-- Dashboard Description -->
+    <div class="mb-4">
+        <p class="text-muted mb-0">
+            Monitor and manage your store orders.
+        </p>
     </div>
 
 
@@ -40,12 +36,11 @@
             </div>
         </div>
 
-
         <!-- Pending Orders -->
         <div class="col-12 col-sm-6 col-xl-4">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2">Pending</p>
+                    <p class="text-muted mb-2">Pending Orders</p>
                     <h3 class="fw-bold text-warning mb-0">
                         {{ pending_orders }}
                     </h3>
@@ -53,12 +48,11 @@
             </div>
         </div>
 
-
         <!-- Confirmed Orders -->
         <div class="col-12 col-sm-6 col-xl-4">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2">Confirmed</p>
+                    <p class="text-muted mb-2">Confirmed Orders</p>
                     <h3 class="fw-bold text-info mb-0">
                         {{ confirmed_orders }}
                     </h3>
@@ -66,12 +60,11 @@
             </div>
         </div>
 
-
         <!-- Processing Orders -->
         <div class="col-12 col-sm-6 col-xl-4">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2">Processing</p>
+                    <p class="text-muted mb-2">Processing Orders</p>
                     <h3 class="fw-bold text-primary mb-0">
                         {{ processing_orders }}
                     </h3>
@@ -79,12 +72,11 @@
             </div>
         </div>
 
-
         <!-- Shipped Orders -->
         <div class="col-12 col-sm-6 col-xl-4">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2">Shipped</p>
+                    <p class="text-muted mb-2">Shipped Orders</p>
                     <h3 class="fw-bold text-primary mb-0">
                         {{ shipped_orders }}
                     </h3>
@@ -92,12 +84,11 @@
             </div>
         </div>
 
-
         <!-- Delivered Orders -->
         <div class="col-12 col-sm-6 col-xl-4">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2">Delivered</p>
+                    <p class="text-muted mb-2">Delivered Orders</p>
                     <h3 class="fw-bold text-success mb-0">
                         {{ delivered_orders }}
                     </h3>
@@ -105,13 +96,9 @@
             </div>
         </div>
 
-    </div>
-
-
-    <!-- Cancelled Orders -->
-    <div class="row mb-4">
+        <!-- Cancelled Orders -->
         <div class="col-12 col-sm-6 col-xl-4">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <p class="text-muted mb-2">Cancelled Orders</p>
                     <h3 class="fw-bold text-danger mb-0">
@@ -120,6 +107,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 
 
@@ -127,7 +115,9 @@
     <div class="card border-0 shadow-sm">
 
         <div class="card-header bg-white py-3">
-            <h5 class="fw-bold mb-0">Recent Orders</h5>
+            <h5 class="fw-bold mb-0">
+                Recent Orders
+            </h5>
         </div>
 
         <div class="card-body p-0">
@@ -153,10 +143,8 @@
 
                             <tr>
 
-                                <td>
-                                    <span class="fw-semibold">
-                                        {{ order.order_number }}
-                                    </span>
+                                <td class="fw-semibold">
+                                    {{ order.order_number }}
                                 </td>
 
                                 <td>
@@ -164,6 +152,7 @@
                                 </td>
 
                                 <td>
+
                                     {% if order.status == "pending" %}
                                         <span class="badge bg-warning text-dark">
                                             {{ order.get_status_display }}
@@ -194,6 +183,7 @@
                                             {{ order.get_status_display }}
                                         </span>
                                     {% endif %}
+
                                 </td>
 
                                 <td>

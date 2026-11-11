@@ -491,7 +491,7 @@ class OrderCancelView(LoginRequiredMixin, View):
       )
 
 
-
+# Admin Dashboard
 class AdminOrderDashboardView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
    template_name = "orders/admin/dashboard.html"
    permission_required = "orders.view_order"
@@ -546,3 +546,73 @@ class AdminOrderDashboardView(LoginRequiredMixin, PermissionRequiredMixin, Templ
 
    
 
+
+# Admin Order List
+class AdminOrderListView(
+   LoginRequiredMixin,
+   PermissionRequiredMixin,
+   ListView,
+):
+   model = Order
+   template_name = "orders/admin/order_list.html"
+   context_object_name = "orders"
+   permission_required = "orders.view_order"
+   raise_exception = True
+   paginate_by = 20
+
+
+   def get_queryset(self):
+
+      queryset = (
+         Order.objects
+         .select_related("user")
+         .order_by("-created_at")
+      )
+
+      # 1. Order Search
+      search_query = self.request.GET.get(
+         "q", ""
+      ).strip()
+
+      if search_query:
+
+         queryset = queryset.filter(
+            Q(order_number__icontains=search_query)
+            | Q(user__username__icontains=search_query)
+            | Q(user__email__icontains=search_query)
+            | Q(shipping_full_name__icontains=search_query)
+            | Q(shipping_phone__icontains=search_query)
+         )
+
+      # 2. Order Status Filter
+      status = self.request.GET.get(
+         "status", ""
+      ).strip()
+
+      valid_statuses = {
+         value for value, label in Order.Status.choices
+      }
+
+      if status in valid_statuses:
+         queryset = queryset.filter(
+            status=status
+         )
+
+      return queryset
+
+   def get_context_data(self, **kwargs):
+      context = super().get_context_data(**kwargs)
+
+      context["search_query"] = self.request.GET.get(
+         "q", ""
+      ).strip()
+
+      context["selected_status"] = self.request.GET.get(
+         "status", ""
+      ).strip()
+
+      context["status_choices"] = Order.Status.choices
+
+      return context
+
+   
