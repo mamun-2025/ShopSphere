@@ -2,460 +2,706 @@
 
 {% extends "accounts/base.html" %}
 
+{% block title %}{{ product.name }} | ShopSphere{% endblock %}
+
+{% block page_heading %}Product Details{% endblock %}
+
 {% block content %}
 
-<div class="container mt-4">
-
-   <h2>Product Detail</h2>
-
-   <div class="card">
-      <div class="card-body">
-
-         <!-- Single Product Image(Main)-->
-         {% if product.image %}
-            <div class="mb-4">
-               <img
-                  src="{{ product.image.url }}"
-                  alt="{{ product.name }}"
-                  class="img-fluid rounded"
-                  style="max-height: 400px;"
-               >
-            </div>
-         {% endif %}
-
-
-         <!-- Multiple Product Image(Gallery) -->
-         <h4 class="mt-4 mb-3">
-            Product Gallery
-         </h4>
-
-         <div class="row">
-            {% for image in product.images.all %}
-
-               <div class="col-md-3 mb-3">
-                  <img
-                  src="{{ image.image.url }}"
-                  alt="{{ image.alt_text }}"
-                  class="img-fluid rounded"
-                  style="
-                     height: 180px;
-                     width: 100%;
-                     object-fit: cover;
-                  "
-                  >
-               </div>
-
-            {% endfor %}
-         </div>
-
-        
-
-         <!-- Product Information -->
-         <h1 class="card-title">
-            {{ product.name }}
-         </h1>
-         <p>
-            <strong>Category:{{ product.category.name }}</strong>
-         </p>
-         <p>
-            <strong>SKU:{{ product.sku }}</strong>
-         </p>
-         <p>
-            <strong>Brand:{{ product.brand }}</strong>
-         </p>
-         <p>
-            <strong>Price:৳{{ product.price }}</strong>
-         </p>
-         <p>
-            <strong>Stock:{{ product.stock }}</strong>
-         </p>
-         <p>
-            <strong>Description:{{ product.description }}</strong>
-         </p>
-
-
-         <!-- Add TO Cart -->
-         <div class="mt-4 mb-4">
-
-            {% if product.is_active and product.stock > 0 %}
-
-               <form method="post"
-                     action="{% url 'carts:add' product.id %}"
-               >
-                  {% csrf_token %}
-
-                  <button
-                     type="submit"
-                     class="btn btn-success"
-                  >
-                  🛒 Add to Cart
-                  </button>
-
-               </form>
-
-
-            {% elif not product.is_active %}
-
-               <span class="badge bg-danger fs-6">
-                  Product Inactive
-               </span>
-
-            {% else %}
-
-               <span class="badge bg-danger fs-6">
-                  Out of Stock
-               </span>
-               
-            {% endif %}
-
-         </div>
-
-         <!-- Buy Now -->
-         {% if product.is_active and product.stock > 0 %}
-            <form 
-               method="post"
-               action="{% url 'orders:buy_now' product.id %}"
-               class="mt-2"
-            >
-               {% csrf_token %}
-               
-               <label for="buy-now-quantity" class="form-label">
-                  Quantity
-               </label>
-
-               <input 
-                  type="number"
-                  id="buy-now-quantity"
-                  name="quantity"
-                  value="1"
-                  min="1"
-                  max="{{ product.stock }}"
-                  class="form-control mb-2"
-                  required
-               >
-
-               <button 
-                  type="submit"
-                  class="btn btn-primary"
-               > 
-               ⚡ Buy Now
-               </button>
-            </form>
-         {% endif %}
-
-
-         <!-- Add To Wishlist -->
-         <div class="mt-4 mb-4">
-
-            <form 
-               method="post"
-               action="{% url 'wishlist:add' product.id %}"
-               class="d-inline"
-            >
-               {% csrf_token %}
-
-               <button
-                  type="submit"
-                  class="btn btn-outline-danger"
-               >
-                  <span aria-hidden="true">♥</span>
-                  Add to Wishlist
-               </button>
-
-            </form>
-            
-         </div>
-
-
-
-         <!-- Product PDF -->
-         {% if product.manual %}
-
-            <div class="mt-4 mb-4">
-
-               <h4> Product Manual </h4>
-
-               <a 
-                  href="{{ product.manual.url }}"
-                  target="_blank"
-                  class="btn btn-outline-primary"
-               >
-               View PDF
-               </a>
-               
-               <a 
-                  href="{{ product.manual.url }}"
-                  download
-                  class="btn btn-primary"
-               >
-               Download PDF
-               </a>
-
-            </div>
-
-         {% endif %}
-
-
-
-
-         <!-- Product Status -->
-         <p>
-            <strong>Status:</strong>
-            {% if product.is_active %}
-               <span class="badge bg-success">
-                  Active
-               </span>
-            {% else %}
-               <span class="badge bg-danger">
-                  Inactive
-               </span>
-            {% endif %}
-         </p>
-
-
-
-         <!-- TimeStamps -->
-         <p>
-            <strong>
-            Created:{{ product.created_at }}
-            </strong>
-         </p>
-         <p>
-            <strong>
-            Updated:{{ product.updated_at }}</strong>
-         </p>
-
-
-         <!-- Action buttons -->
-         <a 
-            href="{% url 'products:product_list' %}"
-            class="btn btn-secondary"
-         >
-         Back to Product_List
-         </a>
-         
-         {% if perms.products.change_product %}
-            <a 
-               href="{% url 'products:product_update' product.pk %}"
-               class="btn btn-primary"
-            >
-            Edit Product
-            </a>
-         {% endif %}
-
-         {% if perms.products.delete_product %}
-            <a 
-               href="{% url 'products:product_delete' product.pk %}"
-               class="btn btn-danger"
-            >
-            Delete Product
-            </a>
-         {% endif %}
-         
-
-         <!-- Customer Reviews -->
-         <hr class="my-5">
-
-         <div class="mt-4">
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-
-               <h3>
-                  Customer Reviews
-               </h3>
-
-               {% if perms.reviews.add_review %}
-                    <a
-                     href="{% url 'reviews:review_create' product.id %}"
-                     class="btn btn-primary"
-                     >
-                     ⭐ Write a Review
-                     </a>
-               {% endif %}
-
-            </div>
-
-            <!-- Rating Summary -->
-            <div class="card mb-4">
-
-               <div class="card-body">
-
-                  <h5 class="card-title">
-                     Rating Summary
-                  </h5>
-
-                  {% if product.average_rating %}
-
-                     <div class="d-flex align-items-center">
-
-                        <!-- Average Number -->
-                        <h2 class="mb-0 me-3">
-                           {{ product.average_rating|floatformat:1 }}/5
-                        </h2> 
-
-                        <!-- Dynamic Stars -->
-                        <div class="fs-4">
-                           
-                           {% if product.average_rating >= 1 %}
-                              <span class="text-warning">⭐</span>
-                           {% else %}
-                              <span class="text-secondary">☆</span>
-                           {% endif %}
-
-                           {% if product.average_rating >= 2 %}
-                              <span class="text-warning">⭐</span>
-                           {% else %}
-                              <span class="text-secondary">☆</span>
-                           {% endif %}
-
-                           {% if product.average_rating >= 3 %}
-                              <span class="text-warning">⭐</span>
-                           {% else %}
-                              <span class="text-secondary">☆</span>
-                           {% endif %}
-
-                           {% if product.average_rating >= 4 %}
-                              <span class="text-warning">⭐</span>
-                           {% else %}
-                              <span class="text-secondary">☆</span>
-                           {% endif %}
-
-                           {% if product.average_rating >= 5 %}
-                              <span class="text-warning">⭐</span>
-                           {% else %}
-                              <span class="text-secondary">☆</span>
-                           {% endif %}
+<div class="container-fluid py-3">
+
+    <!-- Breadcrumb -->
+
+    <nav class="mb-4">
+        <a href="{% url 'products:product_list' %}" class="text-decoration-none">
+            Products
+        </a>
+        <span class="text-muted"> / {{ product.name }}</span>
+    </nav>
+
+
+    <!-- Product Details -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body p-3 p-md-4">
+
+            <div class="row g-4">
+
+
+                <!-- Product Images -->
+
+                <div class="col-12 col-lg-5">
+
+                    {% if product.image %}
+
+                        <img
+                            src="{{ product.image.url }}"
+                            alt="{{ product.name }}"
+                            class="img-fluid rounded product-main-image"
+                        >
+
+                    {% else %}
+
+                        <div class="product-image-placeholder">
+                            No Image Available
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- Product Gallery -->
+
+                    {% if product.images.all %}
+
+                        <h5 class="fw-bold mt-4 mb-3">
+                            Product Gallery
+                        </h5>
+
+                        <div class="row g-2">
+
+                            {% for image in product.images.all %}
+
+                                <div class="col-4">
+
+                                    <img
+                                        src="{{ image.image.url }}"
+                                        alt="{{ image.alt_text }}"
+                                        class="img-fluid rounded gallery-image"
+                                    >
+
+                                </div>
+
+                            {% endfor %}
 
                         </div>
 
-                     </div>
+                    {% endif %}
 
-                     <p class="text-muted mt-2 mb-0">
-                        Based on 
-                        {{ product.total_reviews }}
-                        review{{ product.total_reviews|pluralize }}
-                     </p>
+                </div>
 
-                  {% else %}
 
-                     <p class="text-muted mb-0">
-                        No reviews yet.
-                        Be the first to review this product!
-                     </p>
 
-                  {% endif %}
+                <!-- Product Information -->
 
-               </div>
+                <div class="col-12 col-lg-7">
+
+                    <!-- Category -->
+
+                    <span class="badge bg-light text-primary mb-3">
+                        {{ product.category.name }}
+                    </span>
+
+
+                    <!-- Product Name -->
+
+                    <h2 class="fw-bold mb-3">
+                        {{ product.name }}
+                    </h2>
+
+
+                    <!-- Product SKU -->
+
+                    <p class="text-muted mb-2">
+                        SKU: {{ product.sku }}
+                    </p>
+
+
+                    <!-- Brand -->
+
+                    <p class="mb-3">
+                        <strong>Brand:</strong>
+                        {{ product.brand }}
+                    </p>
+
+
+                    <hr>
+
+
+                    <!-- Price -->
+
+                    <h2 class="fw-bold text-primary mb-3">
+                        ৳{{ product.price }}
+                    </h2>
+
+
+                    <!-- Stock -->
+
+                    <div class="mb-3">
+
+                        <strong>Availability:</strong>
+
+                        {% if product.is_active and product.stock > 0 %}
+
+                            <span class="badge bg-success ms-2">
+                                In Stock
+                            </span>
+
+                        {% elif not product.is_active %}
+
+                            <span class="badge bg-danger ms-2">
+                                Inactive
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-danger ms-2">
+                                Out of Stock
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <p class="mb-3">
+                        <strong>Available Quantity:</strong>
+                        {{ product.stock }}
+                    </p>
+
+
+                    <!-- Description -->
+
+                    <h5 class="fw-bold mt-4">
+                        Product Description
+                    </h5>
+
+                    <p class="text-muted">
+                        {{ product.description }}
+                    </p>
+
+
+                    <hr>
+
+
+                    <!-- Add to Cart -->
+
+                    {% if product.is_active and product.stock > 0 %}
+
+                        <form
+                            method="post"
+                            action="{% url 'carts:add' product.id %}"
+                            class="mb-3"
+                        >
+
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="btn btn-success w-100"
+                            >
+                                🛒 Add to Cart
+                            </button>
+
+                        </form>
+
+
+                        <!-- Buy Now -->
+
+                        <form
+                            method="post"
+                            action="{% url 'orders:buy_now' product.id %}"
+                        >
+
+                            {% csrf_token %}
+
+                            <label
+                                for="buy-now-quantity"
+                                class="form-label fw-semibold"
+                            >
+                                Quantity
+                            </label>
+
+                            <input
+                                type="number"
+                                id="buy-now-quantity"
+                                name="quantity"
+                                value="1"
+                                min="1"
+                                max="{{ product.stock }}"
+                                class="form-control mb-3"
+                                required
+                            >
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary w-100"
+                            >
+                                ⚡ Buy Now
+                            </button>
+
+                        </form>
+
+                    {% elif not product.is_active %}
+
+                        <div class="alert alert-danger">
+                            This product is currently unavailable.
+                        </div>
+
+                    {% else %}
+
+                        <div class="alert alert-warning">
+                            This product is out of stock.
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- Wishlist -->
+
+                    <form
+                        method="post"
+                        action="{% url 'wishlist:add' product.id %}"
+                        class="mt-3"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="btn btn-outline-danger w-100"
+                        >
+                            ♥ Add to Wishlist
+                        </button>
+
+                    </form>
+
+
+                </div>
 
             </div>
 
+        </div>
+
+    </div>
+
+
+
+    <!-- Product Manual -->
+
+    {% if product.manual %}
+
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-3">
+                    📄 Product Manual
+                </h5>
+
+                <p class="text-muted">
+                    View or download the product instruction manual.
+                </p>
+
+                <a
+                    href="{{ product.manual.url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn btn-outline-primary me-2 mb-2"
+                >
+                    View PDF
+                </a>
+
+                <a
+                    href="{{ product.manual.url }}"
+                    download
+                    class="btn btn-primary mb-2"
+                >
+                    Download PDF
+                </a>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+
+    <!-- Product Information & Admin Actions -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body p-4">
+
+            <h5 class="fw-bold mb-3">
+                Additional Information
+            </h5>
+
+            <div class="row g-3">
+
+                <div class="col-12 col-md-6">
+
+                    <strong>Product Status:</strong>
+
+                    {% if product.is_active %}
+
+                        <span class="badge bg-success">
+                            Active
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-danger">
+                            Inactive
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="col-12 col-md-6">
+
+                    <strong>Created:</strong>
+                    {{ product.created_at|date:"d M Y, h:i A" }}
+
+                </div>
+
+
+                <div class="col-12 col-md-6">
+
+                    <strong>Last Updated:</strong>
+                    {{ product.updated_at|date:"d M Y, h:i A" }}
+
+                </div>
+
+            </div>
+
+
+            <hr class="my-4">
+
+
+            <!-- Action Buttons -->
+
+            <div class="d-flex flex-wrap gap-2">
+
+                <a
+                    href="{% url 'products:product_list' %}"
+                    class="btn btn-secondary"
+                >
+                    ← Back to Products
+                </a>
+
+
+                {% if perms.products.change_product %}
+
+                    <a
+                        href="{% url 'products:product_update' product.pk %}"
+                        class="btn btn-primary"
+                    >
+                        Edit Product
+                    </a>
+
+                {% endif %}
+
+
+                {% if perms.products.delete_product %}
+
+                    <a
+                        href="{% url 'products:product_delete' product.pk %}"
+                        class="btn btn-danger"
+                    >
+                        Delete Product
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Customer Reviews -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body p-3 p-md-4">
+
+
+            <!-- Review Header -->
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+                <h3 class="fw-bold mb-0">
+                    Customer Reviews
+                </h3>
+
+
+                {% if perms.reviews.add_review %}
+
+                    <a
+                        href="{% url 'reviews:review_create' product.id %}"
+                        class="btn btn-primary"
+                    >
+                        ⭐ Write a Review
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+
+
+            <!-- Rating Summary -->
+
+            <div class="card border-0 bg-light mb-4">
+
+                <div class="card-body">
+
+                    <h5 class="fw-bold mb-3">
+                        Rating Summary
+                    </h5>
+
+
+                    {% if product.average_rating %}
+
+                        <div class="d-flex align-items-center flex-wrap gap-3">
+
+                            <h2 class="fw-bold mb-0">
+                                {{ product.average_rating|floatformat:1 }}/5
+                            </h2>
+
+
+                            <!-- Average Stars -->
+
+                            <div class="fs-4">
+
+                                {% if product.average_rating >= 1 %}
+                                    <span class="text-warning">★</span>
+                                {% else %}
+                                    <span class="text-secondary">☆</span>
+                                {% endif %}
+
+
+                                {% if product.average_rating >= 2 %}
+                                    <span class="text-warning">★</span>
+                                {% else %}
+                                    <span class="text-secondary">☆</span>
+                                {% endif %}
+
+
+                                {% if product.average_rating >= 3 %}
+                                    <span class="text-warning">★</span>
+                                {% else %}
+                                    <span class="text-secondary">☆</span>
+                                {% endif %}
+
+
+                                {% if product.average_rating >= 4 %}
+                                    <span class="text-warning">★</span>
+                                {% else %}
+                                    <span class="text-secondary">☆</span>
+                                {% endif %}
+
+
+                                {% if product.average_rating >= 5 %}
+                                    <span class="text-warning">★</span>
+                                {% else %}
+                                    <span class="text-secondary">☆</span>
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <p class="text-muted mt-2 mb-0">
+
+                            Based on {{ product.total_reviews }}
+                            review{{ product.total_reviews|pluralize }}
+
+                        </p>
+
+
+                    {% else %}
+
+                        <p class="text-muted mb-0">
+                            No reviews yet. Be the first to review this product!
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+
             <!-- Individual Reviews -->
-            <h4 class="mb-3">
-               Reviews
-            </h4>
+
+            <h5 class="fw-bold mb-3">
+                Customer Feedback
+            </h5>
+
 
             {% for review in active_reviews %}
 
-                  <div class="card mb-3">
+                <div class="card border-0 bg-light mb-3">
 
-                     <div class="card-body">
+                    <div class="card-body">
 
-                        <!-- User + Date -->
-                        <div class="d-flex justify-content-between align-items-center">
 
-                           <h5 class="mb-1">
-                              {{ review.user.username }}
-                           </h5>
+                        <!-- User & Date -->
 
-                           <small class="text-muted">
-                              {{ review.created_at|date:"M d, Y" }}
-                           </small>
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                            <h6 class="fw-bold mb-0">
+                                {{ review.user.username }}
+                            </h6>
+
+                            <small class="text-muted">
+                                {{ review.created_at|date:"d M Y" }}
+                            </small>
 
                         </div>
-                        
 
-                        <!-- Edit/Delete buttons -->
+
+
+                        <!-- Review Rating -->
+
+                        <div class="text-warning fs-5 my-2">
+
+                            {% if review.rating >= 1 %}
+                                ★
+                            {% endif %}
+
+                            {% if review.rating >= 2 %}
+                                ★
+                            {% endif %}
+
+                            {% if review.rating >= 3 %}
+                                ★
+                            {% endif %}
+
+                            {% if review.rating >= 4 %}
+                                ★
+                            {% endif %}
+
+                            {% if review.rating >= 5 %}
+                                ★
+                            {% endif %}
+
+                        </div>
+
+
+
+                        <!-- Review Comment -->
+
+                        <p class="mb-3">
+                            {{ review.comment }}
+                        </p>
+
+
+
+                        <!-- Edit & Delete -->
+
                         {% if review.user == request.user %}
 
-                           <div class="mt-3">
+                            <div class="d-flex flex-wrap gap-2">
 
-                              {% if perms.reviews.change_review %}
-                                 <a 
-                                    href="{% url 'reviews:review_update' review.id %}"
-                                    class="btn btn-secondary"
-                                 >
-                                 Edit Review
-                                 </a>
-                              {% endif %}
+                                {% if perms.reviews.change_review %}
 
-                              {% if perms.reviews.delete_review %}
-                                 <a 
-                                    href="{% url 'reviews:review_delete' review.id %}"
-                                    class="btn btn-danger"
-                                 >
-                                 Delete Review
-                                 </a>
-                              {% endif %}
+                                    <a
+                                        href="{% url 'reviews:review_update' review.id %}"
+                                        class="btn btn-sm btn-outline-primary"
+                                    >
+                                        Edit Review
+                                    </a>
 
-                           </div>
+                                {% endif %}
+
+
+                                {% if perms.reviews.delete_review %}
+
+                                    <a
+                                        href="{% url 'reviews:review_delete' review.id %}"
+                                        class="btn btn-sm btn-outline-danger"
+                                    >
+                                        Delete Review
+                                    </a>
+
+                                {% endif %}
+
+                            </div>
 
                         {% endif %}
 
 
+                    </div>
 
+                </div>
 
-                     
-                        <!-- Rating -->
-                        <div class="text-warning mb-2">
-                           {% if review.rating >= 1 %}
-                              ⭐
-                           {% endif %}
-
-                           {% if review.rating >= 2 %}
-                              ⭐
-                           {% endif %}
-
-                           {% if review.rating >= 3 %}
-                              ⭐
-                           {% endif %}
-
-                           {% if review.rating >= 4 %}
-                              ⭐
-                           {% endif %}
-
-                           {% if review.rating >= 5 %}
-                              ⭐
-                           {% endif %}
-                        </div>
-
-                        <!-- Comment -->
-                        <p class="mb-0">
-                           {{ review.comment }}
-                        </p>
-
-                     </div>
-
-                  </div>
 
             {% empty %}
 
-               <div class="alert alert-info">
-                  No reviews yet.
-                  Be the first to review this product!
-               </div>
-            
+
+                <div class="alert alert-info mb-0">
+
+                    No reviews yet.
+                    Be the first to review this product!
+
+                </div>
+
+
             {% endfor %}
 
-         </div>
 
+        </div>
 
-      </div>
+    </div>
 
-   </div>
 
 </div>
 
 
+
+<!-- Page CSS -->
+
+<style>
+
+    .product-main-image {
+        width: 100%;
+        height: 400px;
+        object-fit: contain;
+        background: #f5f7fb;
+        border-radius: 12px;
+    }
+
+    .product-image-placeholder {
+        height: 400px;
+        background: #f5f7fb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8994a8;
+        border-radius: 12px;
+    }
+
+    .gallery-image {
+        width: 100%;
+        height: 110px;
+        object-fit: cover;
+        background: #f5f7fb;
+    }
+
+    @media (max-width: 576px) {
+
+        .product-main-image,
+        .product-image-placeholder {
+            height: 280px;
+        }
+
+        .gallery-image {
+            height: 85px;
+        }
+
+    }
+
+</style>
+
 {% endblock %}
-
-

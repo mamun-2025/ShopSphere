@@ -1,3 +1,306 @@
 
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <title>{% block title %}ShopSphere Admin{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background: #f5f7fb;
+            margin: 0;
+        }
+
+        /* Admin Sidebar */
+        .admin-sidebar {
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #172033;
+            padding: 24px 16px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 1050;
+            transition: transform 0.3s ease;
+        }
+
+        .admin-brand {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            padding: 0 12px;
+            margin-bottom: 30px;
+        }
+
+        .admin-label {
+            color: #8994a8;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 12px 7px;
+        }
+
+        .admin-sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .admin-sidebar a:hover {
+            background: #293750;
+            color: white;
+        }
+
+        .admin-sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .admin-divider {
+            border-color: #344056;
+            margin: 18px 0;
+        }
+
+        /* Main Content */
+        .admin-main {
+            margin-left: 260px;
+            min-height: 100vh;
+            padding: 25px;
+        }
+
+        .admin-topbar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-admin-header {
+            display: none;
+            background: white;
+            padding: 14px 18px;
+            border-bottom: 1px solid #dee2e6;
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+        }
+
+        /* Scrollbar */
+        .admin-sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 10px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .admin-sidebar.show {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+                padding: 16px;
+            }
+
+            .mobile-admin-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .admin-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1045;
+            }
+
+            .admin-overlay.show {
+                display: block;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- Mobile Header -->
+    <header class="mobile-admin-header">
+        <strong>ShopSphere Admin</strong>
+
+        <button class="btn btn-dark btn-sm"
+                type="button"
+                id="adminSidebarToggle">
+            ☰ Menu
+        </button>
+    </header>
+
+    <!-- Overlay -->
+    <div class="admin-overlay" id="adminOverlay"></div>
+
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+
+        <div class="admin-brand">
+            ShopSphere
+        </div>
+
+        <div class="admin-label">Overview</div>
+
+        {% if perms.orders.view_order %}
+            <a href="{% url 'orders:admin_dashboard' %}">
+                <span>▦</span> Dashboard
+            </a>
+
+            <a href="{% url 'orders:admin_order_list' %}">
+                <span>▣</span> Order Management
+            </a>
+        {% endif %}
+
+        <hr class="admin-divider">
+
+        <div class="admin-label">Store Management</div>
+
+        {% if perms.products.view_product %}
+            <a href="{% url 'products:product_list' %}">
+                <span>◈</span> Products
+            </a>
+        {% endif %}
+
+        {% if perms.categories.view_category or perms.categories.add_category %}
+            <a href="{% url 'category_list' %}">
+                <span>▤</span> Categories
+            </a>
+        {% endif %}
+
+        {% if perms.inventory.view_inventory %}
+            <a href="{% url 'inventory:list' %}">
+                <span>▥</span> Inventory
+            </a>
+        {% endif %}
+
+        <hr class="admin-divider">
+
+        <div class="admin-label">Account</div>
+
+        {% if perms.orders.view_order %}
+            <a href="{% url 'orders:history' %}">
+                <span>◉</span> Customer Orders
+            </a>
+        {% endif %}
+
+        <a href="{% url 'accounts:profile' %}">
+            <span>●</span> My Profile
+        </a>
+
+        <a href="{% url 'accounts:change_password' %}">
+            <span>⚙</span> Change Password
+        </a>
+
+        <hr class="admin-divider">
+
+        <a href="/">
+            <span>⌂</span> Back to Store
+        </a>
+
+        <a href="{% url 'accounts:logout' %}">
+            <span>↪</span> Logout
+        </a>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+
+        <div class="admin-topbar">
+            <h5 class="mb-0">
+                {% block page_heading %}Admin Panel{% endblock %}
+            </h5>
+
+            <span class="text-muted">
+                {{ request.user.username }}
+            </span>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close">
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block admin_content %}
+        {% endblock %}
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const adminSidebar = document.getElementById("adminSidebar");
+        const adminToggle = document.getElementById("adminSidebarToggle");
+        const adminOverlay = document.getElementById("adminOverlay");
+
+        function closeAdminSidebar() {
+            adminSidebar.classList.remove("show");
+            adminOverlay.classList.remove("show");
+        }
+
+        adminToggle?.addEventListener("click", function () {
+            adminSidebar.classList.toggle("show");
+            adminOverlay.classList.toggle("show");
+        });
+
+        adminOverlay.addEventListener("click", closeAdminSidebar);
+
+        adminSidebar.querySelectorAll("a").forEach(function (link) {
+            link.addEventListener("click", function () {
+                if (window.innerWidth <= 768) {
+                    closeAdminSidebar();
+                }
+            });
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

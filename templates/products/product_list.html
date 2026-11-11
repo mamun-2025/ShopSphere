@@ -1,171 +1,344 @@
 
 
 {% extends "accounts/base.html" %}
+
+{% block title %}Products | ShopSphere{% endblock %}
+
+{% block page_heading %}All Products{% endblock %}
+
 {% block content %}
 
-<div class="container mt-4">
+<div class="container-fluid py-3">
 
-   <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Product List</h2>
-   </div>
+    <!-- Page Header -->
 
-   <!-- Search -->
-   <form method="get" class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-      <div class="input-group">
-         <input
-            type="text"
-            name="search"
-            class="form-control"
-            placeholder="Search products..."
-            value="{{ request.GET.search }}"
-         >
+        <div>
+            <h2 class="fw-bold mb-1">Our Products</h2>
 
-         <button
-            type="submit"
-            class="btn btn-primary"
-         >
-         Search
-         </button>
+            <p class="text-muted mb-0">
+                Explore our latest products.
+            </p>
+        </div>
 
-      </div>
-   </form>
+    </div>
 
 
-   <!-- Product List -->
-   <div class="row">
-      {% for product in products %}
+    <!-- Search Form -->
 
-         <div class="col-md mb-4">
-            <div class="card h-100">
+    <div class="card border-0 shadow-sm mb-4">
 
-               {% if product.image %}
-                  <img
-                     src="{{ product.image.url }}"
-                     alt="{{ product.name }}"
-                     class="card-img-top"
-                     style="height: 220px; object-fit: cover;"
-                  
-                  >
-               {% endif %}
+        <div class="card-body">
 
+            <form method="get">
 
-               <div class="card-body">
+                <div class="input-group">
 
-                  <h5 class="card-title">
-                     <a href="{% url 'products:product_detail' product.slug %}">
-                        {{ product.name }}
-                     </a>
-                  </h5>
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Search products..."
+                        value="{{ request.GET.search }}"
+                    >
 
-                  <p class="text-muted">
-                     {{ product.category.name }}
-                  </p>
+                    <button
+                        type="submit"
+                        class="btn btn-primary px-4"
+                    >
+                        Search
+                    </button>
 
-                  <p class="card-text">
-                     {{ product.description|truncatewords:20 }}
-                  </p>
+                </div>
 
-                  <h5>৳{{ product.price }}</h5>
+            </form>
 
-                  {% if product.stock > 0 %}
-                     <span class="badge bg-success"> 
-                        In Stock 
-                     </span>
-                  {% else %}
-                     <span class="badge bg-danger"> 
-                        Out of Stock
-                     </span>
-                  {% endif %}
-                  
-                  <div class="mt-3">
-                     <a 
-                        href="{% url 'products:product_detail' product.slug %}"
-                        class="btn btn-primary"
-                     >
-                     View Product
-                     </a>
-                  </div>
-               </div>
+        </div>
+
+    </div>
 
 
+    <!-- Product Grid -->
+
+    <div class="row g-4">
+
+        {% for product in products %}
+
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+
+                <div class="card h-100 border-0 shadow-sm product-card">
+
+
+                    <!-- Product Image -->
+
+                    {% if product.image %}
+
+                        <img
+                            src="{{ product.image.url }}"
+                            alt="{{ product.name }}"
+                            class="card-img-top product-image"
+                        >
+
+                    {% else %}
+
+                        <div class="product-image-placeholder">
+                            No Image Available
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- Product Details -->
+
+                    <div class="card-body d-flex flex-column">
+
+                        <!-- Category -->
+
+                        <span class="badge bg-light text-primary align-self-start mb-2">
+                            {{ product.category.name }}
+                        </span>
+
+
+                        <!-- Product Name -->
+
+                        <h5 class="card-title fw-bold">
+
+                            <a
+                                href="{% url 'products:product_detail' product.slug %}"
+                                class="product-title"
+                            >
+                                {{ product.name }}
+                            </a>
+
+                        </h5>
+
+
+                        <!-- Description -->
+
+                        <p class="text-muted small">
+                            {{ product.description|truncatewords:18 }}
+                        </p>
+
+
+                        <!-- Price -->
+
+                        <h4 class="fw-bold text-primary mb-3">
+                            ৳{{ product.price }}
+                        </h4>
+
+
+                        <!-- Stock Status -->
+
+                        <div class="mb-3">
+
+                            {% if product.stock > 0 %}
+
+                                <span class="badge bg-success-subtle text-success">
+                                    In Stock
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-danger-subtle text-danger">
+                                    Out of Stock
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Product Button -->
+
+                        <div class="mt-auto">
+
+                            <a
+                                href="{% url 'products:product_detail' product.slug %}"
+                                class="btn btn-primary w-100"
+                            >
+                                View Product
+                            </a>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
 
             </div>
-         </div>
 
 
-      {% empty %}
+        {% empty %}
 
-         <div class="col-12">
-            <div class="alert alert-info">
-               No products available
+
+            <!-- Empty State -->
+
+            <div class="col-12">
+
+                <div class="card border-0 shadow-sm text-center py-5">
+
+                    <div class="card-body">
+
+                        <h4 class="fw-bold">
+                            No Products Found
+                        </h4>
+
+                        <p class="text-muted mb-3">
+                            Sorry, no products are available at the moment.
+                        </p>
+
+                        <a
+                            href="{% url 'products:product_list' %}"
+                            class="btn btn-outline-primary"
+                        >
+                            View All Products
+                        </a>
+
+                    </div>
+
+                </div>
+
             </div>
-         </div>
-
-      {% endfor %}
-   </div>
 
 
+        {% endfor %}
 
-   <!-- Pagination -->
-   {% if is_paginated %}
-
-      <nav aria-label="product pagination">
-         <ul class="pagination justify-content-center">
+    </div>
 
 
-            <!-- Page Previous -->
-            {% if page_obj.has_previous %}
-               <li class="page-item">
-                  <a
-                     class="page-link"
-                     href="?search={{ request.GET.search }}&page={{ page_obj.previous_page_number }}"
-                  >
-                  Previous
-                  </a>
-               </li>
-            {% endif %}
+
+    <!-- Pagination -->
+
+    {% if is_paginated %}
+
+        <nav aria-label="Product pagination" class="mt-5">
+
+            <ul class="pagination justify-content-center">
 
 
-            <!-- Page Number -->
-            {% for num in page_obj.paginator.page_range %}
-               <li class="page-item
-                  {% if page_obj.number == num %}
-                        active
-                  {% endif %}"
-               >
+                <!-- Previous -->
 
-                  <a 
-                     class="page-link"
-                     href="?search={{ request.GET.search }}&page={{ num }}"
-                  >
-                     {{ num }}
-                  </a>
+                {% if page_obj.has_previous %}
 
-               </li>
-            {% endfor %}
+                    <li class="page-item">
 
+                        <a
+                            class="page-link"
+                            href="?search={{ request.GET.search|urlencode }}&page={{ page_obj.previous_page_number }}"
+                        >
+                            Previous
+                        </a>
 
-            <!-- Page Next-->
-            {% if page_obj.has_next %}
-               <li class="page-item">
-                  <a 
-                     class="page-link"
-                     href="?search={{ request.GET.search }}&page={{ page_obj.next_page_number }}"
-                  >
-                  Next
-                  </a>
-               </li>
-            {% endif %}
+                    </li>
+
+                {% else %}
+
+                    <li class="page-item disabled">
+                        <span class="page-link">Previous</span>
+                    </li>
+
+                {% endif %}
 
 
-         </ul>
-      </nav>
 
-   {% endif %}
+                <!-- Page Numbers -->
 
+                {% for num in page_obj.paginator.page_range %}
+
+                    <li class="page-item
+                        {% if page_obj.number == num %}active{% endif %}
+                    ">
+
+                        <a
+                            class="page-link"
+                            href="?search={{ request.GET.search|urlencode }}&page={{ num }}"
+                        >
+                            {{ num }}
+                        </a>
+
+                    </li>
+
+                {% endfor %}
+
+
+
+                <!-- Next -->
+
+                {% if page_obj.has_next %}
+
+                    <li class="page-item">
+
+                        <a
+                            class="page-link"
+                            href="?search={{ request.GET.search|urlencode }}&page={{ page_obj.next_page_number }}"
+                        >
+                            Next
+                        </a>
+
+                    </li>
+
+                {% else %}
+
+                    <li class="page-item disabled">
+                        <span class="page-link">Next</span>
+                    </li>
+
+                {% endif %}
+
+
+            </ul>
+
+        </nav>
+
+    {% endif %}
 
 
 </div>
+
+
+<!-- Product CSS -->
+
+<style>
+
+    .product-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    .product-image {
+        height: 220px;
+        width: 100%;
+        object-fit: cover;
+        background: #f1f3f5;
+    }
+
+    .product-image-placeholder {
+        height: 220px;
+        background: #f1f3f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8994a8;
+        font-size: 14px;
+    }
+
+    .product-title {
+        color: #172033;
+        text-decoration: none;
+    }
+
+    .product-title:hover {
+        color: #2563eb;
+    }
+
+</style>
 
 {% endblock %}

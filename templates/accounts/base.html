@@ -1,23 +1,41 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>{% block title %}ShopSphere{% endblock %}</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
     <style>
+
+        /* =========================
+           Global Styles
+        ========================= */
+
         body {
             background: #f5f7fb;
             margin: 0;
+            font-family: Arial, sans-serif;
+            color: #172033;
         }
 
-        /* Sidebar */
+        a {
+            text-decoration: none;
+        }
+
+
+        /* =========================
+           Sidebar
+        ========================= */
+
         .store-sidebar {
             width: 260px;
             height: 100vh;
@@ -27,14 +45,12 @@
             background: #172033;
             padding: 24px 16px;
             overflow-y: auto;
-            overflow-x: hidden;
             z-index: 1050;
-            transition: transform 0.3s ease;
         }
 
         .store-brand {
             color: white;
-            font-size: 24px;
+            font-size: 25px;
             font-weight: 700;
             padding: 0 12px;
             margin-bottom: 30px;
@@ -46,7 +62,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            padding: 12px 12px 7px;
+            padding: 12px;
         }
 
         .store-sidebar a {
@@ -54,7 +70,6 @@
             align-items: center;
             gap: 12px;
             color: #cbd5e1;
-            text-decoration: none;
             padding: 12px 14px;
             border-radius: 8px;
             margin-bottom: 5px;
@@ -62,11 +77,7 @@
             transition: 0.2s;
         }
 
-        .store-sidebar a:hover {
-            background: #293750;
-            color: white;
-        }
-
+        .store-sidebar a:hover,
         .store-sidebar a.active {
             background: #2563eb;
             color: white;
@@ -77,12 +88,36 @@
             margin: 18px 0;
         }
 
-        /* Main Content */
+
+        /* =========================
+           Main Content
+        ========================= */
+
         .store-main {
             margin-left: 260px;
             min-height: 100vh;
             padding: 25px;
         }
+
+        .store-topbar {
+            background: white;
+            padding: 16px 22px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .store-content {
+            width: 100%;
+        }
+
+
+        /* =========================
+           Mobile Header
+        ========================= */
 
         .mobile-header {
             display: none;
@@ -94,7 +129,35 @@
             z-index: 1040;
         }
 
-        /* Scrollbar */
+        /* Hide Checkbox */
+
+        .sidebar-toggle {
+            display: none;
+        }
+
+        .menu-button {
+            cursor: pointer;
+            background: #172033;
+            color: white;
+            padding: 7px 13px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           Messages
+        ========================= */
+
+        .alert {
+            border-radius: 10px;
+        }
+
+
+        /* =========================
+           Scrollbar
+        ========================= */
+
         .store-sidebar::-webkit-scrollbar {
             width: 5px;
         }
@@ -104,27 +167,31 @@
             border-radius: 10px;
         }
 
-        /* Mobile Responsive */
+
+        /* =========================
+           Responsive Design
+        ========================= */
+
         @media (max-width: 768px) {
-
-            .store-sidebar {
-                transform: translateX(-100%);
-            }
-
-            .store-sidebar.show {
-                transform: translateX(0);
-            }
-
-            .store-main {
-                margin-left: 0;
-                padding: 16px;
-            }
 
             .mobile-header {
                 display: flex;
-                align-items: center;
                 justify-content: space-between;
+                align-items: center;
             }
+
+            .store-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            /* Open Sidebar */
+
+            .sidebar-toggle:checked ~ .store-sidebar {
+                transform: translateX(0);
+            }
+
+            /* Overlay */
 
             .sidebar-overlay {
                 display: none;
@@ -132,372 +199,279 @@
                 inset: 0;
                 background: rgba(0, 0, 0, 0.5);
                 z-index: 1045;
+                cursor: pointer;
             }
 
-            .sidebar-overlay.show {
+            .sidebar-toggle:checked ~ .sidebar-overlay {
                 display: block;
             }
+
+            .store-main {
+                margin-left: 0;
+                padding: 16px;
+            }
+
+            .store-topbar {
+                padding: 14px 16px;
+            }
+
         }
+
     </style>
 
     {% block extra_css %}{% endblock %}
+
 </head>
+
 
 <body>
 
+
+    <!-- =========================
+         Mobile Menu Toggle
+    ========================= -->
+
+    <input
+        type="checkbox"
+        id="sidebarToggle"
+        class="sidebar-toggle"
+    >
+
+
     <!-- Mobile Header -->
+
     <header class="mobile-header">
+
         <strong>ShopSphere</strong>
 
-        <button class="btn btn-dark btn-sm"
-                type="button"
-                id="sidebarToggle"
-                aria-label="Open navigation">
+        <label
+            for="sidebarToggle"
+            class="menu-button"
+        >
             ☰ Menu
-        </button>
+        </label>
+
     </header>
 
-    <!-- Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Sidebar -->
-    <aside class="store-sidebar" id="storeSidebar">
+    <!-- Sidebar Overlay -->
+
+    <label
+        for="sidebarToggle"
+        class="sidebar-overlay"
+    ></label>
+
+
+    <!-- =========================
+         Sidebar
+    ========================= -->
+
+    <aside class="store-sidebar">
 
         <div class="store-brand">
             ShopSphere
         </div>
 
-        <div class="sidebar-label">Main Menu</div>
+
+        <!-- Main Menu -->
+
+        <div class="sidebar-label">
+            Main Menu
+        </div>
 
         <a href="{% url 'products:product_list' %}">
-            <span>▣</span> All Products
+            <span>▣</span>
+            All Products
         </a>
 
         <a href="{% url 'category_list' %}">
-            <span>▤</span> Categories
+            <span>▤</span>
+            Categories
         </a>
+
 
         {% if request.user.is_authenticated %}
 
-            <div class="sidebar-label">Shopping</div>
+
+            <!-- Shopping -->
+
+            <div class="sidebar-label">
+                Shopping
+            </div>
 
             <a href="{% url 'carts:detail' %}">
-                <span>🛒</span> My Cart
+                <span>🛒</span>
+                My Cart
             </a>
 
             <a href="{% url 'wishlist:list' %}">
-                <span>♥</span> My Wishlist
+                <span>♥</span>
+                My Wishlist
             </a>
 
             <a href="{% url 'orders:history' %}">
-                <span>▣</span> My Orders
+                <span>▣</span>
+                My Orders
             </a>
+
 
             <hr class="sidebar-divider">
 
-            <div class="sidebar-label">My Account</div>
+
+            <!-- Account -->
+
+            <div class="sidebar-label">
+                My Account
+            </div>
 
             <a href="{% url 'accounts:profile' %}">
-                <span>●</span> My Profile
+                <span>●</span>
+                My Profile
             </a>
 
             <a href="{% url 'accounts:edit_profile' %}">
-                <span>✎</span> Edit Profile
+                <span>✎</span>
+                Edit Profile
             </a>
 
             <a href="{% url 'accounts:change_password' %}">
-                <span>⚙</span> Change Password
+                <span>⚙</span>
+                Change Password
             </a>
 
             <a href="{% url 'accounts:logout' %}">
-                <span>↪</span> Logout
+                <span>↪</span>
+                Logout
             </a>
+
 
         {% else %}
 
-            <div class="sidebar-label">Account</div>
+
+            <!-- Guest Account -->
+
+            <div class="sidebar-label">
+                Account
+            </div>
 
             <a href="{% url 'accounts:login' %}">
-                <span>↪</span> Login
+                <span>↪</span>
+                Login
             </a>
 
             <a href="{% url 'accounts:register' %}">
-                <span>＋</span> Register
+                <span>＋</span>
+                Register
             </a>
 
+
         {% endif %}
+
+
+        <!-- Management -->
 
         {% if perms.orders.view_order %}
 
             <hr class="sidebar-divider">
 
-            <div class="sidebar-label">Management</div>
+            <div class="sidebar-label">
+                Management
+            </div>
 
             <a href="{% url 'orders:admin_dashboard' %}">
-                <span>▦</span> Admin Dashboard
+                <span>▦</span>
+                Admin Dashboard
             </a>
 
         {% endif %}
+
+
+        <hr class="sidebar-divider">
+
+
+        <!-- Back to Store -->
+
+        <a href="{% url 'products:product_list' %}">
+            <span>⌂</span>
+            Back to Store
+        </a>
+
 
     </aside>
 
 
-    <!-- Main Content -->
+
+    <!-- =========================
+         Main Content
+    ========================= -->
+
     <main class="store-main">
 
+
+        <!-- Topbar -->
+
+        <div class="store-topbar">
+
+            <h5 class="fw-bold mb-0">
+                {% block page_heading %}ShopSphere Store{% endblock %}
+            </h5>
+
+            {% if request.user.is_authenticated %}
+
+                <span class="text-muted small">
+                    {{ request.user.username }}
+                </span>
+
+            {% else %}
+
+                <span class="text-muted small">
+                    Guest User
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- Django Messages -->
+
         {% if messages %}
+
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+
+                <div
+                    class="alert alert-{{ message.tags }}"
+                    role="alert"
+                >
+
                     {{ message }}
 
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="alert"
-                            aria-label="Close">
-                    </button>
                 </div>
+
             {% endfor %}
+
         {% endif %}
 
-        {% block content %}
-        {% endblock %}
+
+
+        <!-- Page Content -->
+
+        <div class="store-content">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </div>
+
 
     </main>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        const sidebar = document.getElementById("storeSidebar");
-        const toggle = document.getElementById("sidebarToggle");
-        const overlay = document.getElementById("sidebarOverlay");
-
-        function closeSidebar() {
-            sidebar.classList.remove("show");
-            overlay.classList.remove("show");
-        }
-
-        toggle?.addEventListener("click", function () {
-            sidebar.classList.toggle("show");
-            overlay.classList.toggle("show");
-        });
-
-        overlay.addEventListener("click", closeSidebar);
-
-        // Close mobile sidebar after clicking a navigation link
-        sidebar.querySelectorAll("a").forEach(function (link) {
-            link.addEventListener("click", function () {
-                if (window.innerWidth <= 768) {
-                    closeSidebar();
-                }
-            });
-        });
-    </script>
-
     {% block extra_js %}{% endblock %}
 
 </body>
+
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-{% comment %} 
-<!DOCTYPE html>
-<html>
-<head>
-   <title>ShopSphere</title>
-   
-   <link 
-         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" 
-         rel="stylesheet"
-   >
-
-</head>
-<body>
-
-<!-- ========================= 
-   Navigation Bar 
-   ========================= -->
-<div class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-   <div class="container">
-      <a class="navbar-brand"
-         href="/"
-      >
-         ShopSphere
-      </a>
-
-      <div>
-
-         {% if perms.inventory.view_inventory %}
-            <a 
-               href="{% url 'inventory:list' %}"
-               class="btn btn-success"
-            >
-            Inventory
-            </a>
-         {% endif %}
-
-
-         {% if perms.categories.add_category %}
-            <a 
-               href="{% url 'category_list' %}"
-               class="btn btn-primary"
-            >
-            Categories
-            </a>
-         {% endif %}
-
-         {% if perms.orders.view_order %}
-            <a 
-               href="{%url 'orders:admin_dashboard' %}"
-               class="btn btn-dark"
-            >
-            Admin Dashboard
-            </a>
-         {% endif %}
-
-            <a 
-               href="{% url 'products:product_list' %}"
-               class="btn btn-secondary"
-            >
-            Products
-            </a>
-
-
-         {% if perms.products.add_product %}
-            <a 
-               href="{% url 'products:product_create' %}"
-               class="btn btn-info"
-            >
-            Add Products
-            </a>
-         {% endif %}
-
-         
-         {% if request.user.is_authenticated %}
-
-            <a 
-               href="{% url 'carts:detail' %}"
-               class="btn btn-primary"
-            >
-             My Cart 
-            </a>
-
-            <a 
-               href="{% url 'orders:history' %}"
-               class="btn btn-danger"
-            >
-            My Orders
-            </a>
-
-            <a 
-               href="{% url 'wishlist:list' %}"
-               class="btn btn-secondary"
-            >
-            ♥ My Wishlist
-            </a>
-
-            <a 
-               href="{% url 'accounts:profile' %}"
-               class="btn btn-success"
-            >
-            Profile
-            </a>
-
-            <a 
-               href="{% url 'accounts:edit_profile' %}"
-               class="btn btn-warning"
-            >
-            Edit Profile
-            </a>
-
-            <a 
-               href="{% url 'accounts:logout' %}"
-               class="btn btn-danger"
-            >
-            Logout
-            </a>
-            
-            <a 
-               href="{% url 'accounts:change_password' %}"
-               class="btn btn-info"
-            >
-            Change Password
-            </a>
-
-         {% else %}
-            <a 
-               href="{% url 'accounts:login' %}"
-               class="btn btn-primary"
-            >
-            Login
-            </a>
-            <a 
-               href="{% url 'accounts:register' %}"
-               class="btn btn-success"
-            >
-            Register
-            </a>
-         {% endif %}
-      </div>
-   </div>
-</div>
-   
-      
-   
-
-<!-- ====================
-    Main Content
-    ==================== -->
-<div class="container mt-4">
-
-   {% if messages %}
-
-      {% for message in messages %}
-
-         <div 
-            class="alert alert-{{ message.tags }} alert-dismissible fade show"
-            role="alert"
-         >
-
-            {{ message }}
-
-            <button
-               type="button"
-               class="btn-close"
-               data-bs-dismiss="alert"
-               aria-label="Close"
-            ></button>
-
-         </div>
-
-
-
-      {% endfor %}
-
-   {% endif %}
-
-
-   {% block content %}
-
-   
-   {% endblock %}
-
-</div>
-   
-
-<script 
-   src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
-</script>
-
-</body>
-</html> {% endcomment %}
+```
