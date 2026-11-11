@@ -13,54 +13,129 @@
 
     <style>
         body {
-            background: #f5f6fa;
+            background: #f5f7fb;
+            margin: 0;
         }
 
+        /* Sidebar */
         .store-sidebar {
-            width: 250px;
-            min-height: 100vh;
+            width: 260px;
+            height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
-            background: white;
-            border-right: 1px solid #dee2e6;
-            padding: 20px 15px;
+            background: #172033;
+            padding: 24px 16px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 1050;
+            transition: transform 0.3s ease;
         }
 
         .store-brand {
-            font-size: 23px;
-            font-weight: bold;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            padding: 0 12px;
             margin-bottom: 30px;
         }
 
+        .sidebar-label {
+            color: #8994a8;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 12px 7px;
+        }
+
         .store-sidebar a {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #cbd5e1;
             text-decoration: none;
-            color: #495057;
-            padding: 11px 15px;
-            border-radius: 6px;
+            padding: 12px 14px;
+            border-radius: 8px;
             margin-bottom: 5px;
+            font-size: 14px;
+            transition: 0.2s;
         }
 
         .store-sidebar a:hover {
-            background: #e9ecef;
-            color: #212529;
+            background: #293750;
+            color: white;
         }
 
+        .store-sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .sidebar-divider {
+            border-color: #344056;
+            margin: 18px 0;
+        }
+
+        /* Main Content */
         .store-main {
-            margin-left: 250px;
+            margin-left: 260px;
+            min-height: 100vh;
             padding: 25px;
         }
 
+        .mobile-header {
+            display: none;
+            background: white;
+            padding: 14px 18px;
+            border-bottom: 1px solid #dee2e6;
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+        }
+
+        /* Scrollbar */
+        .store-sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .store-sidebar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 10px;
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
+
             .store-sidebar {
-                position: relative;
-                width: 100%;
-                min-height: auto;
+                transform: translateX(-100%);
+            }
+
+            .store-sidebar.show {
+                transform: translateX(0);
             }
 
             .store-main {
                 margin-left: 0;
+                padding: 16px;
+            }
+
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1045;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
             }
         }
     </style>
@@ -70,80 +145,98 @@
 
 <body>
 
-    <!-- Customer Sidebar -->
-    <aside class="store-sidebar">
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <strong>ShopSphere</strong>
+
+        <button class="btn btn-dark btn-sm"
+                type="button"
+                id="sidebarToggle"
+                aria-label="Open navigation">
+            ☰ Menu
+        </button>
+    </header>
+
+    <!-- Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="store-sidebar" id="storeSidebar">
 
         <div class="store-brand">
             ShopSphere
         </div>
 
-        <a href="/">
-            Home
-        </a>
+        <div class="sidebar-label">Main Menu</div>
 
         <a href="{% url 'products:product_list' %}">
-            All Products
+            <span>▣</span> All Products
         </a>
 
-        {% if perms.categories.view_category or perms.categories.add_category %}
-            <a href="{% url 'category_list' %}">
-                Categories
-            </a>
-        {% endif %}
+        <a href="{% url 'category_list' %}">
+            <span>▤</span> Categories
+        </a>
 
         {% if request.user.is_authenticated %}
 
-            <hr>
+            <div class="sidebar-label">Shopping</div>
 
             <a href="{% url 'carts:detail' %}">
-                My Cart
+                <span>🛒</span> My Cart
             </a>
 
             <a href="{% url 'wishlist:list' %}">
-                My Wishlist
+                <span>♥</span> My Wishlist
             </a>
 
             <a href="{% url 'orders:history' %}">
-                My Orders
+                <span>▣</span> My Orders
             </a>
 
-            <hr>
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-label">My Account</div>
 
             <a href="{% url 'accounts:profile' %}">
-                My Profile
+                <span>●</span> My Profile
             </a>
 
             <a href="{% url 'accounts:edit_profile' %}">
-                Edit Profile
+                <span>✎</span> Edit Profile
             </a>
 
             <a href="{% url 'accounts:change_password' %}">
-                Change Password
+                <span>⚙</span> Change Password
             </a>
 
             <a href="{% url 'accounts:logout' %}">
-                Logout
+                <span>↪</span> Logout
             </a>
 
         {% else %}
 
-            <hr>
+            <div class="sidebar-label">Account</div>
 
             <a href="{% url 'accounts:login' %}">
-                Login
+                <span>↪</span> Login
             </a>
 
             <a href="{% url 'accounts:register' %}">
-                Register
+                <span>＋</span> Register
             </a>
 
         {% endif %}
 
         {% if perms.orders.view_order %}
-            <hr>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-label">Management</div>
+
             <a href="{% url 'orders:admin_dashboard' %}">
-                Admin Dashboard
+                <span>▦</span> Admin Dashboard
             </a>
+
         {% endif %}
 
     </aside>
@@ -173,6 +266,33 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const sidebar = document.getElementById("storeSidebar");
+        const toggle = document.getElementById("sidebarToggle");
+        const overlay = document.getElementById("sidebarOverlay");
+
+        function closeSidebar() {
+            sidebar.classList.remove("show");
+            overlay.classList.remove("show");
+        }
+
+        toggle?.addEventListener("click", function () {
+            sidebar.classList.toggle("show");
+            overlay.classList.toggle("show");
+        });
+
+        overlay.addEventListener("click", closeSidebar);
+
+        // Close mobile sidebar after clicking a navigation link
+        sidebar.querySelectorAll("a").forEach(function (link) {
+            link.addEventListener("click", function () {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+    </script>
 
     {% block extra_js %}{% endblock %}
 
