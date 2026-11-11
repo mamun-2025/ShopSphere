@@ -500,7 +500,7 @@ class AdminOrderDashboardView(LoginRequiredMixin, PermissionRequiredMixin, Templ
    def get_context_data(self, **kwargs):
       context = super().get_context_data(**kwargs)
 
-      order_status = Order.objects.aaggregate(
+      order_status = Order.objects.aggregate(
          total_orders=Count("id"),
 
          pending_orders=Count(
