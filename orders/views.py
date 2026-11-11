@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ValidationError
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import ListView, DetailView, TemplateView
 from django.db.models import Count, Q 
@@ -19,8 +19,9 @@ from shipping.services import calculate_shipping_for_subtotal, get_shipping_sele
 from taxes.services import calculate_items_totals
 
 from .models import Order
-from .services import create_order_from_items, create_order_from_cart, cancel_order
+from .services import create_order_from_items, create_order_from_cart, cancel_order, update_order_status, ALLOWED_STATUS_TRANSITIONS
 from payments.services import start_sslcommerz_payment
+from .forms import AdminOrderStatusUpdateForm
 
 
 # CheckOut View
@@ -547,7 +548,7 @@ class AdminOrderDashboardView(LoginRequiredMixin, PermissionRequiredMixin, Templ
    
 
 
-# Admin Order List
+# Admin Order List View
 class AdminOrderListView(
    LoginRequiredMixin,
    PermissionRequiredMixin,
@@ -615,4 +616,118 @@ class AdminOrderListView(
 
       return context
 
-   
+
+
+# Admin Order Detail View
+class AdminOrderDetailView(
+   LoginRequiredMixin,
+   PermissionRequiredMixin,
+   DetailView,
+):
+   model = Order
+   template_name = "orders/admin/order_detail.html"
+   context_object_name = "order"
+   slug_field = "order_number"
+   slug_url_kwarg = "order_number"
+
+   permission_required = "orders.view_order"
+   raise_exception = True
+
+   def get_queryset(self):
+      return (
+         Order.objects
+         .select_related("user")
+         .prefetch_related("items")
+      )
+
+   def get_context_data(self, **kwargs):
+
+      context = super().get_context_data(**kwargs)
+
+      context["order_items"] = (
+         self.object.items.all()
+      )
+
+      status_form = AdminOrderStatusUpdateForm()
+
+      allowed_statuses = ALLOWED_STATUS_TRANSITIONS.get(
+         self.object.status,
+         set(),
+      )
+
+      status_choices = dict(Order.Status.choices)
+
+      status_form.fields["status"].choices = [
+         (status, status_choices[status])
+         for status in Order.Status
+         if status in allowed_statuses
+      ]
+
+      context["status_form"] = status_form
+
+      return context
+
+
+
+# Admin Order Status Update View 
+class AdminOrderStatusUpdateView(
+   LoginRequiredMixin,
+   PermissionRequiredMixin,
+   View,
+):
+   permission_required = "orders.change_order"
+   raise_exception = True 
+
+   def post(self, request, order_number):
+      order = get_object_or_404(
+         Order,
+         order_number=order_number,
+      )
+
+      form = AdminOrderStatusUpdateForm(
+         request.POST
+      )
+
+      if not form.is_valid():
+         messages.error(
+            request,
+            "Please select a valid order status.",
+         )
+
+         return redirect(
+            "orders:admin_order_detail",
+            order_number=order.order_number,
+         )
+
+      new_status = form.cleaned_data["status"]
+
+      try:
+         updated_order = update_order_status(
+            order_id=order.pk,
+            new_status=new_status,
+         )
+
+      except ValidationError as exc:
+         messages.error(
+            request,
+            " ".join(exc.messages),
+         )
+
+         return redirect(
+            "orders:admin_order_detail",
+            order_number=order.order_number,
+         )
+
+      messages.success(
+         request,
+         (
+            f"Order #{updated_order.order_number}"
+            f"status updated to "
+            f"{updated_order.get_status_display()}."
+         ),
+      )
+
+      return redirect(
+         "orders:admin_order_detail",
+         order_number=updated_order.order_number,
+      )

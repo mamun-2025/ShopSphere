@@ -163,8 +163,13 @@
 
                             <tr>
 
-                                <td class="fw-semibold">
-                                    {{ order.order_number }}
+                                <td>
+                                    <a 
+                                       href="{% url 'orders:admin_order_detail' order.order_number %}"
+                                       class="fw-semibold text-decoration-none"
+                                    >
+                                       {{ order.order_number }}
+                                    </a>
                                 </td>
 
                                 <td>

@@ -9,6 +9,8 @@ from .views import (
    OrderCancelView,
    AdminOrderDashboardView,
    AdminOrderListView,
+   AdminOrderDetailView,
+   AdminOrderStatusUpdateView,
 )
 
 app_name = "orders"
@@ -48,6 +50,16 @@ urlpatterns = [
        "admin/orders/",
        AdminOrderListView.as_view(),
        name="admin_order_list",
+    ),
+    path(
+       "admin/orders/<uuid:order_number>/",
+       AdminOrderDetailView.as_view(),
+       name="admin_order_detail",
+    ),
+    path(
+       "admin/orders/<uuid:order_number>/status/",
+       AdminOrderStatusUpdateView.as_view(),
+       name="admin_order_status_update",
     ),
 
     
