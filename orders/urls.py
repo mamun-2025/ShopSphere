@@ -7,11 +7,17 @@ from .views import (
    BuyNowView, 
    OrderHistoryView,
    OrderCancelView,
+   AdminOrderDashboardView,
 )
 
 app_name = "orders"
 
 urlpatterns = [
+    path(
+      "admin/",
+      AdminOrderDashboardView.as_view(),
+      name="admin_dashboard",
+       ),
     path(
        "checkout/",
        CheckoutView.as_view(),
@@ -37,5 +43,6 @@ urlpatterns = [
        OrderDetailView.as_view(),
        name="detail",
     ),
+
     
 ]
