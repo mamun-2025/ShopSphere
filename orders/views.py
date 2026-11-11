@@ -3,11 +3,12 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
+from django.db.models import Count, Q 
 
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
@@ -489,4 +490,59 @@ class OrderCancelView(LoginRequiredMixin, View):
          order_number=order_number,
       )
 
+
+
+class AdminOrderDashboardView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+   template_name = "orders/admin/dashboard.html"
+   permission_required = "orders.view_order"
+   raise_exception = True
+
+   def get_context_data(self, **kwargs):
+      context = super().get_context_data(**kwargs)
+
+      order_status = Order.objects.aaggregate(
+         total_orders=Count("id"),
+
+         pending_orders=Count(
+            "id",
+             filter=Q(status=Order.Status.PENDING),
+         ),
+
+         confirmed_orders=Count(
+            "id",
+            filter=Q(status=Order.Status.CONFIRMED),
+         ),
+
+         processing_orders=Count(
+            "id",
+            filter=Q(status=Order.Status.PROCESSING),
+         ),
+
+         shipped_orders=Count(
+            "id",
+            filter=Q(status=Order.Status.SHIPPED),
+         ),
+
+         delivered_orders=Count(
+            "id",
+            filter=Q(status=Order.Status.DELIVERED),
+         ),
+
+         cancelled_orders=Count(
+            "id",
+            filter=Q(status=Order.Status.CANCELLED),
+         ),
+      )
+
+      context.update(order_status)
+
+      context["recent_orders"] = (
+         Order.objects
+         .select_related("user")
+         .order_by("-created_at")[:10]
+      )
+
+      return context
+
+   
 

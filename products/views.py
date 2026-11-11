@@ -179,7 +179,7 @@ Example:
 
 
 ### Product CreateView
-class ProductCreateView(LoginRequiredMixin, CreateView, PermissionRequiredMixin):
+class ProductCreateView(LoginRequiredMixin,  PermissionRequiredMixin, CreateView):
    model = Product
    form_class = ProductForm
    template_name = "products/product_form.html"
