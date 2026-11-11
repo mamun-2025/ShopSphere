@@ -279,40 +279,32 @@ class AdminPaymentListView(
          .order_by("-created_at")
       )
 
-      search_query = self.request.GET.get(
-         "q", ""
-      ).strip()
+      search_query = self.request.GET.get("q", "").strip()
+      status_filter = self.request.GET.get("status", "").strip()
+      method_filter = self.request.GET.get("method", "").strip()
 
+      # Search
       if search_query:
          queryset = queryset.filter(
-            Q(gateway_transaction_id__icontains=search_query)
-            | Q(user__username__icontains=search_query)
-            | Q(user__email__icontains=search_query)
+               Q(gateway_transaction_id__icontains=search_query)
+               | Q(user__username__icontains=search_query)
+               | Q(user__email__icontains=search_query)
          )
 
-      status_filter = self.request.GET.get(
-         "status", ""
-      )
-
-      valid_statuses = dict(Payment.Status.choices)
+      # Status Filter
+      valid_statuses = [value for value, label in Payment.Status.choices]
 
       if status_filter in valid_statuses:
-         queryset = queryset.filter(
-            status=status_filter
-         )
+         queryset = queryset.filter(status=status_filter)
 
-      method_filter = self.request.GET.get(
-         "method", ""
-      )
-
-      valid_methods = dict(Payment.Method.choices)
+      # Method Filter
+      valid_methods = [value for value, label in Payment.Method.choices]
 
       if method_filter in valid_methods:
-         queryset = queryset.filter(
-            method=method_filter
-         )
+         queryset = queryset.filter(method=method_filter)
 
       return queryset
+
 
    def get_context_data(self, **kwargs):
       context = super().get_context_data(**kwargs)

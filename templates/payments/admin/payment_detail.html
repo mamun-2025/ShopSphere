@@ -1,0 +1,163 @@
+
+
+
+{% extends "accounts/base.html" %}
+
+{% block title %}Payment Details | ShopSphere Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Payment Details</h2>
+            <p class="text-muted mb-0">
+                View payment and transaction information.
+            </p>
+        </div>
+
+        <a href="{% url 'payments:admin_payment_list' %}"
+           class="btn btn-outline-secondary">
+            Back to Payments
+        </a>
+    </div>
+
+    <!-- Payment Summary -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Payment Summary</h5>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <strong>Payment Reference</strong>
+                    <p>{{ payment.payment_reference }}</p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Order ID</strong>
+                    <p>#{{ payment.order_id }}</p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Amount</strong>
+                    <p>{{ payment.amount }} {{ payment.currency }}</p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Payment Method</strong>
+                    <p>{{ payment.get_method_display }}</p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Status</strong>
+                    <p>
+                        <span class="badge bg-info">
+                            {{ payment.get_status_display }}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Created At</strong>
+                    <p>{{ payment.created_at|date:"d M Y, h:i A" }}</p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Last Updated</strong>
+                    <p>{{ payment.updated_at|date:"d M Y, h:i A" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Information -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Customer Information</h5>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <strong>Username</strong>
+                    <p>{{ payment.user.username }}</p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Email</strong>
+                    <p>{{ payment.user.email|default:"Not provided" }}</p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Full Name</strong>
+                    <p>
+                        {{ payment.user.get_full_name|default:"Not provided" }}
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Phone</strong>
+                    <p>{{ payment.user.phone|default:"Not provided" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Information -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Transaction Information</h5>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <strong>Gateway Transaction ID</strong>
+                    <p>
+                        {{ payment.gateway_transaction_id|default:"Not available" }}
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Gateway Validation ID</strong>
+                    <p>
+                        {{ payment.gateway_validation_id|default:"Not available" }}
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Bank Transaction ID</strong>
+                    <p>
+                        {{ payment.gateway_bank_transaction_id|default:"Not available" }}
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Gateway Risk Level</strong>
+                    <p>
+                        {% if payment.gateway_risk_level == None %}
+                            Not available
+                        {% else %}
+                            {{ payment.gateway_risk_level }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Reference -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Order Reference</h5>
+
+            <p>
+                <strong>Order:</strong>
+                #{{ payment.order_id }}
+            </p>
+
+            <p>
+                <strong>Payment Reference:</strong>
+                {{ payment.payment_reference }}
+            </p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
