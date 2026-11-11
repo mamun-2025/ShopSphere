@@ -1,0 +1,311 @@
+
+
+
+
+{% extends "accounts/base.html" %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">Customer Details</h2>
+
+            <p class="text-muted mb-0">
+                View complete customer information.
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'accounts:admin_customer_list' %}"
+            class="btn btn-outline-secondary"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Back to Customers
+        </a>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- Profile Card -->
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm border-0 text-center">
+
+                <div class="card-body py-4">
+
+                    {% if customer.profile_picture %}
+
+                        <img
+                            src="{{ customer.profile_picture.url }}"
+                            width="120"
+                            height="120"
+                            class="rounded-circle object-fit-cover mb-3"
+                            alt="Customer Profile"
+                        >
+
+                    {% else %}
+
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mx-auto mb-3"
+                             style="width:120px;height:120px;">
+
+                            <i class="bi bi-person fs-1"></i>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <h4 class="fw-bold">
+
+                        {{ customer.get_full_name|default:customer.username }}
+
+                    </h4>
+
+                    <p class="text-muted">
+                        @{{ customer.username }}
+                    </p>
+
+
+                    {% if customer.is_active %}
+
+                        <span class="badge bg-success">
+                            Active Account
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-danger">
+                            Inactive Account
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Customer Information -->
+
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-header bg-white py-3">
+
+                    <h5 class="fw-bold mb-0">
+                        Personal Information
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+                                First Name
+                            </small>
+
+                            <h6>
+                                {{ customer.first_name|default:"—" }}
+                            </h6>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+                                Last Name
+                            </small>
+
+                            <h6>
+                                {{ customer.last_name|default:"—" }}
+                            </h6>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+                                Username
+                            </small>
+
+                            <h6>
+                                {{ customer.username }}
+                            </h6>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+                                Email Address
+                            </small>
+
+                            <h6>
+                                {{ customer.email|default:"—" }}
+                            </h6>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+                                Phone Number
+                            </small>
+
+                            <h6>
+                                {{ customer.phone|default:"—" }}
+                            </h6>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+                                Date of Birth
+                            </small>
+
+                            <h6>
+                                {{ customer.date_of_birth|date:"d M Y"|default:"—" }}
+                            </h6>
+
+                        </div>
+
+
+                        <div class="col-12">
+
+                            <small class="text-muted">
+                                Address
+                            </small>
+
+                            <h6>
+                                {{ customer.address|default:"—" }}
+                            </h6>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Account Information -->
+
+            <div class="card shadow-sm border-0 mt-4">
+
+                <div class="card-header bg-white py-3">
+
+                    <h5 class="fw-bold mb-0">
+                        Account Information
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+                                Date Joined
+                            </small>
+
+                            <h6>
+                                {{ customer.date_joined|date:"d M Y, h:i A" }}
+                            </h6>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+                                Last Login
+                            </small>
+
+                            <h6>
+                                {{ customer.last_login|date:"d M Y, h:i A"|default:"Never" }}
+                            </h6>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+                                Account Status
+                            </small>
+
+                            <h6>
+
+                                {% if customer.is_active %}
+
+                                    <span class="badge bg-success">
+                                        Active
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-danger">
+                                        Inactive
+                                    </span>
+
+                                {% endif %}
+
+                            </h6>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+                                Email Verified
+                            </small>
+
+                            <h6>
+                                Not configured
+                            </h6>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

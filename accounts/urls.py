@@ -57,9 +57,7 @@ urlpatterns = [
       "admin/customers/<int:pk>/",
       views.AdminCustomerDetailView.as_view(),
       name="admin_customer_detail",
-   )
-
-
+   ),
 
 
 

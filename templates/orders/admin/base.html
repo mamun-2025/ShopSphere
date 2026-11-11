@@ -175,8 +175,8 @@
 
 
                 <a
-                    href="#"
-                    class="nav-link"
+                    href="{% url 'accounts:admin_customer_list' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'admin.customer_list' or request.resolver_match.url_name == 'admin_customer_detail' %}active{% endif %}"
                 >
                     <i class="bi bi-people"></i>
                     Customers

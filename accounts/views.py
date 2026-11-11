@@ -187,7 +187,7 @@ class AdminCustomerListView(UserPassesTestMixin, ListView):
    paginate_by = 10
 
    def test_func(self):
-      return self.request.is_superuser
+      return self.request.user.is_superuser
 
    def get_queryset(self):
       queryset = User.objects.filter(
@@ -243,3 +243,7 @@ class AdminCustomerDetailView(UserPassesTestMixin, DetailView):
          is_staff=False,
          is_superuser=False,
       )
+
+
+
+   
