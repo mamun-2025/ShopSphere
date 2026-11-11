@@ -157,8 +157,8 @@
 
 
                 <a
-                    href="#"
-                    class="nav-link"
+                    href="{% url 'products:product_list' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}"
                 >
                     <i class="bi bi-box-seam"></i>
                     Products
@@ -166,8 +166,8 @@
 
 
                 <a
-                    href="#"
-                    class="nav-link"
+                    href="{% url 'category_list' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}"
                 >
                     <i class="bi bi-tags"></i>
                     Categories

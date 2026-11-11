@@ -1,11 +1,17 @@
+
 from django.shortcuts import render, redirect
 from django.contrib import messages 
 from .forms import RegisterForm, ProfileUpdateForm
 from django.contrib.auth.forms import AuthenticationForm ,PasswordChangeForm 
-from django.contrib.auth import login, logout, update_session_auth_hash
+from django.contrib.auth import get_user_model, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.views.generic import ListView, DetailView
+from django.db.models import Q 
 
 
+
+# 1. Customer Register 
 def register(request):
    if request.method == "POST":
       form = RegisterForm(request.POST)
@@ -32,6 +38,7 @@ def register(request):
 
 
 
+# 2. Customer Login 
 def user_login(request):
    if request.method == "POST":
       form = AuthenticationForm(request, data=request.POST)
@@ -64,6 +71,7 @@ def user_login(request):
 
 
 
+# 3. Customer Logout
 def user_logout(request):
    logout(request)
 
@@ -77,6 +85,7 @@ def user_logout(request):
 
 
 
+# 4. Customer Profile 
 @login_required
 def profile(request):
    return render(
@@ -86,6 +95,7 @@ def profile(request):
 
 
 
+# 5. Customer Edit Profile
 @login_required
 def edit_profile(request):
 
@@ -119,6 +129,8 @@ def edit_profile(request):
    )
 
 
+
+# 6. Customer Change Password
 @login_required
 def change_password(request):
 
@@ -164,68 +176,70 @@ def change_password(request):
 
 
 
-"""
-8. আপনার code-এর architecture
-
-বর্তমানে আপনার Accounts app-এর structure আসলে সুন্দর একটা backend concept দেখাচ্ছে:
-                    accounts
-                       │
-        ┌──────────────┼──────────────┐
-        ↓              ↓              ↓
-    Register         Login          Logout
-        │              │              │
-   RegisterForm   AuthenticationForm  logout()
-        │              │
-        ↓              ↓
-      User          Session
-        │
-        ├───────────────┐
-        ↓               ↓
-     Profile       Edit Profile
-                         │
-                  ProfileUpdateForm
-                         │
-                         ↓
-                   request.user
-                         │
-                         ↓
-                    form.save()
-                         │
-                         ↓
-                   User updated
-
-        User
-          │
-          ↓
-   Change Password
-          │
- PasswordChangeForm
-          │
-          ↓
-     form.save()
-          │
-          ↓
-update_session_auth_hash()
-
-1. এটা শুধু "Django code" না—
-এখানে আপনি ইতিমধ্যে Authentication, Session, Form Validation,
-ModelForm, File Upload, Authorization—এই backend concepts শিখছেন।
+User = get_user_model()
 
 
-2. আপনার এখন এই conceptsগুলো জানা হয়ে যাচ্ছে:
-Function-Based View = register(), user_login()
-Authentication =	AuthenticationForm
-Login	= login()
-Logout =	logout()
-Authorization =	@login_required
-ModelForm =	RegisterForm, ProfileUpdateForm
-Existing object update = instance=request.user
-File upload	= request.FILES
-Password management	= PasswordChangeForm
-Session	= login() / logout()
-Session preservation	= update_session_auth_hash()
-Flash messages	= messages.success()
-POST/GET handling	= request.method
-Validation	= form.is_valid()
+# Admin Customer List View
+class AdminCustomerListView(UserPassesTestMixin, ListView):
+   model = User
+   template_name = "accounts/admin/customer_list.html"
+   context_object_name = "customers"
+   paginate_by = 10
 
-"""
+   def test_func(self):
+      return self.request.is_superuser
+
+   def get_queryset(self):
+      queryset = User.objects.filter(
+         is_staff=False,
+         is_superuser=False,
+      ).order_by("-date_joined")
+
+      search_query = self.request.GET.get(
+         "q", ""
+      ).strip()
+
+      if search_query:
+         queryset = queryset.filter(
+            Q(username__icontains=search_query)
+            | Q(first_name__icontains=search_query)
+            | Q(last_name__icontains=search_query)
+            | Q(email__icontains=search_query)
+            | Q(phone__icontains=search_query)
+         )
+
+      return queryset
+
+
+   def get_context_data(self, **kwargs):
+      context = super().get_context_data(**kwargs)
+
+      context["search_query"] = self.request.GET.get(
+         "q", ""
+      )
+
+      context["total_customers"] = User.objects.filter(
+         is_staff=False,
+         is_superuser=False,
+      ).count()
+
+      return context
+
+
+
+
+# Admin Customer Detail View
+class AdminCustomerDetailView(UserPassesTestMixin, DetailView):
+
+   model = User 
+   template_name = "accounts/admin/customer_detail.html"
+   context_object_name = "customer"
+
+   def test_func(self):
+      return self.request.user.is_superuser
+
+   def get_queryset(self):
+      return User.objects.filter(
+         is_staff=False,
+         is_superuser=False,
+      )

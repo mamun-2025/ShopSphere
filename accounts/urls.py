@@ -7,13 +7,17 @@ from django.contrib.auth import views as auth_views
 app_name = "accounts"
 
 urlpatterns = [
+   # Authentication
    path("register/", views.register, name="register"),
    path("login/", views.user_login, name="login"),
    path("logout/", views.user_logout, name="logout"),
+
+   # Customer Profile
    path("profile/", views.profile, name="profile"),
    path("profile/edit/", views.edit_profile, name="edit_profile"),
    path("password/change/", views.change_password, name="change_password"),
 
+   # Password Reset 
    path(
       "password-reset/",
       auth_views.PasswordResetView.as_view(
@@ -43,7 +47,17 @@ urlpatterns = [
       name="password_reset_complete",
    ),
 
-
+   # Admin Customer Management
+   path(
+      "admin/customers/",
+      views.AdminCustomerListView.as_view(),
+      name="admin_customer_list",
+   ),
+   path(
+      "admin/customers/<int:pk>/",
+      views.AdminCustomerDetailView.as_view(),
+      name="admin_customer_detail",
+   )
 
 
 
