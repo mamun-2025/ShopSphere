@@ -6,6 +6,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
+from django.conf import settings
 
 
 class Coupon(models.Model):
@@ -193,4 +194,40 @@ class Coupon(models.Model):
       return self.code 
 
 
-      
+
+
+class CouponUsage(models.Model):
+   coupon = models.ForeignKey(
+      Coupon,
+      on_delete=models.PROTECT,
+      related_name="usages",
+   )
+
+   user = models.ForeignKey(
+      settings.AUTH_USER_MODEL,
+      on_delete=models.PROTECT,
+      related_name="coupon_usages",
+   )
+
+   order = models.OneToOneField(
+      "orders.Order",
+      on_delete=models.PROTECT,
+      related_name="coupon_usage",
+   )
+
+   used_at = models.DateTimeField(
+      auto_now_add=True
+   )
+
+   class Meta:
+      ordering = ["-used_at"]
+
+      indexes = [
+         models.Index(
+            fields=["coupon", "user"],
+            name="coupon_user_usage_idx",
+         ),
+      ]
+
+   def __str__(self):
+      return f"{self.coupon.code} - {self.user}"

@@ -38,7 +38,7 @@ class CouponAdmin(admin.ModelAdmin):
       "-created_at",
    )
 
-   date_hierarchy = "created-at"
+   date_hierarchy = "created_at"
 
    list_per_page = 20
 
