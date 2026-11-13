@@ -19,24 +19,26 @@ def normalize_coupon_code(code):
    return code.strip().upper()
 
 
-def validate_coupon(code, user, subtotal, now=None):
+
+
+def validate_coupon_instance(
+      *,
+      coupon,
+      user,
+      subtotal,
+      now=None,
+):
    """
-    Validate coupon eligibility.
+   Validate an already-fetched Coupon instance.
 
-    Returns:
-        Coupon instance
-
-    Raises:
-        ValidationError
-    """
-
-   # 1. Validate Customer 
+   During order creation, the coupon instance should
+   be fetched using select_for_update().
+   """
    if not user or not user.is_authenticated:
       raise ValidationError(
          "You must be logged in to use a coupon."
       )
 
-   # 2. Validate Subtotal 
    try:
       subtotal = Decimal(str(subtotal))
    except (InvalidOperation, TypeError, ValueError):
@@ -49,20 +51,7 @@ def validate_coupon(code, user, subtotal, now=None):
          "Invalid order amount."
       )
 
-   # 3. Normalize coupon code 
-   normalized_code = normalize_coupon_code(code)
-
-   # 4. Find Coupon
-   coupon = Coupon.objects.filter(
-      code=normalized_code
-   ).first()
-
-   if coupon is None:
-      raise ValidationError(
-         "Invalid coupon code."
-      )
-
-   # 5. Check active and validity period
+   
    now = now or timezone.now()
 
    if not coupon.is_active:
@@ -102,6 +91,36 @@ def validate_coupon(code, user, subtotal, now=None):
       )
 
    return coupon
+
+
+
+
+   
+def validate_coupon(code, user, subtotal, now=None):
+
+   if not isinstance(code, str) or not code.strip():
+      raise ValidationError(
+         "Please enter a coupon code."
+      )
+   
+   normalized_code = normalize_coupon_code(code)
+
+   coupon = Coupon.objects.filter(
+      code=normalized_code
+   ).first()
+
+   if coupon is None:
+      raise ValidationError(
+         "Invalid coupon code."
+      )
+
+   return validate_coupon_instance(
+      coupon=coupon,
+      user=user,
+      subtotal=subtotal,
+      now=now,
+   )
+
 
 
 
