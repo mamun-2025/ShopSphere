@@ -1,0 +1,354 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>Invoice {{ invoice.invoice_number }}</title>
+
+    <style>
+        @page {
+            size: A4;
+            margin: 18mm;
+        }
+
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 12px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #198754;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .brand {
+            color: #198754;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .section {
+            margin-top: 22px;
+        }
+
+        .section h3 {
+            color: #198754;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 6px;
+        }
+
+        .details {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .details td {
+            padding: 5px;
+            vertical-align: top;
+        }
+
+        .products {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .products th,
+        .products td {
+            border: 1px solid #ddd;
+            padding: 9px;
+            text-align: left;
+        }
+
+        .products th {
+            background: #f1f5f3;
+        }
+
+        .text-right {
+            text-align: right !important;
+        }
+
+        .summary {
+            width: 55%;
+            margin-left: auto;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        .summary td {
+            padding: 6px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .grand-total {
+            font-size: 16px;
+            font-weight: bold;
+            color: #198754;
+        }
+
+        .payment-status {
+            display: inline-block;
+            padding: 3px 9px;
+            background: #fff3cd;
+            color: #856404;
+            border-radius: 4px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 12px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #777;
+            font-size: 10px;
+        }
+
+        .muted {
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+
+    <div class="header">
+
+        <div>
+            <div class="brand">ShopSphere</div>
+            <div class="muted">Online Shopping Store</div>
+        </div>
+
+        <div class="invoice-title">
+            <h1>INVOICE</h1>
+            <strong>{{ invoice.invoice_number }}</strong>
+            <div>
+                Date: {{ invoice.issued_at|date:"d M Y" }}
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Customer Information -->
+
+    <div class="section">
+
+        <h3>Bill To</h3>
+
+        <table class="details">
+            <tr>
+                <td width="50%">
+                    <strong>{{ invoice.customer_name }}</strong><br>
+                    {{ invoice.customer_email }}<br>
+                    {{ invoice.customer_phone }}
+                </td>
+
+                <td>
+                    <strong>Shipping Address</strong><br>
+                    {{ invoice.shipping_address_line }}<br>
+                    {{ invoice.shipping_area }},
+                    {{ invoice.shipping_city_or_district }}<br>
+
+                    {% if invoice.shipping_postal_code %}
+                        {{ invoice.shipping_postal_code }}
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+
+    <!-- Order and Payment -->
+
+    <div class="section">
+
+        <h3>Order Information</h3>
+
+        <table class="details">
+            <tr>
+                <td>
+                    <strong>Order Number:</strong>
+                    {{ invoice.order.order_number }}
+                </td>
+
+                <td>
+                    <strong>Payment Method:</strong>
+                    {{ invoice.order.get_payment_method_display }}
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <strong>Payment Status:</strong>
+                    <span class="payment-status">
+                        {{ invoice.get_payment_status_display }}
+                    </span>
+                </td>
+
+                <td>
+                    <strong>Shipping Method:</strong>
+                    {{ invoice.shipping_method_name }}
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+
+    <!-- Products -->
+
+    <div class="section">
+
+        <h3>Products</h3>
+
+        <table class="products">
+
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Unit Price</th>
+                    <th>Quantity</th>
+                    <th>Tax</th>
+                    <th class="text-right">Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for item in invoice.items.all %}
+
+                    <tr>
+                        <td>{{ item.product_name }}</td>
+
+                        <td>
+                            ৳{{ item.unit_price|floatformat:2 }}
+                        </td>
+
+                        <td>{{ item.quantity }}</td>
+
+                        <td>
+                            ৳{{ item.tax_amount|floatformat:2 }}
+                        </td>
+
+                        <td class="text-right">
+                            ৳{{ item.line_total|floatformat:2 }}
+                        </td>
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="5">
+                            No invoice items found.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- Financial Summary -->
+
+    <div class="section">
+
+        <h3>Payment Summary</h3>
+
+        <table class="summary">
+
+            <tr>
+                <td>Subtotal</td>
+                <td class="text-right">
+                    ৳{{ invoice.subtotal|floatformat:2 }}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Tax</td>
+                <td class="text-right">
+                    ৳{{ invoice.tax_amount|floatformat:2 }}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Shipping Fee</td>
+                <td class="text-right">
+                    ৳{{ invoice.shipping_fee|floatformat:2 }}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Service Fee</td>
+                <td class="text-right">
+                    ৳{{ invoice.service_fee|floatformat:2 }}
+                </td>
+            </tr>
+
+            {% if invoice.discount_amount > 0 %}
+
+                <tr>
+                    <td>
+                        Discount
+                        {% if invoice.coupon_code %}
+                            ({{ invoice.coupon_code }})
+                        {% endif %}
+                    </td>
+
+                    <td class="text-right">
+                        - ৳{{ invoice.discount_amount|floatformat:2 }}
+                    </td>
+                </tr>
+
+            {% endif %}
+
+            <tr class="grand-total">
+                <td>Grand Total</td>
+
+                <td class="text-right">
+                    ৳{{ invoice.total|floatformat:2 }}
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+
+
+    <!-- Footer -->
+
+    <div class="footer">
+
+        <p>Thank you for shopping with ShopSphere!</p>
+
+        <p>
+            This is a computer-generated invoice.
+        </p>
+
+    </div>
+
+</body>
+</html>

@@ -13,5 +13,10 @@ urlpatterns = [
        views.InvoiceDetailView.as_view(),
        name="detail",
     ),
+    path(
+       "<str:invoice_number>/pdf/",
+       views.InvoicePDFView.as_view(),
+       name="pdf",
+    ),
 
 ]
