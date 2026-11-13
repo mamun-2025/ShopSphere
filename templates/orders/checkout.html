@@ -141,6 +141,72 @@
                   </span>
                </div>
 
+               <!-- Coupon section -->
+               <div class="mt-4 mb-3">
+                  <h6 class="mb-3">Have a coupon code?</h6>
+
+                  {% if request.session.coupon_code %}
+                     <div class="alert alert-success d-flex justify-content-between align-items-center">
+
+                        <div>
+                           <strong>
+                              {{ request.session.coupon_code }}
+                           </strong>
+                        </div>
+
+                        <div class="small">
+                           Coupon applied successfully.
+                        </div>
+
+                        <form 
+                           method="POST"
+                           action="{% url 'coupons:remove' %}"
+                        >
+                           {% csrf_token %}
+
+                           <button 
+                              type="submit"
+                              class="btn btn-sm btn-outline-danger"
+                           >
+                           Remove 
+                           </button>
+                        </form>
+
+                     </div>
+
+                  {% else %}
+
+                     <form 
+                        method="POST"
+                        action="{% url 'coupons:apply' %}"
+                     >
+                        {% csrf_token %}
+
+                        <div class="input-group">
+                           <input
+                              type="text"
+                              name="code"
+                              class="form-control"
+                              placeholder="Enter coupon code"
+                              maxlength="50"
+                              autocomplete="off"
+                              required
+                           >
+
+                           <button
+                              type="submit"
+                              class="btn btn-outline-primary"
+                           >
+                           Apply
+                           </button>
+                        </div>
+                     
+                     </form>
+
+                  {% endif %}
+                  
+               </div>
+
                <hr>
 
                <div class="d-flex justify-content-between mb-3">

@@ -13,7 +13,7 @@ from .services import validate_and_calculate_coupon
 
 
 
-class ApplyCouponView(LoginRequiredMixin, CheckoutView):
+class ApplyCouponView(CheckoutView):
 
    def post(self, request, *args, **kwags):
 
