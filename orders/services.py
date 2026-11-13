@@ -327,6 +327,13 @@ def create_order_from_items(
       for snapshot in item_snapshots
    ])
 
+   # Generate Invoice after creating OrderItems.
+   from invoices.services import create_invoice_from_order
+
+   create_invoice_from_order(
+      order=order,
+   )
+
 
    # 14. Deduct stock after all validations.
    for product_id, quantity in quantities.items():

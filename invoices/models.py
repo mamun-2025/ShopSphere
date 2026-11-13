@@ -226,3 +226,17 @@ class InvoiceItem(models.Model):
    def __str__(self):
       return f"{self.product_name} X {self.quantity}"
 
+
+
+class InvoiceNumberSequence(models.Model):
+
+   year = models.PositiveIntegerField(
+      unique=True,
+   )
+
+   last_number = models.PositiveIntegerField(
+      default=0,
+   )
+
+   def __str__(self):
+      return f"Invoice Sequence {self.year}"
