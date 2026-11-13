@@ -311,10 +311,10 @@ The project is divided into 14 milestones. Each milestone introduces specific ba
 
 7. Invoice Generation
 
-* [ ] Invoice Model / Numbering
-* [ ] PDF Invoice Generation
-* [ ] Invoice Download
-* [ ] Invoice Access Control
+* [✅] Invoice Model / Numbering
+* [✅] PDF Invoice Generation
+* [✅] Invoice Download
+* [✅] Invoice Access Control
 
 ## Output
 
