@@ -207,6 +207,17 @@
                   
                </div>
 
+               {% if coupon and discount_amount > 0 %}
+                  <div class="d-flex justify-content-between mb-2 text-success">
+                     <span>
+                        Coupon Discount ({{ coupon.code }})
+                     </span>
+                     <strong>
+                        - ৳{{ discount_amount|floatformat:2 }}
+                     </strong>
+                  </div>
+               {% endif %}
+
                <hr>
 
                <div class="d-flex justify-content-between mb-3">

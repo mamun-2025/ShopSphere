@@ -300,14 +300,14 @@ The project is divided into 14 milestones. Each milestone introduces specific ba
 
 6. Coupon & Discount Management
 
-* [ ] Coupon Model
-* [ ] Percentage Discount
-* [ ] Fixed Amount Discount
-* [ ] Coupon Validation
-* [ ] Expiration Date
-* [ ] Minimum Order Amount
-* [ ] Coupon Usage Limits
-* [ ] Discount Calculation
+* [✅] Coupon Model
+* [✅] Percentage Discount
+* [✅] Fixed Amount Discount
+* [✅] Coupon Validation
+* [✅] Expiration Date
+* [✅] Minimum Order Amount
+* [✅] Coupon Usage Limits
+* [✅] Discount Calculation
 
 7. Invoice Generation
 

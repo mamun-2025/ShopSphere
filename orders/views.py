@@ -19,7 +19,9 @@ from shipping.services import calculate_shipping_for_subtotal, get_shipping_sele
 from taxes.services import calculate_items_totals
 
 from .models import Order
+from .services import money
 from .services import create_order_from_items, create_order_from_cart, cancel_order, update_order_status, ALLOWED_STATUS_TRANSITIONS
+from coupons.services import validate_and_calculate_coupon
 from payments.services import start_sslcommerz_payment
 from .forms import AdminOrderStatusUpdateForm
 
@@ -172,11 +174,39 @@ class CheckoutView(LoginRequiredMixin, View):
       service_fee = Decimal("0.00")
       shipping_fee = shipping_summary["shipping_fee"]
 
+
+      # Coupon calculation
+      coupon = None 
+      discount_amount = Decimal("0.00")
+      coupon_code = request.session.get("coupon_code")
+
+      if coupon_code:
+         try:
+            coupon_result = validate_and_calculate_coupon(
+               code=coupon_code,
+               user=request.user,
+               subtotal=tax_summary["subtotal"],
+            )
+
+            coupon = coupon_result["coupon"]
+            discount_amount = coupon_result["discount"]
+
+         except ValidationError as exc:
+
+            request.session.pop("coupon_code", None)
+
+            for error in exc.messages:
+               messages.warning(request, error)
+
+
       total = (
          tax_summary["total"]
          + shipping_fee
          + service_fee
+         - discount_amount
       )
+
+      total = money(total)
 
       context = {
          "checkout_items": checkout_items,
@@ -185,13 +215,19 @@ class CheckoutView(LoginRequiredMixin, View):
          "shipping_method": shipping_method,
          "shipping_address": shipping_address,
 
+          **tax_summary,
+
          "shipping_fee": shipping_fee,
          "free_shipping": shipping_summary["free_shipping"],
 
          "service_fee": service_fee,
+
+         "coupon": coupon,
+         "coupon_code": coupon_code if coupon else "",
+         "discount_amount": discount_amount,
+         
          "total": total,
 
-         **tax_summary,
       }
 
       return render(
@@ -241,6 +277,8 @@ class CheckoutView(LoginRequiredMixin, View):
       # 3. Get checkout source
       source = self.get_checkout_source(request)
 
+      coupon_code = request.session.get("coupon_code")
+
 
       # 4. Create order
       try:
@@ -250,6 +288,7 @@ class CheckoutView(LoginRequiredMixin, View):
                shipping_address_id=shipping_address_id,
                shipping_method_id=shipping_method_id,
                payment_method=payment_method,
+               coupon_code=coupon_code,
          )
 
          elif source == "buy_now":
@@ -280,6 +319,7 @@ class CheckoutView(LoginRequiredMixin, View):
                shipping_address_id=shipping_address_id,
                shipping_method_id=shipping_method_id,
                payment_method=payment_method,
+               coupon_code=coupon_code,
             )
 
          else:
@@ -299,6 +339,7 @@ class CheckoutView(LoginRequiredMixin, View):
       request.session.pop("checkout_source", None)
       request.session.pop("buy_now_product_id", None)
       request.session.pop("buy_now_quantity", None)
+      request.session.pop("coupon_code", None)
 
 
       # 6. Handle Cash on Delivery
@@ -400,6 +441,7 @@ class BuyNowView(LoginRequiredMixin, View):
       # 6. Remove old shipping selection.
       request.session.pop("shipping_address_id", None)
       request.session.pop("shipping_method_id", None)
+      request.session.pop("coupon_code", None)
 
       messages.success(
          request,
@@ -477,6 +519,7 @@ class OrderCancelView(LoginRequiredMixin, View):
 
       except Order.DoesNotExist:
          messages.error(
+            request,
             "Order not found."
          )
 
@@ -721,7 +764,7 @@ class AdminOrderStatusUpdateView(
       messages.success(
          request,
          (
-            f"Order #{updated_order.order_number}"
+            f"Order #{updated_order.order_number} "
             f"status updated to "
             f"{updated_order.get_status_display()}."
          ),

@@ -11,6 +11,8 @@ from shipping.models import ShippingAddress, ShippingMethod
 from taxes.services import get_default_tax_rate
 
 from .models import Order, OrderItem
+from coupons.models import Coupon, CouponUsage
+from coupons.services import normalize_coupon_code, validate_coupon_instance, calculate_coupon_discount
 
 
 ZERO = Decimal("0.00")
@@ -32,6 +34,7 @@ def create_order_from_items(
    shipping_address_id,
    shipping_method_id,
    payment_method=Order.PaymentMethod.COD,
+   coupon_code=None,
 ):
    """
    Create an order from a list of product/quantity pairs.
@@ -174,6 +177,42 @@ def create_order_from_items(
 
    subtotal = money(subtotal)
 
+   # 7A. Validate and lock coupon if supplied
+   coupon = None
+   discount_amount = ZERO
+   normalized_coupon_code = ""
+
+   if coupon_code:
+
+      normalized_coupon_code = normalize_coupon_code(
+         coupon_code
+      )
+
+      try:
+         coupon = (
+            Coupon.objects
+            .select_for_update()
+            .get(code=normalized_coupon_code)
+         )
+
+      except Coupon.DoesNotExist:
+         raise ValidationError(
+            "Invalid coupon code."
+         )
+
+      validate_coupon_instance(
+         coupon=coupon,
+         user=user,
+         subtotal=subtotal,
+      )
+
+      discount_amount = calculate_coupon_discount(
+         coupon=coupon,
+         subtotal=subtotal,
+      )
+
+   discount_amount = money(discount_amount)
+
 
    # 8. Get configured tax rate.
    tax_rate_obj = get_default_tax_rate()
@@ -237,6 +276,7 @@ def create_order_from_items(
       + total_tax
       + shipping_fee
       + service_fee
+      - discount_amount
    )
 
 
@@ -263,6 +303,10 @@ def create_order_from_items(
       tax_amount=total_tax,
       shipping_fee=shipping_fee,
       service_fee=service_fee,
+
+      coupon_code=normalized_coupon_code,
+      discount_amount=discount_amount,
+
       total=total,
    )
 
@@ -290,6 +334,25 @@ def create_order_from_items(
       product.stock -= quantity
       product.save(update_fields=["stock"])
 
+
+   # 15. Record successful coupon usage.
+   if coupon is not None:
+
+      CouponUsage.objects.create(
+         coupon=coupon,
+         user=user,
+         order=order,
+      )
+
+      coupon.used_count += 1
+
+      coupon.save(
+         update_fields=[
+            "used_count",
+            "updated_at",
+         ]
+      )
+
    return order
 
 
@@ -302,6 +365,7 @@ def create_order_from_cart(
    shipping_address_id,
    shipping_method_id,
    payment_method=Order.PaymentMethod.COD,
+   coupon_code=None,
 ):
    """
    Create an order from the user's cart.
@@ -341,6 +405,7 @@ def create_order_from_cart(
       shipping_address_id=shipping_address_id,
       shipping_method_id=shipping_method_id,
       payment_method=payment_method,
+      coupon_code=coupon_code,
    )
 
    # Only Cart Checkout clears cart items.
