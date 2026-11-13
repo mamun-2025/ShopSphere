@@ -1,12 +1,19 @@
 
 
-# from django.urls import path
+from django.urls import path
 
-# from .models import Coupon
+from . import views
 
-# urlpatterns = [
-#     path(
-#        "coupons/",
-
-#     )
-# ]
+urlpatterns = [
+    path(
+       "apply/",
+       views.ApplyCouponView.as_view(),
+       name="apply",
+    ),
+    path(
+       "remove/",
+       views.RemoveCouponView.as_view(),
+       name="remove",
+    ),
+    
+]
