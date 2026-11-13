@@ -64,7 +64,7 @@ class Invoice(models.Model):
       default="",
    )
 
-   shippng_zone_name = models.CharField(
+   shipping_zone_name = models.CharField(
       max_length=100,
       blank=True,
       default="",

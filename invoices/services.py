@@ -19,7 +19,7 @@ def create_invoice_from_order(*, order):
    2. Invoice number must be unique.
    3. Preserve order and item snapshots.
    4. Do not recalculate financial values.
-   5. Create invoice and invoice items automically.
+   5. Create invoice and invoice items automatically.
    """
 
    # 1. Lock the order 
@@ -84,7 +84,7 @@ def create_invoice_from_order(*, order):
    )
 
    invoice_number = (
-      f"INV--{year}--{sequence.last_number:06d}"
+      f"INV-{year}-{sequence.last_number:06d}"
    )
 
    # 5. Create invoice snapshot.
@@ -101,7 +101,7 @@ def create_invoice_from_order(*, order):
       shipping_city_or_district=order.shipping_city_or_district,
       shipping_postal_code=order.shipping_postal_code,
       shipping_zone_name=order.shipping_zone_name,
-      shipping_method=order.shipping_method_name,
+      shipping_method_name=order.shipping_method_name,
 
       payment_status=order.payment_status,
       payment_method=order.payment_method,
@@ -127,7 +127,7 @@ def create_invoice_from_order(*, order):
          product_name=item.product_name,
 
          unit_price=item.unit_price,
-         quantity=item.quantiy,
+         quantity=item.quantity,
 
          is_taxable=item.is_taxable,
          tax_rate=item.tax_rate,
