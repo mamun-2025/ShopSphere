@@ -718,8 +718,22 @@ class AdminOrderStatusUpdateView(
    PermissionRequiredMixin,
    View,
 ):
-   permission_required = "orders.change_order"
    raise_exception = True 
+
+   def get_permission_required(self):
+      
+      new_status = self.request.POST.get("status")
+
+      delivery_statuses = {
+         Order.Status.SHIPPED,
+         Order.Status.DELIVERED,
+      }
+
+      if new_status in delivery_statuses:
+         return ("orders.update_delivery_status",)
+
+      return ("orders.process_order",)
+   
 
    def post(self, request, order_number):
       order = get_object_or_404(

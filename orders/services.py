@@ -2,7 +2,7 @@
 
 from decimal import Decimal, ROUND_HALF_UP
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.db import transaction
 
 from carts.models import Cart, CartItem
@@ -494,7 +494,38 @@ def _restore_order_stock(order):
 
 # Update Order Status
 @transaction.atomic
-def update_order_status(*, order_id, new_status):
+def update_order_status(*, order_id, new_status, user):
+
+   """
+   Update order status using:
+   1. User permission
+   2. Allowed status transitions
+   3. Database transaction
+   """
+   if new_status in {
+      Order.Status.SHIPPED,
+      Order.Status.DELIVERED,
+   }:
+      required_permission = (
+         "orders.update_delivery_status"
+      )
+
+   elif new_status == Order.Status.CANCELLED:
+      required_permission = (
+         "orders.cancel_order"
+      )
+
+   else:
+      required_permission = (
+         "orders.process_order"
+      )
+
+   if not user.has_perm(required_permission):
+      raise ValidationError(
+         "You do not have permission to update this order."
+      )
+
+
    """
    Update an order status using allowed transitions.
    Intended for Admin-side stastus management.

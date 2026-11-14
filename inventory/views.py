@@ -65,7 +65,7 @@ class InventoryStockIncreaseView(
    form_class = StockAdjustmentForm
    template_name = "inventory/stock_adjustment.html"
 
-   permission_required = "inventory.change_inventory"
+   permission_required = "inventory.adjust_stock"
 
    raise_exception = True
 
@@ -111,7 +111,7 @@ class InventoryStockDecreaseView(
    form_class = StockAdjustmentForm
    template_name = "inventory/stock_adjustment.html"
 
-   permission_required = "inventory.change_inventory"
+   permission_required = "inventory.adjust_stock"
 
    raise_exception = True
 

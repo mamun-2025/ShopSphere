@@ -20,11 +20,17 @@ class InvoiceDetailView(LoginRequiredMixin, DetailView):
     slug_url_kwarg = "invoice_number"
 
     def get_queryset(self):
-        return (
+        queryset = (
             Invoice.objects
-            .filter(order__user=self.request.user)
             .select_related("order")
             .prefetch_related("items")
+        )
+
+        if self.request.user.has_perm("invoices.view_invoice"):
+            return queryset 
+
+        return queryset.filter(
+            order__user=self.request.user 
         )
 
 
