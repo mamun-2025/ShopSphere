@@ -40,7 +40,9 @@ def register(request):
 
 # 2. Customer Login 
 def user_login(request):
+
    if request.method == "POST":
+
       form = AuthenticationForm(request, data=request.POST)
 
       if form.is_valid():
@@ -53,7 +55,13 @@ def user_login(request):
             request,
             "Login successful."
          )
-         return redirect("accounts:profile")
+
+          # Admin
+         if user.is_superuser:
+            return redirect("orders:admin_dashboard")
+
+         # Manager, Staff and Customer
+         return redirect("products:product_list")
 
    else:
       form = AuthenticationForm()

@@ -3,7 +3,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
@@ -536,10 +536,14 @@ class OrderCancelView(LoginRequiredMixin, View):
 
 
 # Admin Dashboard
-class AdminOrderDashboardView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+class AdminOnlyMixin(LoginRequiredMixin, UserPassesTestMixin):
+
+   def test_func(self):
+      return self.request.user.is_superuser
+
+
+class AdminOrderDashboardView(AdminOnlyMixin, TemplateView):
    template_name = "orders/admin/dashboard.html"
-   permission_required = "orders.view_order"
-   raise_exception = True
 
    def get_context_data(self, **kwargs):
       context = super().get_context_data(**kwargs)
@@ -593,15 +597,12 @@ class AdminOrderDashboardView(LoginRequiredMixin, PermissionRequiredMixin, Templ
 
 # Admin Order List View
 class AdminOrderListView(
-   LoginRequiredMixin,
-   PermissionRequiredMixin,
+   AdminOnlyMixin,
    ListView,
 ):
    model = Order
    template_name = "orders/admin/order_list.html"
    context_object_name = "orders"
-   permission_required = "orders.view_order"
-   raise_exception = True
    paginate_by = 20
 
 
@@ -663,8 +664,7 @@ class AdminOrderListView(
 
 # Admin Order Detail View
 class AdminOrderDetailView(
-   LoginRequiredMixin,
-   PermissionRequiredMixin,
+   AdminOnlyMixin,
    DetailView,
 ):
    model = Order
@@ -673,8 +673,6 @@ class AdminOrderDetailView(
    slug_field = "order_number"
    slug_url_kwarg = "order_number"
 
-   permission_required = "orders.view_order"
-   raise_exception = True
 
    def get_queryset(self):
       return (
@@ -714,27 +712,10 @@ class AdminOrderDetailView(
 
 # Admin Order Status Update View 
 class AdminOrderStatusUpdateView(
-   LoginRequiredMixin,
-   PermissionRequiredMixin,
+   AdminOnlyMixin,
    View,
 ):
-   raise_exception = True 
-
-   def get_permission_required(self):
-      
-      new_status = self.request.POST.get("status")
-
-      delivery_statuses = {
-         Order.Status.SHIPPED,
-         Order.Status.DELIVERED,
-      }
-
-      if new_status in delivery_statuses:
-         return ("orders.update_delivery_status",)
-
-      return ("orders.process_order",)
    
-
    def post(self, request, order_number):
       order = get_object_or_404(
          Order,
