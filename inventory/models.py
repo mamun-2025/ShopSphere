@@ -75,6 +75,11 @@ class Inventory(models.Model):
          update_fields=["stock"]
       )
 
+   class Meta:
+      permissions = [
+         ("adjust_stock", "Can adjust product stock"),
+      ]
+
 
    def __str__(self):
       return f"Inventory: {self.product.name}"

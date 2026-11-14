@@ -151,6 +151,10 @@ class Invoice(models.Model):
    class Meta:
       ordering = ["-issued_at"]
 
+      permissions = [
+         ("generate_invoice", "Can generate invoice"),
+      ]
+
    def __str__(self):
       return self.invoice_number
 

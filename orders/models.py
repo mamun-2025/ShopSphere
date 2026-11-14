@@ -156,6 +156,11 @@ class Order(models.Model):
    class Meta:
       ordering = ["-created_at"]
 
+      permissions = [
+         ("process_order", "Can process orders"),
+         ("update_delivery_status", "Can update delivery status"),
+      ]
+
    def __str__(self):
       return f"Order {self.order_number}"
 
