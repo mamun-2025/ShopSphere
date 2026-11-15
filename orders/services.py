@@ -10,7 +10,7 @@ from products.models import Product
 from shipping.models import ShippingAddress, ShippingMethod
 from taxes.services import get_default_tax_rate
 
-from .models import Order, OrderItem
+from .models import Order, OrderItem, OrderCancellation
 from coupons.models import Coupon, CouponUsage
 from coupons.services import normalize_coupon_code, validate_coupon_instance, calculate_coupon_discount
 
@@ -597,6 +597,67 @@ def cancel_order(*, order_id, user):
 
 
 
+# Request Order Cancellation
+@transaction.atomic
+def request_order_cancellation(*, order_id, user, reason):
+   """
+   Create a customer cancellation request.
+
+   The order is NOT cancancelled here.
+   Stock is NOT restored here.
+   Admin approval is required.
+   """
+   # 1. Validate cancellation reason 
+   reason = (reason or "").strip()
+
+   if not reason:
+      raise ValidationError(
+         "Please provide a cancellation reason."
+      )
+
+   # 2. Lock the customer's order 
+   try:
+      order = (
+         Order.objects
+         .select_for_update()
+         .get(
+            pk=order_id,
+            user=user,
+         )
+      )
+
+   except Order.DoesNotExist:
+      raise PermissionDenied(
+         "You do not have permission to cancel this order."
+      )
+
+   # 3. Check whether the order can be cancelled
+   if order.status not in CUSTOMER_CANCELLABLE_STATUSES:
+      raise ValidationError(
+         "This order is not eligible for cancellation."
+      )
+
+   # 4. Prevent duplicate pending requests
+   existing_request = OrderCancellation.objects.filter(
+      order=order,
+      status=OrderCancellation.Status.PENDING,
+   ).exists()
+
+   if existing_request:
+      raise ValidationError(
+         "A cancellation request is already pending for this order."
+      )
+
+   # 5. Create Cancellation request
+   cancellation = OrderCancellation.objects.create(
+      order=order,
+      source=OrderCancellation.Source.CUSTOMER_REQUEST,
+      status=OrderCancellation.Status.PENDING,
+      initiated_by=user,
+      reason=reason,
+   )
+
+   return cancellation
 
 
 
