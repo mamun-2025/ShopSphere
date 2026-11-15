@@ -13,6 +13,7 @@ from taxes.services import get_default_tax_rate
 from .models import Order, OrderItem, OrderCancellation
 from coupons.models import Coupon, CouponUsage
 from coupons.services import normalize_coupon_code, validate_coupon_instance, calculate_coupon_discount
+from django.utils import timezone
 
 
 ZERO = Decimal("0.00")
@@ -659,6 +660,91 @@ def request_order_cancellation(*, order_id, user, reason):
 
    return cancellation
 
+
+
+# Approve Customer Cancellation Request
+@transaction.atomic
+def approve_order_cancellation(*, cancellation_id, user, admin_note=""):
+   """
+   Approve a customer's cancellation request.
+   Cancel the order and restore stock atomically.
+   """
+   if not user.has_perm("orders.review_order_cancellation"):
+      raise PermissionDenied(
+         "You do not have permission to review cancellation requests."
+      )
+
+   # Find the related order ID first.
+   order_id = (
+      OrderCancellation.objects
+      .filter(pk=cancellation_id)
+      .values_list("order_id", flat=True)
+      .first()
+   )
+
+   if order_id is None:
+      raise ValidationError(
+         "Cancellation request does not exist."
+      )
+
+   # Always lock order before Cancellation
+   order = (
+      Order.objects
+      .select_for_update()
+      .filter(pk=order_id)
+      .first()
+   )
+
+   if order is None:
+      raise ValidationError(
+         "Order does not exist."
+      )
+
+   cancellation = (
+      OrderCancellation.objects
+      .select_for_update()
+      .get(pk=cancellation_id)
+   )
+
+   if cancellation.status != OrderCancellation.Status.PENDING:
+      raise ValidationError(
+         "This cancellation request has already been reviewed."
+      )
+
+   if cancellation.source != OrderCancellation.Source.CUSTOMER_REQUEST:
+      raise ValidationError(
+         "Only customer cancellation requests can be approved here."
+      )
+
+   if order.status not in CUSTOMER_CANCELLABLE_STATUSES:
+      raise ValidationError(
+         "This order is no longer eligible for cancellation."
+      )
+
+   # Restore stock and cancel order 
+   _restore_order_stock(order)
+
+   order.status = Order.Status.CANCELLED
+   order.save(
+      update_fields=["status", "updated_at"],
+   )
+
+   # Update cancellation audit record.
+   cancellation.status = OrderCancellation.Status.APPROVED
+   cancellation.reviewed_by = user
+   cancellation.reviewed_at = timezone.now()
+   cancellation.admin_note = admin_note.strip()
+   cancellation.save(
+      update_fields=[
+         "status",
+         "reviewed_by",
+         "reviewed_at",
+         "admin_note",
+         "updated_at",
+      ]
+   )
+
+   return cancellation
 
 
 
