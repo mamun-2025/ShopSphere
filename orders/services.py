@@ -822,6 +822,86 @@ def reject_order_cancellation(
 
 
 
+# Direct Admin order cancellation
+@transaction.atomic
+def directlyc_cancel_order(
+   *,
+   order_id,
+   user, 
+   reason,
+   admin_note="",
+):
+   """
+   Allow an authorized admin to cancel an order directly.
+   No customer request is required.
+   """
+   if not user.has_perm("orders.directly_cancel_order"):
+      raise PermissionDenied(
+         "You do not have permission to directly cancel orders."
+      )
+
+   reason = (reason or "").strip()
+
+   if not reason:
+      raise ValidationError(
+         "Please provide a cancellation reason."
+      )
+
+   # Lock the order 
+   try:
+      order = (
+         Order.objects
+         .select_for_update()
+         .get(pk=order_id)
+      )
+
+   except Order.DoesNotExist:
+      raise ValidationError("Order does not exist.")
+
+   if (
+      Order.Status.CANCELLED
+      not in ALLOWED_STATUS_TRANSITIONS.get(order.status, set())
+   ):
+      raise ValidationError(
+         "This order cannot be cancelled in its current status."
+      )
+
+   # Do not silently override an unresolved customer request.
+   pending_request_exists = OrderCancellation.objects.filter(
+      order=order,
+      status=OrderCancellation.Status.PENDING,
+   ).exists()
+
+   if pending_request_exists:
+      raise ValidationError(
+         "This order has a pending customer cancellation request."
+         "Please review that request first."
+      )
+
+   # Restore stock and update order status.
+   _restore_order_stock(order)
+
+   order.status = Order.Status.CANCELLED
+   order.save(
+      update_fields=["status", "updated_at"]
+   )
+
+   # Create direct admin cancellation audit record.
+   cancellation = OrderCancellation.objects.create(
+      order=order,
+      source=OrderCancellation.Source.ADMIN_DIRECT,
+      status=OrderCancellation.Status.COMPLETED,
+      initiated_by=user,
+      reason=reason,
+      reviewed_by=user,
+      reviewed_at=timezone.now(),
+      admin_note=admin_note.strip(),
+
+   )
+
+   return cancellation
+
+
 
 
 
