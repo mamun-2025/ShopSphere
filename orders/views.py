@@ -743,6 +743,7 @@ class AdminOrderStatusUpdateView(
          updated_order = update_order_status(
             order_id=order.pk,
             new_status=new_status,
+            user=request.user,
          )
 
       except ValidationError as exc:

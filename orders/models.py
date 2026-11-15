@@ -159,6 +159,7 @@ class Order(models.Model):
       permissions = [
          ("process_order", "Can process orders"),
          ("update_delivery_status", "Can update delivery status"),
+         ("cancel_order", "Can cancel orders"),
       ]
 
    def __str__(self):
@@ -234,6 +235,103 @@ class OrderItem(models.Model):
       return f"{self.product_name} X {self.quantity}"
 
 
+
+# Order Cancellation Model
+class OrderCancellation(models.Model):
+
+   class Source(models.TextChoices):
+      CUSTOMER_REQUEST = "CUSTOMER_REQUEST", "Customer Request"
+      ADMIN_DIRECT = "ADMIN_DEIRECT", "Direct Admin Cancellation"
+
+   class Status(models.TextChoices):
+      PENDING = "PENDING", "Pending"
+      APPROVED = "APPROVED", "Approved"
+      REJECTED = "REJECTED", "Rejected"
+      COMPLETED = "COMPLETED", "Completed"
+
+   order = models.ForeignKey(
+      "orders.Order",
+      on_delete=models.PROTECT,
+      related_name="cancellations",
+   )
+
+   source = models.CharField(
+      max_length=20,
+      choices=Source.choices,
+   )
+
+   status = models.CharField(
+      max_length=10,
+      choices=Status.choices,
+      default=Status.PENDING,
+   )
+
+   initiated_by = models.ForeignKey(
+      settings.AUTH_USER_MODEL,
+      on_delete=models.SET_NULL,
+      null=True,
+      related_name="initiated_order_cancellations",
+   )
+
+   reason = models.TextField()
+
+   reviewed_by = models.ForeignKey(
+      settings.AUTH_USER_MODEL,
+      on_delete=models.SET_NULL,
+      null=True,
+      blank=True,
+      related_name="reviewed_order_cancellations",
+   )
+
+   reviewed_at = models.DateTimeField(
+      null=True,
+      blank=True,
+   )
+
+   admin_note = models.TextField(
+      blank=True,
+   )
+
+   created_at = models.DateTimeField(
+      auto_now_add=True,
+   )
+
+   updated_at = models.DateTimeField(
+      auto_now=True,
+   )
+
+   class Meta:
+      ordering = ["-created_at"]
+
+      permissions = [
+         ("review_order_cancellation", "Can review order cancellation requests.",),
+         ("directly_cancel_order", "Can directly cancel orders",),
+      ]
+
+      constraints = [
+         models.UniqueConstraint(
+            fields=["order"],
+            condition=models.Q(status="PENDING"),
+            name="unique_pending_order_cancellation",
+         ),
+      ]
+
+      indexes = [
+         models.Index(
+            fields=["order", "status"],
+            name="order_cancel_status_idx",
+         ),
+         models.Index(
+            fields=["status", "created_at"],
+            name="cancel_status_created_idx",
+         ),
+      ]
+
+   def __str__(self):
+      return (
+         f"Cancellation for Order {self.order.order_number} "
+         f"({self.status})"
+      )
 
 
 
