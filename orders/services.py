@@ -747,6 +747,80 @@ def approve_order_cancellation(*, cancellation_id, user, admin_note=""):
    return cancellation
 
 
+# Reject Customer Cancellation Request
+
+@transaction.atomic
+def reject_order_cancellation(
+   *,
+   cancellation_id,
+   user,
+   admin_note="",
+):
+   """
+   Reject a customer's cancellation request.
+   The order and product stock remain unchanged.
+   """
+   if not user.has_perm("orders.review_order_cancellation"):
+      raise PermissionDenied(
+         "You do not have permission to review cancellation requests."
+      )
+
+   order_id = (
+      OrderCancellation.objects
+      .filter(pk=cancellation_id)
+      .values_list("order_id", flat=True)
+      .first()
+   )
+
+   if order_id is None:
+      raise ValidationError(
+         "Cancellation request does not exist."
+      )
+
+   # Lock order first for consistent locking order 
+   order = (
+      Order.objects
+      .select_for_update()
+      .filter(pk=order_id)
+      .first()
+   )
+
+   if order is None:
+      raise ValidationError("Order does not exist.")
+
+   cancellation = (
+      OrderCancellation.objects
+      .select_for_update()
+      .get(pk=cancellation_id)
+   )
+
+   if cancellation.status != OrderCancellation.Status.PENDING:
+      raise ValidationError(
+         "This cancellation request has already been reviewed."
+      )
+
+   if cancellation.source != OrderCancellation.Source.CUSTOMER_REQUEST:
+      raise ValidationError(
+         "This is not a customer cancellation request."
+      )
+
+   cancellation.status = OrderCancellation.Status.REJECTED
+   cancellation.reviewed_by = user
+   cancellation.reviewed_at = timezone.now()
+   cancellation.admin_note = admin_note.strip()
+   cancellation.save(
+      update_fields=[
+         "status",
+         "reviewed_by",
+         "reviewed_at",
+         "admin_note",
+         "updated_at",
+      ]
+   )
+
+   return cancellation
+
+
 
 
 
