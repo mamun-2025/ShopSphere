@@ -3,9 +3,11 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
-from django.core.exceptions import ValidationError
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
+
 from django.views import View
 from django.views.generic import ListView, DetailView, TemplateView
 from django.db.models import Count, Q 
@@ -18,12 +20,29 @@ from carts.models import Cart
 from shipping.services import calculate_shipping_for_subtotal, get_shipping_selection
 from taxes.services import calculate_items_totals
 
-from .models import Order
+from .models import Order, OrderCancellation
 from .services import money
-from .services import create_order_from_items, create_order_from_cart, cancel_order, update_order_status, ALLOWED_STATUS_TRANSITIONS
+from .services import (
+   create_order_from_items, 
+   create_order_from_cart, 
+   cancel_order, 
+   update_order_status, 
+   ALLOWED_STATUS_TRANSITIONS,
+   request_order_cancellation,
+   approve_order_cancellation,
+   reject_order_cancellation,
+   directlyc_cancel_order,
+)
+
 from coupons.services import validate_and_calculate_coupon
 from payments.services import start_sslcommerz_payment
-from .forms import AdminOrderStatusUpdateForm
+from .forms import (
+   AdminOrderStatusUpdateForm,
+   OrderCancellationRequestForm,
+   AdminCancellationReviewForm,
+   AdminDirectCancellationForm,
+)
+
 
 
 # CheckOut View
@@ -495,44 +514,79 @@ class OrderHistoryView(LoginRequiredMixin, ListView):
 
 
 # Cancel Order View
-class OrderCancelView(LoginRequiredMixin, View):
+class CustomerOrderCancellationRequestView(
+   LoginRequiredMixin,
+   View,
+):
+   template_name = "orders/cancellation_request.html"
 
-   def post(self, request, *args, **kwargs):
-
-      order_number = kwargs.get("order_number")
-
-      try:
-         order = Order.objects.get(
-            order_number=order_number,
-            user=request.user,
-         )
-
-         cancel_order(
-            order_id=order.pk,
-            user=request.user,
-         )
-
-         messages.success(
-            request,
-            "Your order has been cancelled successfully."
-         )
-
-      except Order.DoesNotExist:
-         messages.error(
-            request,
-            "Order not found."
-         )
-
-      except ValidationError as error:
-         messages.error(
-            request,
-            error.messages[0]
-         )
-
-      return redirect(
-         "orders:detail",
-         order_number=order_number,
+   def get_order(self, order_id, user):
+      return get_object_or_404(
+         Order,
+         pk=order_id,
+         user=user,
       )
+
+   def get(self, request, order_id):
+      order = self.get_order(
+         order_id,
+         request.user,
+      )
+
+      form = OrderCancellationRequestForm()
+
+      return render(
+         request,
+         self.template_name,
+         {
+            "order": order,
+            "form": form,
+         },
+      )
+
+
+   def post(self, request, order_id):
+      order = self.get_order(
+         order_id,
+         request.user,
+      )
+
+      form = OrderCancellationRequestForm(
+         request.POST,
+      )
+
+      if form.is_valid():
+         try:
+            cancellation = request_order_cancellation(
+               order_id=order.pk,
+               user=request.user,
+               reason=form.cleaned_data["reason"],
+            )
+
+            messages.success(
+               request,
+               "Your cancellation request has been submitted.",
+            )
+
+            return redirect(
+               "orders:customer-cancellation-request",
+               order_id=order.pk,
+            )
+
+         except ValidationError as error:
+            form.add_error(None, error)
+
+      return render(
+         request,
+         self.template_name,
+         {
+            "order": order,
+            "form": form,
+         },
+      )
+      
+
+
 
 
 # Admin Dashboard
@@ -773,7 +827,67 @@ class AdminOrderStatusUpdateView(
 
 
 
+# Admin Cancellation list view
+class AdminCancellationListView(
+   AdminOnlyMixin,
+   ListView,
+):
+   model = OrderCancellation
+   template_name = "orders/admin/cancellation_list.html"
+   context_object_name = "cancellations"
+   paginate_by = 20
+
+   def get_queryset(self):
+      return (
+         OrderCancellation.objects
+         .select_related(
+            "order",
+            "order__user",
+            "initiated_by",
+            "reviewed_by",
+         ).order_by("-created_at")
+      )
 
 
 
-   
+# Admin Approve Cancelltion View
+class AdminApproveCancellationView(
+   AdminOnlyMixin,
+   View,
+):
+   def post(self, request, cancellation_id):
+      cancellation = get_object_or_404(
+         OrderCancellation,
+         pk=cancellation_id,
+      )
+
+      form = AdminCancellationReviewForm(
+         request.POST,
+      )
+
+      if not form.is_valid():
+         messages.error(
+            request,
+            "Invalid reviews information",
+         )
+         return redirect(
+            "orders:admin-cancellation-list"
+         )
+      try:
+         approve_order_cancellation(
+            cancellation_id=cancellation.pk,
+            user=request.user,
+            admin_note=form.cleaned_data["admin_note"],
+         )
+
+         messages.success(
+            request,
+            "Cancellation request approved. Order cancelled and stock restored."
+         )
+
+      except (ValidationError, PermissionDenied) as error:
+         messages.error(request, str(error))
+
+      return redirect(
+         "orders:admin-cancellation-list"
+      )
