@@ -553,7 +553,9 @@ def update_order_status(*, order_id, new_status, user):
       )
 
    if new_status == Order.Status.CANCELLED:
-      _restore_order_stock(order)
+      raise ValidationError(
+         "Use directly_cancel_order() to cancel an order."
+      )
 
    order.status = new_status
    order.save(update_fields=["status", "updated_at"])
