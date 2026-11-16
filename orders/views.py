@@ -891,3 +891,114 @@ class AdminApproveCancellationView(
       return redirect(
          "orders:admin-cancellation-list"
       )
+
+
+
+# Admin reject cancellation view
+class AdminRejectCancellationView(
+   AdminOnlyMixin,
+   View,
+):
+   def post(self, request, cancellation_id):
+      cancellation = get_object_or_404(
+         OrderCancellation,
+         pk=cancellation_id,
+      )
+
+      form = AdminCancellationReviewForm(
+         request.POST,
+      )
+
+      if not form.is_valid():
+         messages.error(
+            request,
+            "Invalid review information",
+         )
+         return redirect(
+            "orders:admin-cancellation-list"
+         )
+
+      try:
+         reject_order_cancellation(
+            cancellation_id=cancellation.pk,
+            user=request.user,
+            admin_note=form.cleaned_data["admin_note"],
+         )
+
+         messages.success(
+            request,
+            "Cancellation request rejected.",
+         )
+
+      except (ValidationError, PermissionDenied) as error:
+         messages.error(request, str(error))
+
+      return redirect(
+         "orders:admin-cancellation-list"
+      )
+
+
+
+# Admin direct cancellation view
+class AdminDirectCancellationView(
+   AdminOnlyMixin,
+   View,
+):
+   template_name = "orders/admin/direct_cancellation.html"
+
+   def get_order(self, order_id):
+      return get_object_or_404(
+         Order,
+         pk=order_id,
+      )
+
+   def get(self, request, order_id):
+      order = self.get_order(order_id)
+
+      form = AdminDirectCancellationForm()
+
+      return render(
+         request,
+         self.template_name,
+         {
+            "order": order,
+            "form": form,
+         },
+      )
+
+   def post(self, request, order_id):
+      order = self.get_order(order_id)
+
+      form = AdminDirectCancellationForm(
+         request.POST,
+      )
+
+      if form.is_valid():
+         try:
+            directlyc_cancel_order(
+               order_id=order.pk,
+               user=request.user,
+               reason=form.cleaned_data["reason"],
+               admin_note=form.cleaned_data["admin_note"],
+            )
+
+            messages.success(
+               request,
+               "Order cancelled successfully. Stock restored.",
+            )
+
+            return redirect(
+               "orders:admin-cancellation-list"
+            )
+
+         except (ValidationError, PermissionDenied) as error:
+            form.add_error(None, error)
+
+      return redirect(
+         request,
+         self.template_name,
+         {
+            "order": order,
+            "form": form,
+         },
+      )
