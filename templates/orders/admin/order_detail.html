@@ -153,6 +153,70 @@
    </div>
 
 
+   <!-- Cancellation Management -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header bg-white py-3">
+
+            <h5 class="fw-bold mb-0">
+                <i class="bi bi-x-circle text-danger"></i>
+                Cancellation Management
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if has_pending_cancellation_request %}
+
+                <div class="alert alert-warning mb-3">
+
+                    <strong>Pending Cancellation Request</strong>
+
+                    <p class="mb-2">
+                        This order has an unresolved customer cancellation request.
+                        Please review it before taking any direct cancellation action.
+                    </p>
+
+                    <a
+                        href="{% url 'orders:admin-cancellation-list' %}"
+                        class="btn btn-sm btn-warning"
+                    >
+                        Review Cancellation Request
+                    </a>
+
+                </div>
+
+            {% elif can_direct_cancel %}
+
+                <p class="text-muted">
+                    You can directly cancel this order if necessary.
+                    Stock will be restored automatically after successful cancellation.
+                </p>
+
+                <a
+                    href="{% url 'orders:admin-direct-cancellation' order.order_number %}"
+                    class="btn btn-danger"
+                >
+                    <i class="bi bi-x-circle"></i>
+                    Cancel Order
+                </a>
+
+            {% else %}
+
+                <div class="alert alert-info mb-0">
+
+                    This order is not eligible for direct cancellation.
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
 
     <!-- Customer and Shipping Information -->
     <div class="row g-4 mb-4">

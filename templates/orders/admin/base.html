@@ -155,6 +155,13 @@
                     Orders
                 </a>
 
+                <a 
+                    href="{% url 'orders:admin-cancellation-list' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'admin-cancellation-list' or request.resolvere_match.url_name == 'admin-approve-cancellation' or request.resolver_match.url_name == 'admin-reject-cancel' %}active{% endif %}"
+                >
+                    <i class="bi bi-x-circle"></i>
+                    Cancellation Requests
+                </a>
 
                 <a
                     href="{% url 'products:product_list' %}"

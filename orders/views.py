@@ -656,6 +656,12 @@ class AdminOrderDashboardView(AdminOnlyMixin, TemplateView):
          .order_by("-created_at")[:10]
       )
 
+      context["pending_cancellations"] = (
+         OrderCancellation.objects.filter(
+            status=OrderCancellation.Status.PENDING
+         ).count()
+      )
+
       return context
 
    
