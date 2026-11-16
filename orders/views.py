@@ -27,6 +27,7 @@ from .services import (
    create_order_from_cart, 
    cancel_order, 
    update_order_status, 
+   CUSTOMER_CANCELLABLE_STATUSES,
    ALLOWED_STATUS_TRANSITIONS,
    request_order_cancellation,
    approve_order_cancellation,
@@ -527,6 +528,24 @@ class CustomerOrderCancellationRequestView(
          user=user,
       )
 
+   def get_context(self, order, form):
+      has_pending_request = OrderCancellation.objects.filter(
+         order=order,
+         status=OrderCancellation.Status.PENDING,
+      ).exists()
+
+      can_request_cancellation = (
+         order.status in CUSTOMER_CANCELLABLE_STATUSES
+         and not has_pending_request
+      )
+
+      return {
+         "order": order,
+         "form": form,
+         "has_pending_request": has_pending_request,
+         "can_request_cancellation": can_request_cancellation,
+      }
+
    def get(self, request, order_number):
       order = self.get_order(
          order_number,
@@ -538,12 +557,8 @@ class CustomerOrderCancellationRequestView(
       return render(
          request,
          self.template_name,
-         {
-            "order": order,
-            "form": form,
-         },
+         self.get_context(order, form),
       )
-
 
    def post(self, request, order_number):
       order = self.get_order(
@@ -557,7 +572,7 @@ class CustomerOrderCancellationRequestView(
 
       if form.is_valid():
          try:
-            cancellation = request_order_cancellation(
+            request_order_cancellation(
                order_id=order.pk,
                user=request.user,
                reason=form.cleaned_data["reason"],
@@ -565,7 +580,7 @@ class CustomerOrderCancellationRequestView(
 
             messages.success(
                request,
-               "Your cancellation request has been submitted.",
+               "Your cancellation request has been submitted successfully.",
             )
 
             return redirect(
@@ -579,10 +594,7 @@ class CustomerOrderCancellationRequestView(
       return render(
          request,
          self.template_name,
-         {
-            "order": order,
-            "form": form,
-         },
+         self.get_context(order, form),
       )
       
 
@@ -724,6 +736,7 @@ class AdminOrderDetailView(
    model = Order
    template_name = "orders/admin/order_detail.html"
    context_object_name = "order"
+
    slug_field = "order_number"
    slug_url_kwarg = "order_number"
 
@@ -739,14 +752,14 @@ class AdminOrderDetailView(
 
       context = super().get_context_data(**kwargs)
 
-      context["order_items"] = (
-         self.object.items.all()
-      )
+      order = self.object 
+
+      context["order_items"] = order.items.all()
 
       status_form = AdminOrderStatusUpdateForm()
 
       allowed_statuses = ALLOWED_STATUS_TRANSITIONS.get(
-         self.object.status,
+         self.status,
          set(),
       )
 
@@ -763,7 +776,22 @@ class AdminOrderDetailView(
 
       context["status_form"] = status_form
 
-      return context
+      has_pending_request = OrderCancellation.objects.filter(
+         order=order,
+         stauts=OrderCancellation.Status.PENDING,
+      ).exists()
+
+      context["can_direct_cancel"] = (
+         Order.Status.CANCELLED
+         in allowed_statuses
+         and not has_pending_request
+      )
+
+      context["has_pending_cancellation_request"] = (
+         has_pending_request
+      )
+
+      return context 
 
 
 
@@ -991,7 +1019,8 @@ class AdminDirectCancellationView(
             )
 
             return redirect(
-               "orders:admin-cancellation-list"
+               "orders:admin_order_detail",
+               order_number=order.order_number,
             )
 
          except (ValidationError, PermissionDenied) as error:

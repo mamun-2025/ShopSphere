@@ -68,7 +68,7 @@ class AdminDirectCancellationForm(forms.Form):
       widget=forms.Textarea(
          attrs={
             "rows": 3,
-            "placeholder": "Optional internal not...",
+            "placeholder": "Optional internal note...",
             "class": "form-control",
          }
       ),
