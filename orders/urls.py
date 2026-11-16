@@ -93,7 +93,7 @@ urlpatterns = [
     path(
        "admin/cancellations/<int:cancellation_id>/approve/",
        AdminApproveCancellationView.as_view(),
-       name="admin-cancellation-list",
+       name="admin-approve-cancellation",
     ),
 
     path(

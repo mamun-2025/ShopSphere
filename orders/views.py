@@ -765,7 +765,7 @@ class AdminOrderDetailView(
       status_form = AdminOrderStatusUpdateForm()
 
       allowed_statuses = ALLOWED_STATUS_TRANSITIONS.get(
-         self.status,
+         order.status,
          set(),
       )
 
@@ -784,7 +784,7 @@ class AdminOrderDetailView(
 
       has_pending_request = OrderCancellation.objects.filter(
          order=order,
-         stauts=OrderCancellation.Status.PENDING,
+         status=OrderCancellation.Status.PENDING,
       ).exists()
 
       context["can_direct_cancel"] = (

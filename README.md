@@ -294,9 +294,9 @@ The project is divided into 14 milestones. Each milestone introduces specific ba
 * [✅] Order Management Dashboard
 * [✅] Admin Order Status Management
 * [✅] Order Status Transition Rules
-* [ ] Order Processing Workflow
-* [ ] Order Cancellation Management
-* [ ] Stock Restoration on Cancellation
+* [✅] Order Processing Workflow
+* [✅] Order Cancellation Management
+* [✅] Stock Restoration on Cancellation
 
 6. Coupon & Discount Management
 
