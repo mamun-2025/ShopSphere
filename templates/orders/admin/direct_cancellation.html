@@ -1,0 +1,265 @@
+
+
+
+{% extends "orders/admin/base.html" %}
+
+{% block title %}Direct Order Cancellation | ShopSphere{% endblock %}
+
+{% block page_heading %}
+    Direct Order Cancellation
+{% endblock %}
+
+
+{% block admin_content %}
+
+<div class="container-fluid p-0">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+
+            <!-- Warning -->
+
+            <div class="alert alert-danger">
+
+                <h5 class="fw-bold">
+
+                    <i class="bi bi-exclamation-triangle"></i>
+
+                    Important Warning
+
+                </h5>
+
+                <p class="mb-0">
+
+                    You are about to directly cancel this order.
+                    This action will restore the purchased product stock.
+
+                    Please review the order information carefully.
+
+                </p>
+
+            </div>
+
+
+            <!-- Order Information -->
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white py-3">
+
+                    <h5 class="fw-bold mb-0">
+                        Order Information
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Order Number
+                            </small>
+
+                            <strong>
+                                {{ order.order_number }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Customer
+                            </small>
+
+                            <strong>
+                                {{ order.user.username }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Order Status
+                            </small>
+
+                            <strong>
+                                {{ order.get_status_display }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Payment Status
+                            </small>
+
+                            <strong>
+                                {{ order.get_payment_status_display }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="col-12">
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between">
+
+                                <span class="fw-semibold">
+                                    Order Total
+                                </span>
+
+                                <strong class="text-primary">
+                                    ৳{{ order.total }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Cancellation Form -->
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white py-3">
+
+                    <h5 class="fw-bold mb-0">
+                        Cancellation Details
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+
+                        {% if form.non_field_errors %}
+
+                            <div class="alert alert-danger">
+
+                                {{ form.non_field_errors }}
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- Reason -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="{{ form.reason.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Cancellation Reason
+                            </label>
+
+                            {{ form.reason }}
+
+                            {% if form.reason.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ form.reason.errors }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Admin Note -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="{{ form.admin_note.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Internal Admin Note
+                            </label>
+
+                            {{ form.admin_note }}
+
+                            {% if form.admin_note.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ form.admin_note.errors }}
+                                </div>
+
+                            {% endif %}
+
+                            <small class="text-muted">
+                                This note is intended for internal administration.
+                            </small>
+
+                        </div>
+
+
+                        <!-- Actions -->
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-danger"
+                                onclick="return confirm('Are you sure you want to cancel this order?');"
+                            >
+
+                                <i class="bi bi-x-circle"></i>
+
+                                Confirm Cancellation
+
+                            </button>
+
+
+                            <a
+                                href="{% url 'orders:admin_order_detail' order.order_number %}"
+                                class="btn btn-outline-secondary"
+                            >
+
+                                Go Back
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
