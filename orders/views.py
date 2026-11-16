@@ -31,7 +31,7 @@ from .services import (
    request_order_cancellation,
    approve_order_cancellation,
    reject_order_cancellation,
-   directlyc_cancel_order,
+   directly_cancel_order,
 )
 
 from coupons.services import validate_and_calculate_coupon
@@ -520,16 +520,16 @@ class CustomerOrderCancellationRequestView(
 ):
    template_name = "orders/cancellation_request.html"
 
-   def get_order(self, order_id, user):
+   def get_order(self, order_number, user):
       return get_object_or_404(
          Order,
-         pk=order_id,
+         order_number=order_number,
          user=user,
       )
 
-   def get(self, request, order_id):
+   def get(self, request, order_number):
       order = self.get_order(
-         order_id,
+         order_number,
          request.user,
       )
 
@@ -545,9 +545,9 @@ class CustomerOrderCancellationRequestView(
       )
 
 
-   def post(self, request, order_id):
+   def post(self, request, order_number):
       order = self.get_order(
-         order_id,
+         order_number,
          request.user,
       )
 
@@ -569,8 +569,8 @@ class CustomerOrderCancellationRequestView(
             )
 
             return redirect(
-               "orders:customer-cancellation-request",
-               order_id=order.pk,
+               "orders:cancel",
+               order_number=order.order_number,
             )
 
          except ValidationError as error:
@@ -755,7 +755,10 @@ class AdminOrderDetailView(
       status_form.fields["status"].choices = [
          (status, status_choices[status])
          for status in Order.Status
-         if status in allowed_statuses
+         if (
+            status in allowed_statuses
+            and status != Order.Status.CANCELLED
+         )
       ]
 
       context["status_form"] = status_form
@@ -946,14 +949,14 @@ class AdminDirectCancellationView(
 ):
    template_name = "orders/admin/direct_cancellation.html"
 
-   def get_order(self, order_id):
+   def get_order(self, order_number):
       return get_object_or_404(
          Order,
-         pk=order_id,
+         order_number=order_number,
       )
 
-   def get(self, request, order_id):
-      order = self.get_order(order_id)
+   def get(self, request, order_number):
+      order = self.get_order(order_number)
 
       form = AdminDirectCancellationForm()
 
@@ -966,8 +969,8 @@ class AdminDirectCancellationView(
          },
       )
 
-   def post(self, request, order_id):
-      order = self.get_order(order_id)
+   def post(self, request, order_number):
+      order = self.get_order(order_number)
 
       form = AdminDirectCancellationForm(
          request.POST,
@@ -975,7 +978,7 @@ class AdminDirectCancellationView(
 
       if form.is_valid():
          try:
-            directlyc_cancel_order(
+            directly_cancel_order(
                order_id=order.pk,
                user=request.user,
                reason=form.cleaned_data["reason"],
@@ -994,7 +997,7 @@ class AdminDirectCancellationView(
          except (ValidationError, PermissionDenied) as error:
             form.add_error(None, error)
 
-      return redirect(
+      return render(
          request,
          self.template_name,
          {

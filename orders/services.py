@@ -826,7 +826,7 @@ def reject_order_cancellation(
 
 # Direct Admin order cancellation
 @transaction.atomic
-def directlyc_cancel_order(
+def directly_cancel_order(
    *,
    order_id,
    user, 
