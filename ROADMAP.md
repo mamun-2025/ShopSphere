@@ -352,7 +352,7 @@ Legend:
 ### Topics
 
 1. Django Signals Fundamentals
-- [ ] What Are Django Signals?
+- [✅] What Are Django Signals?
 - [ ] Why Signals Are Used
 - [ ] Signal, Sender, Receiver, Dispatcher
 - [ ] Signal Lifecycle
