@@ -353,10 +353,10 @@ Legend:
 
 1. Django Signals Fundamentals
 - [✅] What Are Django Signals?
-- [ ] Why Signals Are Used
-- [ ] Signal, Sender, Receiver, Dispatcher
-- [ ] Signal Lifecycle
-- [ ] Synchronous Signal Execution
+- [✅] Why Signals Are Used
+- [✅] Signal, Sender, Receiver, Dispatcher
+- [✅] Signal Lifecycle
+- [✅] Synchronous Signal Execution
 - [ ] Built-in Django Signals
 - [ ] Signal Use Cases and Limitations
 2. Model Signals
