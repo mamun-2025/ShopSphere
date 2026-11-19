@@ -357,14 +357,14 @@ Legend:
 - [✅] Signal, Sender, Receiver, Dispatcher
 - [✅] Signal Lifecycle
 - [✅] Synchronous Signal Execution
-- [ ] Built-in Django Signals
-- [ ] Signal Use Cases and Limitations
+- [✅] Built-in Django Signals
+- [✅] Signal Use Cases and Limitations
 2. Model Signals
-- [ ] pre_save
-- [ ] post_save
-- [ ] pre_delete
-- [ ] post_delete
-- [ ] m2m_changed (Advanced / When Needed)
+- [✅] pre_save
+- [✅] post_save
+- [✅] pre_delete
+- [✅] post_delete
+- [✅] m2m_changed (Advanced / When Needed)
 - [ ] Signal Receiver Arguments
 - [ ] created, raw, using, update_fields
 - [ ] QuerySet update() and Bulk Operation Limitations
