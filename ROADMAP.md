@@ -365,20 +365,20 @@ Legend:
 - [✅] pre_delete
 - [✅] post_delete
 - [✅] m2m_changed (Advanced / When Needed)
-- [ ] Signal Receiver Arguments
-- [ ] created, raw, using, update_fields
-- [ ] QuerySet update() and Bulk Operation Limitations
+- [✅] Signal Receiver Arguments
+- [✅] created, raw, using, update_fields
+- [✅] QuerySet update() and Bulk Operation Limitations
 3. Signal Registration & Best Practices
-- [ ] signals.py
-- [ ] AppConfig
-- [ ] AppConfig.ready()
-- [ ] @receiver
-- [ ] Explicit Signal Registration
-- [ ] dispatch_uid
-- [ ] Avoiding Duplicate Registration
-- [ ] Avoiding Recursive save() Calls
-- [ ] Keeping Receivers Small
-- [ ] Signal Testing
+- [✅] signals.py
+- [✅] AppConfig
+- [✅] AppConfig.ready()
+- [✅] @receiver
+- [✅] Explicit Signal Registration
+- [✅] dispatch_uid
+- [✅] Avoiding Duplicate Registration
+- [✅] Avoiding Recursive save() Calls
+- [✅] Keeping Receivers Small
+- [✅] Signal Testing
 4. Database Transaction Fundamentals
 - [ ] What Is a Database Transaction?
 - [ ] Why Transactions Are Needed

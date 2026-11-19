@@ -149,7 +149,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 
 # Login and Logout Redirect URLs 
-LOGIN_REDIRECT_URL = "profile"
+LOGIN_REDIRECT_URL = "accounts:profile"
 LOGOUT_REDIRECT_URL = "accounts:login"
 LOGIN_URL = "accounts:login"
 
