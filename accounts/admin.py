@@ -20,9 +20,10 @@ class CustomUserAdmin(UserAdmin):
    )
 
    list_filter = (
-      "username",
-      "email",
-      "phone",
+      "is_staff",
+      "is_active",
+      "is_superuser",
+      "date_joined",
    )
 
    ordering = (

@@ -46,15 +46,23 @@ class ProfileUpdateForm(forms.ModelForm):
          "date_of_birth": forms.DateInput(
             attrs={
                "type": "date",
-            },
+               "class": "form-control",
+            }
+         ),
+         "address": forms.Textarea(
+            attrs={
+               "rows": 4,
+            }
          ),
       }
 
 
    def __init__(self, *args, **kwargs):
+
       super().__init__(*args, **kwargs)
 
       for field in self.fields.values():
+         
          field.widget.attrs["class"] = "form-control"
 
 
