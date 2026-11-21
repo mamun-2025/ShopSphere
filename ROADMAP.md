@@ -380,16 +380,16 @@ Legend:
 - [✅] Keeping Receivers Small
 - [✅] Signal Testing
 4. Database Transaction Fundamentals
-- [ ] What Is a Database Transaction?
-- [ ] Why Transactions Are Needed
-- [ ] ACID Properties
-- [ ] Atomicity
-- [ ] Consistency
-- [ ] Isolation
-- [ ] Durability
-- [ ] Commit
-- [ ] Rollback
-- [ ] Transaction Boundaries
+- [✅] What Is a Database Transaction?
+- [✅] Why Transactions Are Needed
+- [✅] ACID Properties
+- [✅] Atomicity
+- [✅] Consistency
+- [✅] Isolation
+- [✅] Durability
+- [✅] Commit
+- [✅] Rollback
+- [✅] Transaction Boundaries
 5. Django Transaction Management
 - [ ] transaction.atomic()
 - [ ] Atomic Blocks
