@@ -391,15 +391,15 @@ Legend:
 - [✅] Rollback
 - [✅] Transaction Boundaries
 5. Django Transaction Management
-- [ ] transaction.atomic()
-- [ ] Atomic Blocks
-- [ ] Nested Atomic Blocks
-- [ ] Savepoints
-- [ ] Exception Handling
-- [ ] Transaction Rollback
-- [ ] ATOMIC_REQUESTS (Concept and Trade-offs)
-- [ ] transaction.on_commit()
-- [ ] Why post_save Does Not Mean Transaction Commit
+- [✅] transaction.atomic()
+- [✅] Atomic Blocks
+- [✅] Nested Atomic Blocks
+- [✅] Savepoints
+- [✅] Exception Handling
+- [✅] Transaction Rollback
+- [✅] ATOMIC_REQUESTS (Concept and Trade-offs)
+- [✅] transaction.on_commit()
+- [✅] Why post_save Does Not Mean Transaction Commit
 6. Database Integrity & Concurrency
 - [ ] Database Constraints
 - [ ] Unique Constraints
