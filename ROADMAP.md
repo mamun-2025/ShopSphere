@@ -403,7 +403,7 @@ Legend:
 6. Database Integrity & Concurrency
 - [✅] Database Constraints
 - [✅] Unique Constraints
-- [ ] Check Constraints
+- [✅] Check Constraints
 - [ ] Foreign Key Integrity
 - [ ] IntegrityError
 - [ ] Race Conditions
