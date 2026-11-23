@@ -401,8 +401,8 @@ Legend:
 - [✅] transaction.on_commit()
 - [✅] Why post_save Does Not Mean Transaction Commit
 6. Database Integrity & Concurrency
-- [ ] Database Constraints
-- [ ] Unique Constraints
+- [✅] Database Constraints
+- [✅] Unique Constraints
 - [ ] Check Constraints
 - [ ] Foreign Key Integrity
 - [ ] IntegrityError
