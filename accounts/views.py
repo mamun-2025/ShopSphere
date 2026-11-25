@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import ListView, DetailView
 from django.db.models import Q 
+from django.views.decorators.http import require_POST
 
 
 
@@ -80,6 +81,7 @@ def user_login(request):
 
 
 # 3. Customer Logout
+@require_POST
 def user_logout(request):
    logout(request)
 

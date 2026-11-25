@@ -88,6 +88,30 @@
             margin: 18px 0;
         }
 
+        /* =========================
+           Sidebar-logout
+        ========================= */
+        .sidebar-logout {
+            display:flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            color: none;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .sidebar-logout: hover {
+            background: #2563eb;
+            color: white;
+        }
+
+
+
 
         /* =========================
            Main Content
@@ -341,10 +365,14 @@
                 Change Password
             </a>
 
-            <a href="{% url 'accounts:logout' %}">
-                <span>↪</span>
-                Logout
-            </a>
+            <form method="POST" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+
+                <button type="submit" class="sidebar-logout">
+                    <span>↪</span>
+                    Logout
+                </button>
+            </form>
 
 
         {% else %}
