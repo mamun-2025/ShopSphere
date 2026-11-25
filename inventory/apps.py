@@ -8,4 +8,4 @@ class InventoryConfig(AppConfig):
     name = 'inventory'
 
     def ready(self):
-        import inventory.signals
+        from . import signals 

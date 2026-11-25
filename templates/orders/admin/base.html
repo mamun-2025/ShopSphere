@@ -180,6 +180,16 @@
                     Categories
                 </a>
 
+                {% if perms.inventory.view_inventory %}
+                    <a
+                        href="{% url 'inventory:list' %}"
+                        class="nav-link {% if request.resolver_match.app_name == 'inventory' %}active{% endif %}"
+                    >
+                        <i class="bi bi-box-seam"></i>
+                        Inventory
+                    </a>
+                {% endif %}
+
 
                 <a
                     href="{% url 'accounts:admin_customer_list' %}"
