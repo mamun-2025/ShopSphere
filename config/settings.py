@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'categories',
     'products',
     'reviews',
-    'inventory',
+    'inventory.apps.InventoryConfig',
     'carts',
     'wishlist',
     'taxes',
