@@ -8,6 +8,8 @@ from .views import (
    CategoryDeleteView,
 )
 
+app_name = "categories"
+
 urlpatterns = [
     path(
        "",

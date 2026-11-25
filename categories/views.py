@@ -17,14 +17,14 @@ class CategoryListView(ListView):
    context_object_name = "categories"
 
    def get_queryset(self):
-      return Category.objects.filter(is_active=True)
+      return Category.objects.all()
 
 
 class CategoryCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
    model = Category
    form_class = CategoryForm
    template_name = "categories/category_form.html"
-   success_url = reverse_lazy("category_list")
+   success_url = reverse_lazy("categories:category_list")
    permission_required = "categories.add_category"
 
 
@@ -32,13 +32,13 @@ class CategoryUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView
    model = Category
    form_class = CategoryForm
    template_name = "categories/category_form.html"
-   success_url = reverse_lazy("category_list")
+   success_url = reverse_lazy("categories:category_list")
    permission_required = "categories.change_category"
 
 
 class CategoryDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
    model = Category
    template_name = "categories/category_confirm_delete.html"
-   success_url = reverse_lazy("category_list")
+   success_url = reverse_lazy("categories:category_list")
    permission_required = "categories.delete_category"
 

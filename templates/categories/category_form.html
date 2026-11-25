@@ -15,6 +15,7 @@
 
    <form method="post">
       {% csrf_token %}
+
       {{ form.as_p }}
 
       <button 
@@ -25,15 +26,14 @@
       </button>
 
       <a
-         href="{% url 'category_list' %}"
+         href="{% url 'categories:category_list' %}"
          class="btn btn-secondary"
       >
          Cancel
       </a>
+   </form>
 
 </div>
-
-
 
 
 {% endblock %}

@@ -5,10 +5,10 @@
 {% block content %}
 <div class="container mt-4">
 
-   <h2>Category Delete</h2>
+   <h2>Delete Category</h2>
 
    <p>
-      Are your sure you want to delete 
+      Are you sure you want to delete 
       <strong>
          {{ object.name }}
       </strong>?
@@ -25,11 +25,12 @@
       </button>
 
       <a 
-         href="{% url 'category_list' %}"
+         href="{% url 'categories:category_list' %}"
          class="btn btn-secondary"
       >
       Cancel
       </a>
+   </form>
 
 </div>
 

@@ -309,7 +309,7 @@
         </a>
 
         {% if request.user.is_authenticated and request.user.is_superuser %}
-        <a href="{% url 'category_list' %}">
+        <a href="{% url 'categories:category_list' %}">
             <span>▤</span>
             Categories
         </a>
