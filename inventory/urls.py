@@ -12,7 +12,7 @@ urlpatterns = [
        name="list",
     ),
     path(
-       "<int:pk>",
+       "<int:pk>/",
        views.InventoryDetailView.as_view(),
        name="detail",
     ),

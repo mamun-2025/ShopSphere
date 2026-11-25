@@ -30,7 +30,7 @@
          </p>
 
          
-         {% if perms.inventory.change_inventory %}
+         {% if perms.inventory.adjust_stock %}
 
             <div class="mt-4">
 
@@ -60,12 +60,31 @@
 
          <p>
             <strong>Status:</strong>
-            {{ inventory.stock_status }}
+            
+            {% if inventory.is_out_of_stock %}
+               <span class="badge bg-danger">
+                  Out of Stock
+               </span>
+
+            {% elif inventory.is_low_stock %}
+               <span class="badge bg-warning text-dark">
+                  Low Stock
+               </span>
+
+            {% else %}
+               <span class="badge bg-success">
+                  In Stock
+               </span>
+            {% endif %}
          </p>
 
          <p>
-            <strong>Created:<strong>
-            {{ inventory.updated_at }}
+            <strong>Created:</strong>
+            {{ inventory.created_at|date:"d M Y, h:i A" }}
+         </p>
+         <p>
+            <strong>Last Updated:</strong>
+            {{ inventory.updated_at|date:"d M Y, h:i A" }}
          </p>
 
          <a 

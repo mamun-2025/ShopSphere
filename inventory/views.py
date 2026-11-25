@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.views.generic import ListView, DetailView, FormView
 from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
+from django.core.exceptions import ValidationError
 
 from .forms import StockAdjustmentForm
 from .models import Inventory
@@ -16,7 +17,7 @@ class InventoryListView(
    ListView,
 ):
    model = Inventory
-   template_name = "inventory/Inventory_list.html"
+   template_name = "inventory/inventory_list.html"
    context_object_name = "inventories"
 
    permission_required = "inventory.view_inventory"
@@ -56,8 +57,8 @@ class InventoryDetailView(
 
 
 
-# Inventory Stock Increase View
-class InventoryStockIncreaseView(
+# Common Stock Adjustment View
+class InventoryStockAdjustmentBaseView(
    LoginRequiredMixin,
    PermissionRequiredMixin,
    FormView,
@@ -70,90 +71,76 @@ class InventoryStockIncreaseView(
    raise_exception = True
 
 
+   def get_inventory(self):
+      if not hasattr(self, "inventory"):
+         self.inventory = get_object_or_404(
+            Inventory.objects.select_related("product"),
+            pk=self.kwargs["pk"],
+         )
 
-   def dispatch(self, request, *args, **kwargs):
-       self.inventory = get_object_or_404(
-          Inventory.objects.select_related("product"),
-          pk=kwargs["pk"],
-       )
-       
-       return super().dispatch(
-          request, 
-          *args, 
-          **kwargs
-      )
-
+         return self.inventory
+      
+   def get_context_data(self, **kwargs):
+      context = super().get_context_data(**kwargs)
+      context["inventory"] = self.get_inventory()
+      return context
 
    def form_valid(self, form):
+      
+      inventory = self.get_inventory()
       quantity = form.cleaned_data["quantity"]
 
-      self.inventory.increase_stock(quantity)
+      try:
+         self.adjust_stock(inventory, quantity)
+
+      except ValidationError as error:
+         form.add_error("quantity", error)
+         return self.form_invalid(form)
       
       messages.success(
          self.request,
-         f"{quantity} stock added successfully",
+         self.get_success_message(quantity),
       )
 
       return redirect(
          "inventory:detail",
-         pk=self.inventory.pk,
+         pk=inventory.pk,
       )
+
+   def adjust_stock(self, inventory, quantity):
+      raise NotImplementedError(
+         "Subclasses must implement ajust_stock()."
+      )
+
+   def get_success_message(self, quantity):
+      raise NotImplementedError(
+         "Subclasses must implement get_success_message()."
+      )
+
+
+# Inventory Stock Increase View
+class InventoryStockIncreaseView(
+   InventoryStockAdjustmentBaseView,
+):
+   def adjust_stock(self, inventory, quantity):
+      inventory.increase_stock(quantity)
+
+   def get_success_message(self, quantity):
+      return f"{quantity} stock added successfully."
+
 
 
 
 
 # Inventory Stock Decrease View
 class InventoryStockDecreaseView(
-   LoginRequiredMixin,
-   PermissionRequiredMixin,
-   FormView,
+   InventoryStockAdjustmentBaseView,
 ):
-   form_class = StockAdjustmentForm
-   template_name = "inventory/stock_adjustment.html"
+   def adjust_stock(self, inventory, quantity):
+      inventory.decrease_stock(quantity)
 
-   permission_required = "inventory.adjust_stock"
-
-   raise_exception = True
-
-
-   def dispatch(self, request, *args, **kwargs):
-      self.inventory = get_object_or_404(
-         Inventory.objects.select_related("product"),
-         pk=kwargs["pk"],
-      )
-
-      return super().dispatch(
-         request, 
-         *args, 
-         **kwargs
-      )
-
-
-   def form_valid(self, form):
-      quantity = form.cleaned_data["quantity"]
-
-      try:
-         self.inventory.decrease_stock(quantity)
-
-      except ValueError as error:
-         form.add_error(
-            "quantity",
-            str(error),
-         )
-
-         return self.form_invalid(form)
-
-
-      messages.success(
-         self.request,
-         f"{quantity} stock removed successfully",
-      )
-
-      return redirect(
-         "inventory:detail",
-         pk=self.inventory.pk,
-      )
-
+   def get_success_message(self, quantity):
+      return f"{quantity} stock removed successfully."
 
       
 

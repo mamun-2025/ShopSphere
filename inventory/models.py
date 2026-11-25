@@ -1,4 +1,6 @@
-from django.db import models
+
+from django.db import models, transaction
+from django.core.exceptions import ValidationError
 from products.models import Product
 
 
@@ -44,7 +46,7 @@ class Inventory(models.Model):
    # Stock Validation
    def validate_quantity(self, quantity):
       if quantity <= 0:
-         raise ValueError(
+         raise ValidationError(
             "Quantity must be greater than zero."
          )
 
@@ -53,31 +55,49 @@ class Inventory(models.Model):
    def increase_stock(self, quantity):
       self.validate_quantity(quantity)
 
-      self.product.stock += quantity
+      with transaction.atomic():
+         product = (
+            Product.objects
+            .select_for_update()
+            .get(pk=self.product_id)
+         )
 
-      self.product.save(
-         update_fields=["stock"]
-      )
+         product.stock += quantity
+         product.save(
+            update_fields=["stock"]
+         )
+         self.product = product
 
 
    # Decrease Stock
    def decrease_stock(self, quantity):
       self.validate_quantity(quantity)
 
-      if quantity > self.product.stock:
-         raise ValueError(
-            "Insufficient stock."
+      with transaction.atomic():
+         product = (
+            Product.objects
+            .select_for_update()
+            .get(pk=self.product_id)
          )
 
-      self.product.stock -= quantity
+         if quantity > product.stock:
+            raise ValidationError(
+               "Insufficient stock."
+            )
 
-      self.product.save(
-         update_fields=["stock"]
-      )
+         product.stock -= quantity
+         product.save(
+            update_fields=["stock"]
+         )
+         self.product = product
 
+      
    class Meta:
       permissions = [
-         ("adjust_stock", "Can adjust product stock"),
+         (
+            "adjust_stock", 
+            "Can adjust product stock",
+         ),
       ]
 
 
