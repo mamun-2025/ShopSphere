@@ -408,9 +408,9 @@ Legend:
 - [✅] IntegrityError
 - [✅] Race Conditions
 - [✅] Concurrent Requests
-- [ ] select_for_update()
-- [ ] Locking Fundamentals
-- [ ] Safe Stock Update Patterns
+- [✅] select_for_update()
+- [✅] Locking Fundamentals
+- [✅] Safe Stock Update Patterns
 7. Service Layer Architecture
 - [ ] What Is a Service Layer?
 - [ ] Why Business Logic Should Not Live in Views
