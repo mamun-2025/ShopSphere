@@ -31,7 +31,10 @@
 
                   <div class="mb-3">
 
-                     <label class="form-label">
+                     <label 
+                        for="{{ form.name.id_for_label }}"
+                        class="form-label"
+                     >
                         Product Name
                      </label>
 
@@ -43,7 +46,10 @@
                   
                   <div class="mb-3">
 
-                     <label class="form-label">
+                     <label
+                        for="{{ form.category.id_for_label }}"
+                        class="form-label"
+                     >
                         Category
                      </label>
 
@@ -54,7 +60,10 @@
 
                    <div class="mb-3">
 
-                     <label class="form-label">
+                     <label 
+                        for="{{ form.brand.id_for_label }}"
+                        class="form-label"
+                     >
                         Brand
                      </label>
 
@@ -65,7 +74,10 @@
 
                   <div class="mb-3">
 
-                     <label class="form-label">
+                     <label 
+                        for="{{ form.sku.id_for_label }}"
+                        class="form-label"
+                     >
                         SKU
                      </label>
 
@@ -76,7 +88,10 @@
 
                   <div class="mb-3">
 
-                     <label class="form-label">
+                     <label 
+                        for="{{ form.description.id_for_label }}"
+                        class="form-label"
+                     >
                         Description
                      </label>
 
@@ -87,7 +102,10 @@
 
                   <div class="mb-3">
 
-                     <label class="form-label">
+                     <label 
+                        for="{{ form.price.id_for_label }}"
+                        class="form-label"
+                     >
                         Price
                      </label>
 
@@ -98,7 +116,10 @@
 
                   <div class="mb-3">
 
-                     <label class="form-label">
+                     <label 
+                        for="{{ form.stock.id_for_label }}"
+                        class="form-label"
+                     >
                         Stock
                      </label>
 
@@ -108,7 +129,10 @@
                   </div>
 
                   <div class="mb-3">
-                     <label class="form-label">
+                     <label 
+                        for="{{ form.image.id_for_label }}"
+                        class="form-label"
+                     >
                         Product Image
                      </label>
 
@@ -117,8 +141,29 @@
                      
                   </div>
 
+                  {% if product and product.image %}
+                     <div class="mt-2">
+
+                        <p class="text-muted small mb-2">
+                              Current Product Image:
+                        </p>
+
+                        <img
+                              src="{{ product.image.url }}"
+                              alt="{{ product.name }}"
+                              width="120"
+                              class="rounded"
+                        >
+
+                     </div>
+
+                  {% endif %}
+
+
                   <div class="mb-3">
-                     <label class="form-label">
+                     <label 
+                        for="{{ form.manual.id_for_label }}"
+                        class="form-label">
                         Product Manual(PDF)
                      </label>
 
@@ -127,11 +172,31 @@
                      
                   </div>
 
+                  {% if product and product.manual %}
+                     <p class="small mt-2">
+                        Current Manual:
+
+                        <a
+                              href="{{ product.manual.url }}"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                        >
+                              View Current PDF
+                        </a>
+
+                     </p>
+
+                  {% endif %}
+                  
+
                   <div class="mb-3 form-check">
 
                      {{ form.is_active }}
 
-                     <label class="form-check-label">
+                     <label 
+                        for="{{ form.is_active.id_for_label }}"
+                        class="form-check-label"
+                     >
                         Active Product
                      </label>
 

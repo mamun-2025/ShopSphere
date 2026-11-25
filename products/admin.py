@@ -41,3 +41,6 @@ class ProductImageAdmin(admin.ModelAdmin):
       "alt_text",
       "created_at",
    )
+
+
+   
