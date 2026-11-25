@@ -4,6 +4,7 @@ from django import forms
 from .models import Review
 
 class ReviewForm(forms.ModelForm):
+
    class Meta:
       model = Review
 
@@ -34,6 +35,15 @@ class ReviewForm(forms.ModelForm):
                "placeholder": "Write your review",
             },
          ),
-
-         
       }
+
+   def clean_comment(self):
+      comment = self.cleaned_data["comment"].strip()
+
+      if not comment:
+         raise forms.ValidationError(
+            "Review comment cannot be empty."
+         )
+      
+      return comment
+   

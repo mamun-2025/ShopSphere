@@ -27,22 +27,25 @@ class ReviewCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
    raise_exception = True
 
 
-   def dispatch(self, request, *args, **kwargs):
+   def get_product(self):
+      if not hasattr(self, "porduct"):
+         self.product = get_object_or_404(
+            Product,
+            pk=self.kwargs["product_id"],
+            is_active=True,
+            category__is_active=True,
+         )
+      return self.product
 
-      self.product = get_object_or_404(
-         Product,
-         pk=kwargs["product_id"],
-         is_active=True,
-         
-      )
-      return super().dispatch(
-         request, 
-         *args, 
-         **kwargs,
-      )
+   def get_context_data(self, **kwargs):
+      context = super().get_context_data(**kwargs)
+      context["product"] = self.get_product()
+      return context 
 
 
    def form_valid(self, form):
+
+      self.product = self.get_product()
 
       form.instance.user = self.request.user 
 
@@ -129,13 +132,14 @@ class ReviewUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
       )
 
    def form_valid(self, form):
+      response = super().form_valid(form)
 
       messages.success(
          self.request,
          "Your review has been updated successfully.",
       )
 
-      return super().form_valid(form)
+      return response
 
    
 
@@ -171,12 +175,13 @@ class ReviewDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
       )
 
    def form_valid(self, form):
+      response = super().form_valid(form)
 
       messages.success(
          self.request,
          "Your review has been deleted successfully.",
       )
 
-      return super().form_valid(form)
+      return response
    
    

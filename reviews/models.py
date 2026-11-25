@@ -39,7 +39,12 @@ class Review(models.Model):
          models.UniqueConstraint(
             fields = ["user", "product"],
             name="unique_user_product_review",
-         )
+         ),
+         models.CheckConstraint(
+            condition=models.Q(rating__gte=1) & models.Q(rating__lte=5),
+            name="review_rating_between_1_and_5",
+         ),
+
       ]
 
 
