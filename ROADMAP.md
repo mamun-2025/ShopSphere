@@ -468,8 +468,8 @@ signals just because a signal exists.
 
 1. PostgreSQL Fundamentals
 - [✅] PostgreSQL Introduction
-- [ ] PostgreSQL vs SQLite
-- [ ] PostgreSQL Installation
+- [✅] PostgreSQL vs SQLite
+- [✅] PostgreSQL Installation
 - [ ] PostgreSQL Service Management
 - [ ] Database Creation
 - [ ] Database Users and Roles
