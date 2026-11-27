@@ -470,8 +470,8 @@ signals just because a signal exists.
 - [✅] PostgreSQL Introduction
 - [✅] PostgreSQL vs SQLite
 - [✅] PostgreSQL Installation
-- [ ] PostgreSQL Service Management
-- [ ] Database Creation
+- [✅] PostgreSQL Service Management
+- [✅] Database Creation
 - [ ] Database Users and Roles
 - [ ] Database Privileges
 - [ ] PostgreSQL Shell (psql)
