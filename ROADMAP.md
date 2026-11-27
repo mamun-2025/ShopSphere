@@ -467,7 +467,7 @@ signals just because a signal exists.
 ### Topics
 
 1. PostgreSQL Fundamentals
-- [ ] PostgreSQL Introduction
+- [✅] PostgreSQL Introduction
 - [ ] PostgreSQL vs SQLite
 - [ ] PostgreSQL Installation
 - [ ] PostgreSQL Service Management
