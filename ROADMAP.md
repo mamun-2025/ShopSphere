@@ -472,7 +472,7 @@ signals just because a signal exists.
 - [✅] PostgreSQL Installation
 - [✅] PostgreSQL Service Management
 - [✅] Database Creation
-- [ ] Database Users and Roles
+- [✅] Database Users and Roles
 - [ ] Database Privileges
 - [ ] PostgreSQL Shell (psql)
 - [ ] Basic SQL Commands
